@@ -6,14 +6,17 @@ import { Button } from '../ui/Button';
 
 interface PropertiesProps {
   properties: Property[];
-  addProperty: (property: Omit<Property, 'id' | 'imageUrl'>) => void;
+  addProperty: (property: Omit<Property, 'id'>) => void;
+  onSelectProperty: (id: string) => void;
 }
 
-export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty }) => {
+export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty, onSelectProperty }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const filteredProperties = useMemo(() => {
     return properties.filter(prop => {
@@ -23,9 +26,25 @@ export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty 
       return matchesSearch && matchesStatus && matchesType;
     });
   }, [properties, searchTerm, statusFilter, typeFilter]);
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleAddProperty = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!imagePreview) {
+      alert('Por favor, suba una imagen para la propiedad.');
+      return;
+    }
     const formData = new FormData(e.currentTarget);
     const newProperty = {
       title: formData.get('title') as string,
@@ -37,11 +56,14 @@ export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty 
       banos: Number(formData.get('banos')),
       estacionamientos: Number(formData.get('estacionamientos')),
       precio_alquiler: Number(formData.get('precio_alquiler')),
-      moneda: formData.get('moneda') as Currency,
+      moneda: Currency.USD,
       estado_ocupacion: formData.get('estado_ocupacion') as OccupancyStatus,
+      imageUrl: imagePreview,
     };
     addProperty(newProperty);
     setShowAddForm(false);
+    setImageFile(null);
+    setImagePreview(null);
   };
   
   if (showAddForm) {
@@ -52,6 +74,28 @@ export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty 
                 <div className="md:col-span-2">
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título / Dirección Corta</label>
                     <input type="text" name="title" id="title" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                </div>
+                 <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Foto de la Propiedad</label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div className="space-y-1 text-center">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="Property preview" className="mx-auto h-24 w-auto rounded-md" />
+                            ) : (
+                                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            )}
+                            <div className="flex text-sm text-gray-600 justify-center">
+                                <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary px-1">
+                                    <span>Subir un archivo</span>
+                                    <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageChange} required />
+                                </label>
+                                <p className="pl-1">o arrastrar y soltar</p>
+                            </div>
+                            <p className="text-xs text-gray-500">PNG, JPG, GIF hasta 10MB</p>
+                        </div>
+                    </div>
                 </div>
                  <div>
                     <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">Dirección Completa</label>
@@ -74,14 +118,8 @@ export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty 
                     </select>
                 </div>
                  <div>
-                    <label htmlFor="precio_alquiler" className="block text-sm font-medium text-gray-700">Precio de Alquiler</label>
+                    <label htmlFor="precio_alquiler" className="block text-sm font-medium text-gray-700">Precio de Alquiler (USD)</label>
                     <input type="number" name="precio_alquiler" id="precio_alquiler" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
-                </div>
-                 <div>
-                    <label htmlFor="moneda" className="block text-sm font-medium text-gray-700">Moneda</label>
-                    <select name="moneda" id="moneda" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
-                         {Object.values(Currency).map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
                 </div>
                  <div>
                     <label htmlFor="area_m2" className="block text-sm font-medium text-gray-700">Área (m²)</label>
@@ -137,7 +175,7 @@ export const Properties: React.FC<PropertiesProps> = ({ properties, addProperty 
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProperties.map(property => (
-          <PropertyCard key={property.id} property={property} />
+          <PropertyCard key={property.id} property={property} onSelect={onSelectProperty} />
         ))}
       </div>
       {filteredProperties.length === 0 && (

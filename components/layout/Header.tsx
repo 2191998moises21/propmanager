@@ -1,23 +1,132 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { UserCircleIcon, BellIcon, Bars3Icon, UserIcon as UserIconSolid, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { View } from '../../App';
 
-import React from 'react';
-import { UserCircleIcon, BellIcon } from '@heroicons/react/24/outline';
+interface HeaderProps {
+    toggleSidebar: () => void;
+    setView: (view: View) => void;
+}
 
-export const Header: React.FC = () => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  const notifications = [
+      { id: 1, text: 'Nuevo pago recibido de Maria Rodriguez.', time: 'hace 5 min' },
+      { id: 2, text: 'Ticket "Fuga de agua" ha sido cerrado.', time: 'hace 1 hora' },
+      { id: 3, text: 'Contrato para Av. Libertador vence en 30 días.', time: 'hace 1 día' },
+  ];
+
+  const toggleNotifications = () => {
+    setNotificationsOpen(prev => !prev);
+    setAccountOpen(false);
+  };
+  
+  const toggleAccount = () => {
+    setAccountOpen(prev => !prev);
+    setNotificationsOpen(false);
+  };
+  
+  const handleProfileClick = () => {
+    setView('profile');
+    setAccountOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
+      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+
   return (
     <header className="flex-shrink-0 bg-white border-b border-gray-200">
       <div className="flex items-center justify-between p-4 h-16">
         <div className="flex items-center">
-          {/* Could be a search bar */}
+          <button
+            onClick={toggleSidebar}
+            className="p-2 -ml-2 mr-2 text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-700 hidden md:block"
+            aria-label="Toggle sidebar"
+          >
+             <Bars3Icon className="h-6 w-6" />
+          </button>
           <h1 className="text-xl font-semibold text-gray-800">Hola, Propietario</h1>
         </div>
         <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-700">
-            <BellIcon className="h-6 w-6" />
-          </button>
-          <button className="flex items-center space-x-2">
-            <UserCircleIcon className="h-8 w-8 text-gray-500" />
-            <span className="hidden md:inline text-sm font-medium">Mi Cuenta</span>
-          </button>
+          {/* Notifications Button & Dropdown */}
+          <div ref={notificationsRef} className="relative">
+            <button 
+              onClick={toggleNotifications}
+              className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            >
+              <BellIcon className="h-6 w-6" />
+              <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+            </button>
+            {notificationsOpen && (
+              <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                  <div className="px-4 py-2 border-b">
+                    <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto">
+                    {notifications.map(notif => (
+                      <a 
+                        key={notif.id}
+                        href="#" 
+                        className="flex items-start px-4 py-3 text-sm text-gray-700 hover:bg-gray-100" 
+                        onClick={(e) => { e.preventDefault(); alert('Navegando a la notificación...'); setNotificationsOpen(false); }}
+                      >
+                        <BellIcon className="w-5 h-5 mr-3 mt-0.5 text-primary flex-shrink-0" />
+                        <div>
+                          <p>{notif.text}</p>
+                          <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="px-4 py-2 border-t">
+                    <a href="#" className="block text-center text-sm font-medium text-primary hover:underline">
+                      Ver todas las notificaciones
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Account Button & Dropdown */}
+           <div ref={accountRef} className="relative">
+            <button onClick={toggleAccount} className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+              <UserCircleIcon className="h-8 w-8 text-gray-500" />
+              <span className="hidden md:inline text-sm font-medium">Mi Cuenta</span>
+            </button>
+            {accountOpen && (
+              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                  <button onClick={handleProfileClick} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    <UserIconSolid className="w-5 h-5 mr-3" />
+                    Perfil
+                  </button>
+                  <button onClick={() => alert('Cerrar sesión presionado')} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+                    Cerrar Sesión
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
@@ -33,5 +142,20 @@ const UserCircleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 const BellIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+  </svg>
+);
+const Bars3Icon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+  </svg>
+);
+const UserIconSolid: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+  </svg>
+);
+const ArrowRightOnRectangleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
   </svg>
 );

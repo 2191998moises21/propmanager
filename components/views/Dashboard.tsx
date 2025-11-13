@@ -18,8 +18,8 @@ interface DashboardProps {
   setView: (view: View) => void;
 }
 
-const formatCurrency = (amount: number, currency: string) => {
-  return new Intl.NumberFormat('es-US', { style: 'currency', currency, minimumFractionDigits: 0 }).format(amount);
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, payments, setView }) => {
@@ -44,10 +44,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, pay
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Propiedades" value={stats.totalProperties} icon={<BuildingIcon />} color="blue" />
-        <StatCard title="Propiedades Ocupadas" value={stats.occupiedProperties} icon={<CheckCircleIcon />} color="green" />
-        <StatCard title="Ingreso Mensual Potencial" value={formatCurrency(stats.monthlyIncome, 'USD')} icon={<CurrencyDollarIcon />} color="yellow" />
-        <StatCard title="Pagos Pendientes" value={stats.pendingPaymentsCount} icon={<ExclamationTriangleIcon />} color="red" />
+        <StatCard title="Total Propiedades" value={stats.totalProperties} icon={<BuildingIcon />} color="blue" onClick={() => setView('properties')} />
+        <StatCard title="Propiedades Ocupadas" value={stats.occupiedProperties} icon={<CheckCircleIcon />} color="green" onClick={() => setView('properties')} />
+        <StatCard title="Ingreso Mensual Potencial" value={formatCurrency(stats.monthlyIncome)} icon={<CurrencyDollarIcon />} color="yellow" onClick={() => setView('income')} />
+        <StatCard title="Pagos Pendientes" value={stats.pendingPaymentsCount} icon={<ExclamationTriangleIcon />} color="red" onClick={() => setView('payments')} />
       </div>
 
       {/* Quick Actions */}
@@ -86,7 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, pay
             {pendingPayments.map(payment => (
               <div key={payment.id} className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50">
                 <div>
-                   <p className="font-medium text-gray-900">{formatCurrency(payment.monto_pago, 'USD')}</p>
+                   <p className="font-medium text-gray-900">{formatCurrency(payment.monto_pago)}</p>
                    <p className="text-sm text-gray-500">Vence: {new Date(payment.mes_correspondiente).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</p>
                 </div>
                  <Badge text={payment.estado_pago} color={payment.estado_pago === 'pendiente' ? 'yellow' : 'red'} />

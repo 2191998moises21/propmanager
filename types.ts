@@ -1,4 +1,3 @@
-
 export enum PropertyType {
   Casa = 'casa',
   Apartamento = 'apartamento',
@@ -9,11 +8,6 @@ export enum PropertyType {
 
 export enum Currency {
   USD = 'USD',
-  EUR = 'EUR',
-  BRL = 'BRL',
-  PEN = 'PEN',
-  VES = 'VES',
-  COP = 'COP',
 }
 
 export enum OccupancyStatus {
@@ -44,6 +38,27 @@ export enum PaymentMethod {
   Deposito = 'deposito',
 }
 
+export enum TicketStatus {
+    Abierto = 'abierto',
+    EnProgreso = 'en progreso',
+    Cerrado = 'cerrado',
+}
+
+export enum TicketUrgency {
+    Baja = 'baja',
+    Media = 'media',
+    Alta = 'alta',
+}
+
+export interface Owner {
+  id: string;
+  nombre_completo: string;
+  email: string;
+  telefono: string;
+  direccion: string;
+  fotoUrl: string;
+}
+
 export interface Property {
   id: string;
   title: string;
@@ -72,6 +87,12 @@ export interface Tenant {
   email: string;
   telefono: string;
   fotoUrl: string;
+  documentoUrl?: string;
+}
+
+export interface ContractDocument {
+    nombre: string;
+    url: string; // Data URL
 }
 
 export interface Contract {
@@ -85,6 +106,7 @@ export interface Contract {
   moneda: Currency;
   dia_pago: number;
   estado_contrato: ContractStatus;
+  documentos?: ContractDocument[];
 }
 
 export interface Payment {
@@ -95,4 +117,28 @@ export interface Payment {
   fecha_pago: string; // YYYY-MM-DD
   metodo_pago: PaymentMethod;
   estado_pago: PaymentStatus;
+  referencia?: string;
+}
+
+export interface Contractor {
+    id: string;
+    nombre: string;
+    especialidad: string;
+    telefono: string;
+}
+
+export interface Ticket {
+    id: string;
+    propertyId: string;
+    tenantId: string;
+    titulo: string;
+    descripcion: string;
+    fotos: string[];
+    costo_estimado: number;
+    moneda: Currency;
+    urgencia: TicketUrgency;
+    estado: TicketStatus;
+    fecha_creacion: string; // YYYY-MM-DD
+    contratistaId?: string;
+    facturaUrl?: string;
 }
