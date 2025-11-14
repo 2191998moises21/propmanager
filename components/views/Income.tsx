@@ -1,7 +1,8 @@
 
 import React, { useMemo } from 'react';
 import { Contract, Property, Tenant, ContractStatus, Payment, PaymentStatus } from '../../types';
-import { View } from '../../App';
+// FIX: 'View' type is exported from LandlordPortal, not App.
+import { View } from '../../portals/LandlordPortal';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';

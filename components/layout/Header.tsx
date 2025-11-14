@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { UserCircleIcon, BellIcon, Bars3Icon, UserIcon as UserIconSolid, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
-import { View } from '../../App';
+import { Owner, Tenant } from '../../types';
 
 interface HeaderProps {
     toggleSidebar: () => void;
-    setView: (view: View) => void;
+    user: Owner | Tenant;
+    onLogout: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
   const notificationsRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
 
+  // Notifications can be dynamic based on user role in a real app
   const notifications = [
       { id: 1, text: 'Nuevo pago recibido de Maria Rodriguez.', time: 'hace 5 min' },
       { id: 2, text: 'Ticket "Fuga de agua" ha sido cerrado.', time: 'hace 1 hora' },
@@ -28,11 +30,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
   const toggleAccount = () => {
     setAccountOpen(prev => !prev);
     setNotificationsOpen(false);
-  };
-  
-  const handleProfileClick = () => {
-    setView('profile');
-    setAccountOpen(false);
   };
 
   useEffect(() => {
@@ -63,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
           >
              <Bars3Icon className="h-6 w-6" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-800">Hola, Propietario</h1>
+          <h1 className="text-xl font-semibold text-gray-800">Hola, {user.nombre_completo.split(' ')[0]}</h1>
         </div>
         <div className="flex items-center space-x-4">
           {/* Notifications Button & Dropdown */}
@@ -109,17 +106,23 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
           {/* Account Button & Dropdown */}
            <div ref={accountRef} className="relative">
             <button onClick={toggleAccount} className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-              <UserCircleIcon className="h-8 w-8 text-gray-500" />
+              <img src={user.fotoUrl} alt="user photo" className="h-8 w-8 rounded-full object-cover" />
               <span className="hidden md:inline text-sm font-medium">Mi Cuenta</span>
             </button>
             {accountOpen && (
               <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                  <button onClick={handleProfileClick} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  <span className="w-full text-left flex items-center px-4 pt-2 pb-1 text-xs text-gray-500" role="menuitem">
+                    Conectado como
+                  </span>
+                  <span className="w-full text-left flex items-center px-4 pb-2 text-sm text-gray-800 font-medium border-b mb-1" role="menuitem">
+                    {user.nombre_completo}
+                  </span>
+                  <button disabled className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50" role="menuitem">
                     <UserIconSolid className="w-5 h-5 mr-3" />
                     Perfil
                   </button>
-                  <button onClick={() => alert('Cerrar sesión presionado')} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  <button onClick={onLogout} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                     <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
                     Cerrar Sesión
                   </button>
@@ -134,11 +137,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, setView }) => {
 };
 
 // Dummy icons for compilation if @heroicons are not available
-const UserCircleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-);
 const BellIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />

@@ -8,7 +8,8 @@ import { BuildingIcon } from '../icons/BuildingIcon';
 import { CheckCircleIcon } from '../icons/CheckCircleIcon';
 import { CurrencyDollarIcon } from '../icons/CurrencyDollarIcon';
 import { ExclamationTriangleIcon } from '../icons/ExclamationTriangleIcon';
-import { View } from '../../App';
+// FIX: 'View' type is exported from LandlordPortal, not App.
+import { View } from '../../portals/LandlordPortal';
 import { Badge } from '../ui/Badge';
 
 interface DashboardProps {

@@ -28,6 +28,7 @@ export enum PaymentStatus {
   Pagado = 'pagado',
   Atrasado = 'atrasado',
   Parcial = 'parcial',
+  EnRevision = 'en revisión',
 }
 
 export enum PaymentMethod {
@@ -118,6 +119,7 @@ export interface Payment {
   metodo_pago: PaymentMethod;
   estado_pago: PaymentStatus;
   referencia?: string;
+  comprobanteUrl?: string; // URL for payment proof
 }
 
 export interface Contractor {
