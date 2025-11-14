@@ -20,14 +20,15 @@ const App: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>(mockPayments);
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
   const [contractors, setContractors] = useState<Contractor[]>(mockContractors);
-  const [owner, setOwner] = useState<Owner>(mockOwner);
+  const [owners, setOwners] = useState<Owner[]>([mockOwner]);
 
   // --- Handlers for state modification ---
 
   const handleLogin = (email: string, role: 'owner' | 'tenant') => {
     if (role === 'owner') {
-      if (email.toLowerCase() === mockOwner.email.toLowerCase()) {
-        setCurrentUser({ type: 'owner', data: mockOwner });
+      const owner = owners.find(o => o.email.toLowerCase() === email.toLowerCase());
+      if (owner) {
+        setCurrentUser({ type: 'owner', data: owner });
         return true;
       }
     } else {
@@ -39,6 +40,20 @@ const App: React.FC = () => {
     }
     return false;
   };
+
+  const handleRegisterOwner = (ownerData: Omit<Owner, 'id' | 'fotoUrl'>): boolean => {
+    if (owners.some(o => o.email.toLowerCase() === ownerData.email.toLowerCase())) {
+        return false; // Email already exists
+    }
+    const newOwner: Owner = {
+        ...ownerData,
+        id: `owner${owners.length + 1}`,
+        fotoUrl: `https://i.pravatar.cc/150?u=${ownerData.email}`
+    };
+    setOwners(prev => [...prev, newOwner]);
+    setCurrentUser({ type: 'owner', data: newOwner });
+    return true;
+  }
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -99,7 +114,10 @@ const App: React.FC = () => {
   };
 
   const updateOwner = (updatedOwner: Owner) => {
-    setOwner(updatedOwner);
+    setOwners(prev => prev.map(o => (o.id === updatedOwner.id ? updatedOwner : o)));
+    if (currentUser && currentUser.type === 'owner' && currentUser.data.id === updatedOwner.id) {
+        setCurrentUser({ ...currentUser, data: updatedOwner });
+    }
   }
 
   const terminateContract = (contractId: string) => {
@@ -170,13 +188,13 @@ const App: React.FC = () => {
 
 
   if (!currentUser) {
-    return <LoginPage onLogin={handleLogin} />;
+    return <LoginPage onLogin={handleLogin} onRegister={handleRegisterOwner} />;
   }
 
   if (currentUser.type === 'owner') {
     return (
       <LandlordPortal
-        owner={owner}
+        owner={currentUser.data}
         properties={properties}
         tenants={tenants}
         contracts={contracts}
