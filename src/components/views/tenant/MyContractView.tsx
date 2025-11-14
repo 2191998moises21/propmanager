@@ -1,8 +1,8 @@
 import React from 'react';
-import { Contract, Property } from '../../../types';
-import { Card } from '../../ui/Card';
+import { Contract, Property } from '@/types';
+import { Card } from '@/components/ui/Card';
 import { DocumentIcon, CalendarDaysIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
-import { TenantView } from '../../../portals/TenantPortal';
+import { TenantView } from '@/portals/TenantPortal';
 
 interface MyContractViewProps {
   contract: Contract;

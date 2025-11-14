@@ -30,6 +30,22 @@ body {
   @apply outline-2 outline-offset-2 outline-primary;
 }
 
+/* Toast animations */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
 /* Print styles */
 @media print {
   .no-print {

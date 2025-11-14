@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { Property, PropertyType, OccupancyStatus, Currency } from '../../types';
-import { PropertyCard } from '../shared/PropertyCard';
-import { Button } from '../ui/Button';
+import { Property, PropertyType, OccupancyStatus, Currency } from '@/types';
+import { PropertyCard } from '@/components/shared/PropertyCard';
+import { Button } from '@/components/ui/Button';
 
 interface PropertiesProps {
   properties: Property[];

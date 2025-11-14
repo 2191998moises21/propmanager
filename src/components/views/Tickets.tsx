@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Ticket, Property, Tenant, Contractor, TicketStatus, TicketUrgency, Currency } from '../../types';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
-import { Modal } from '../ui/Modal';
+import { Ticket, Property, Tenant, Contractor, TicketStatus, TicketUrgency, Currency } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { BuildingOfficeIcon, UserIcon, CalendarIcon, CurrencyDollarIcon, InformationCircleIcon, PhoneIcon, DocumentTextIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
 
 interface TicketsProps {

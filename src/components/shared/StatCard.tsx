@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card } from '../ui/Card';
+import { Card } from '@/components/ui/Card';
 
 // FIX: Changed icon prop type from React.ReactNode to React.ReactElement to allow cloning with className.
 interface StatCardProps {

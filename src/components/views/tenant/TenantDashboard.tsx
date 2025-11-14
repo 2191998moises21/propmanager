@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Tenant, Ticket, Payment, PaymentStatus, TicketStatus } from '../../../types';
-import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
-import { TenantView } from '../../../portals/TenantPortal';
+import { Tenant, Ticket, Payment, PaymentStatus, TicketStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { TenantView } from '@/portals/TenantPortal';
 import { CurrencyDollarIcon, TicketIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface TenantDashboardProps {

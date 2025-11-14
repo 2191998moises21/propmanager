@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Property, OccupancyStatus } from '../../types';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
+import { Property, OccupancyStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { MapPinIcon, BuildingOfficeIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 interface PropertyCardProps {

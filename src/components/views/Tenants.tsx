@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Tenant } from '../../types';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Tenant } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 interface TenantsProps {
   tenants: Tenant[];

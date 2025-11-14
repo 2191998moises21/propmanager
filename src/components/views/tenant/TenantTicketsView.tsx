@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Ticket, Property, Tenant, TicketStatus, TicketUrgency } from '../../../types';
-import { Card } from '../../ui/Card';
-import { Badge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
-import { CreateTicketModal } from '../../shared/CreateTicketModal';
-import { Modal } from '../../ui/Modal';
+import { Ticket, Property, Tenant, TicketStatus, TicketUrgency } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { CreateTicketModal } from '@/components/shared/CreateTicketModal';
+import { Modal } from '@/components/ui/Modal';
 
 interface TenantTicketsViewProps {
   tickets: Ticket[];

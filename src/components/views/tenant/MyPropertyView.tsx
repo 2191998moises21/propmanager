@@ -1,6 +1,6 @@
 import React from 'react';
-import { Property, OccupancyStatus } from '../../../types';
-import { Card } from '../../ui/Card';
+import { Property, OccupancyStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
 import { HomeIcon, SparklesIcon, BuildingOfficeIcon } from '@heroicons/react/24/solid';
 
 interface MyPropertyViewProps {
