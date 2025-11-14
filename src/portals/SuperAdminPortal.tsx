@@ -5,6 +5,9 @@ import { SuperAdminDashboard } from '@/components/views/superadmin/SuperAdminDas
 import { UsersManagement } from '@/components/views/superadmin/UsersManagement';
 import { ActivityLogs } from '@/components/views/superadmin/ActivityLogs';
 import { SystemConfig } from '@/components/views/superadmin/SystemConfig';
+import { Reports } from '@/components/views/superadmin/Reports';
+import { SupportTools } from '@/components/views/superadmin/SupportTools';
+import { Maintenance } from '@/components/views/superadmin/Maintenance';
 import {
   ChartBarIcon,
   UsersIcon,
@@ -14,9 +17,19 @@ import {
   Bars3Icon,
   XMarkIcon,
   ShieldCheckIcon,
+  DocumentChartBarIcon,
+  WrenchScrewdriverIcon,
+  ServerIcon,
 } from '@heroicons/react/24/outline';
 
-export type SuperAdminView = 'dashboard' | 'users' | 'logs' | 'config';
+export type SuperAdminView =
+  | 'dashboard'
+  | 'users'
+  | 'logs'
+  | 'config'
+  | 'reports'
+  | 'support'
+  | 'maintenance';
 
 interface SuperAdminPortalProps {
   superAdmin: SuperAdmin;
@@ -43,21 +56,30 @@ export const SuperAdminPortal: React.FC<SuperAdminPortalProps> = ({ superAdmin }
     { id: 'dashboard' as SuperAdminView, label: 'Dashboard', icon: ChartBarIcon },
     { id: 'users' as SuperAdminView, label: 'Usuarios', icon: UsersIcon },
     { id: 'logs' as SuperAdminView, label: 'Actividad', icon: ClockIcon },
+    { id: 'reports' as SuperAdminView, label: 'Reportes', icon: DocumentChartBarIcon },
     { id: 'config' as SuperAdminView, label: 'Configuración', icon: Cog6ToothIcon },
+    { id: 'support' as SuperAdminView, label: 'Soporte', icon: WrenchScrewdriverIcon },
+    { id: 'maintenance' as SuperAdminView, label: 'Mantenimiento', icon: ServerIcon },
   ];
 
   const renderView = () => {
     switch (view) {
       case 'dashboard':
-        return <SuperAdminDashboard />;
+        return <SuperAdminDashboard onNavigate={(newView) => setView(newView as SuperAdminView)} />;
       case 'users':
         return <UsersManagement />;
       case 'logs':
         return <ActivityLogs />;
+      case 'reports':
+        return <Reports />;
       case 'config':
         return <SystemConfig />;
+      case 'support':
+        return <SupportTools />;
+      case 'maintenance':
+        return <Maintenance />;
       default:
-        return <SuperAdminDashboard />;
+        return <SuperAdminDashboard onNavigate={(newView) => setView(newView as SuperAdminView)} />;
     }
   };
 
