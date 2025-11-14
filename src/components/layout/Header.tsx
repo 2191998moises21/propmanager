@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { UserCircleIcon, BellIcon, Bars3Icon, UserIcon as UserIconSolid, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
-import { Owner, Tenant } from '../../types';
+import { Owner, Tenant } from '@/types';
 
 interface HeaderProps {
     toggleSidebar: () => void;

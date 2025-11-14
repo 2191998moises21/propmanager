@@ -1,5 +1,5 @@
 import React from 'react';
-import { TenantView } from '../../portals/TenantPortal';
+import { TenantView } from '@/portals/TenantPortal';
 import { HomeIcon, BuildingOffice2Icon, DocumentTextIcon, TicketIcon, BanknotesIcon, UserCircleIcon, ChevronDoubleLeftIcon } from '@heroicons/react/24/outline';
 
 interface TenantSidebarProps {

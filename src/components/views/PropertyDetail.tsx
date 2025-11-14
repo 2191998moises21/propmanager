@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Property, Contract, Tenant, OccupancyStatus, PropertyType, Currency } from '../../types';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
+import { Property, Contract, Tenant, OccupancyStatus, PropertyType, Currency } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { ArrowLeftIcon, MapPinIcon, BuildingOfficeIcon, CurrencyDollarIcon, HomeIcon, UserCircleIcon, Cog6ToothIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { SparklesIcon, CalendarDaysIcon } from '@heroicons/react/24/solid';
-import { AssignTenantModal } from '../shared/AssignTenantModal';
+import { AssignTenantModal } from '@/components/shared/AssignTenantModal';
 
 const getStatusBadgeColor = (status: OccupancyStatus): 'green' | 'yellow' | 'blue' | 'gray' => {
   switch (status) {

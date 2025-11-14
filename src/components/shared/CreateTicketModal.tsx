@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
-import { Ticket, Property, Tenant } from '../../types';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Ticket, Property, Tenant } from '@/types';
 
 interface CreateTicketModalProps {
   isOpen: boolean;

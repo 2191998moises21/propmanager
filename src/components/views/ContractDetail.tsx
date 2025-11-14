@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Contract, Property, Tenant, ContractStatus, ContractDocument } from '../../types';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { AddDocumentModal } from '../shared/AddDocumentModal';
+import { Contract, Property, Tenant, ContractStatus, ContractDocument } from '@/types';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { AddDocumentModal } from '@/components/shared/AddDocumentModal';
 import { ArrowLeftIcon, CalendarDaysIcon, CurrencyDollarIcon, BuildingOfficeIcon, UserIcon, DocumentIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 
 interface ContractDetailProps {

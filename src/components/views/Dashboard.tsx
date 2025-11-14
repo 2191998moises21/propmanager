@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
-import { Property, Contract, Payment, OccupancyStatus, PaymentStatus } from '../../types';
-import { StatCard } from '../shared/StatCard';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
-import { BuildingIcon } from '../icons/BuildingIcon';
-import { CheckCircleIcon } from '../icons/CheckCircleIcon';
-import { CurrencyDollarIcon } from '../icons/CurrencyDollarIcon';
-import { ExclamationTriangleIcon } from '../icons/ExclamationTriangleIcon';
+import { Property, Contract, Payment, OccupancyStatus, PaymentStatus } from '@/types';
+import { StatCard } from '@/components/shared/StatCard';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { BuildingIcon } from '@/components/icons/BuildingIcon';
+import { CheckCircleIcon } from '@/components/icons/CheckCircleIcon';
+import { CurrencyDollarIcon } from '@/components/icons/CurrencyDollarIcon';
+import { ExclamationTriangleIcon } from '@/components/icons/ExclamationTriangleIcon';
 // FIX: 'View' type is exported from LandlordPortal, not App.
-import { View } from '../../portals/LandlordPortal';
-import { Badge } from '../ui/Badge';
+import { View } from '@/portals/LandlordPortal';
+import { Badge } from '@/components/ui/Badge';
 
 interface DashboardProps {
   properties: Property[];

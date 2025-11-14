@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Contract, Property, Tenant, ContractStatus, OccupancyStatus } from '../../types';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import { Contract, Property, Tenant, ContractStatus, OccupancyStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface ContractsProps {
   contracts: Contract[];

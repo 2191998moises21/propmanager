@@ -1,7 +1,7 @@
 
 import React from 'react';
 // FIX: 'View' type is exported from LandlordPortal, not App.
-import { View } from '../../portals/LandlordPortal';
+import { View } from '@/portals/LandlordPortal';
 import { HomeIcon, BuildingOffice2Icon, UsersIcon, DocumentTextIcon, BanknotesIcon, TicketIcon, ChevronDoubleLeftIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
 interface SidebarProps {

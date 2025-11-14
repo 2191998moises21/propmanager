@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Payment, Contract, PaymentStatus } from '../../../types';
-import { Card } from '../../ui/Card';
-import { Badge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
-import { UploadPaymentModal } from '../../shared/UploadPaymentModal';
+import { Payment, Contract, PaymentStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { UploadPaymentModal } from '@/components/shared/UploadPaymentModal';
 
 interface TenantPaymentsViewProps {
     payments: Payment[];

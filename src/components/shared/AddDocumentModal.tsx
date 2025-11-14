@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
-import { ContractDocument } from '../../types';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { ContractDocument } from '@/types';
 
 interface AddDocumentModalProps {
   isOpen: boolean;

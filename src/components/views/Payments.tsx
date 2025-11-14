@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Payment, Contract, Tenant, Property, PaymentStatus, PaymentMethod } from '../../types';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import { Payment, Contract, Tenant, Property, PaymentStatus, PaymentMethod } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface PaymentsProps {
   payments: Payment[];

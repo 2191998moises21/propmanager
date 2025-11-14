@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
-import { Payment } from '../../types';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Payment } from '@/types';
 
 interface UploadPaymentModalProps {
   isOpen: boolean;

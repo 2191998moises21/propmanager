@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Owner } from '../../types';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Owner } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { PencilIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 interface ProfileProps {
