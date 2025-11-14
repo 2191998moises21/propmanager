@@ -1,0 +1,77 @@
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { Owner, Tenant } from '@/types';
+import { STORAGE_KEYS } from '@/utils/constants';
+
+export type User = { type: 'owner'; data: Owner } | { type: 'tenant'; data: Tenant };
+
+interface AuthContextType {
+  currentUser: User | null;
+  login: (user: User) => void;
+  logout: () => void;
+  updateUser: (userData: Owner | Tenant) => void;
+  isAuthenticated: boolean;
+  isOwner: boolean;
+  isTenant: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    // Try to restore session from localStorage
+    const storedUser = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const login = useCallback((user: User) => {
+    setCurrentUser(user);
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+  }, []);
+
+  const logout = useCallback(() => {
+    setCurrentUser(null);
+    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+  }, []);
+
+  const updateUser = useCallback((userData: Owner | Tenant) => {
+    setCurrentUser((prev) => {
+      if (!prev) return null;
+
+      const updated = { ...prev, data: userData };
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updated));
+      return updated as User;
+    });
+  }, []);
+
+  const value: AuthContextType = {
+    currentUser,
+    login,
+    logout,
+    updateUser,
+    isAuthenticated: currentUser !== null,
+    isOwner: currentUser?.type === 'owner',
+    isTenant: currentUser?.type === 'tenant',
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
