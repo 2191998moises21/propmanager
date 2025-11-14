@@ -6,9 +6,10 @@ interface HeaderProps {
     toggleSidebar: () => void;
     user: Owner | Tenant;
     onLogout: () => void;
+    setView: (view: 'profile') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout }) => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout, setView }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
@@ -118,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout })
                   <span className="w-full text-left flex items-center px-4 pb-2 text-sm text-gray-800 font-medium border-b mb-1" role="menuitem">
                     {user.nombre_completo}
                   </span>
-                  <button disabled className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50" role="menuitem">
+                  <button onClick={() => { setView('profile'); setAccountOpen(false); }} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50" role="menuitem">
                     <UserIconSolid className="w-5 h-5 mr-3" />
                     Perfil
                   </button>

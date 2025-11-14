@@ -12,6 +12,7 @@ interface TicketsProps {
   tenants: Tenant[];
   contractors: Contractor[];
   updateTicket: (ticket: Ticket) => void;
+  onSelectProperty: (propertyId: string) => void;
 }
 
 const getStatusBadgeColor = (status: TicketStatus): 'green' | 'yellow' | 'red' | 'blue' | 'gray' => {
@@ -41,7 +42,7 @@ const formatCurrency = (amount: number) => {
 };
 
 
-export const Tickets: React.FC<TicketsProps> = ({ tickets, properties, tenants, contractors, updateTicket }) => {
+export const Tickets: React.FC<TicketsProps> = ({ tickets, properties, tenants, contractors, updateTicket, onSelectProperty }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
@@ -168,7 +169,11 @@ export const Tickets: React.FC<TicketsProps> = ({ tickets, properties, tenants, 
                         <h4 className="font-semibold text-gray-800 mb-4 border-b pb-2">Detalles del Ticket</h4>
                         <div className="space-y-3">
                             <DetailItem icon={<InformationCircleIcon />} label="Estado" value={<Badge text={selectedTicket.estado} color={getStatusBadgeColor(selectedTicket.estado)} />} />
-                            <DetailItem icon={<BuildingOfficeIcon />} label="Propiedad" value={getRelatedData(selectedTicket).property?.title || 'N/A'} />
+                            <DetailItem icon={<BuildingOfficeIcon />} label="Propiedad" value={
+                              <button onClick={() => onSelectProperty(selectedTicket.propertyId)} className="text-primary hover:underline text-left">
+                                {getRelatedData(selectedTicket).property?.title || 'N/A'}
+                              </button>
+                            } />
                             <DetailItem icon={<UserIcon />} label="Inquilino" value={getRelatedData(selectedTicket).tenant?.nombre_completo || 'N/A'} />
                             <DetailItem icon={<CalendarIcon />} label="Fecha Reporte" value={formatDate(selectedTicket.fecha_creacion)} />
                             <DetailItem icon={<CurrencyDollarIcon />} label="Costo Estimado" value={formatCurrency(selectedTicket.costo_estimado)} />

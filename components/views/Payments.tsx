@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Payment, Contract, Tenant, Property, PaymentStatus, PaymentMethod } from '../../types';
 import { Card } from '../ui/Card';
@@ -12,6 +11,7 @@ interface PaymentsProps {
   properties: Property[];
   addPayment: (payment: Omit<Payment, 'id'>) => void;
   updatePayment: (payment: Payment) => void;
+  onSelectContract: (contractId: string) => void;
 }
 
 const getStatusBadgeColor = (status: PaymentStatus): 'green' | 'yellow' | 'red' | 'blue' | 'gray' => {
@@ -43,7 +43,7 @@ const toInputMonthFormat = (dateString: string) => {
     return dateString.substring(0, 7); // "YYYY-MM"
 };
 
-export const Payments: React.FC<PaymentsProps> = ({ payments, contracts, tenants, properties, addPayment, updatePayment }) => {
+export const Payments: React.FC<PaymentsProps> = ({ payments, contracts, tenants, properties, addPayment, updatePayment, onSelectContract }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
   
@@ -209,10 +209,12 @@ export const Payments: React.FC<PaymentsProps> = ({ payments, contracts, tenants
                     {filteredPayments.map((payment) => {
                        const { tenant, property } = getRelatedData(payment);
                        return (
-                        <tr key={payment.id} className="hover:bg-gray-50">
+                        <tr key={payment.id} className="hover:bg-gray-50 group">
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{tenant?.nombre_completo || 'N/A'}</div>
-                                <div className="text-sm text-gray-500">{property?.title || 'N/A'}</div>
+                                <button onClick={() => onSelectContract(payment.contractId)} className="text-left hover:text-primary transition-colors">
+                                    <div className="text-sm font-medium text-gray-900 group-hover:text-primary">{tenant?.nombre_completo || 'N/A'}</div>
+                                    <div className="text-sm text-gray-500">{property?.title || 'N/A'}</div>
+                                </button>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{formatMonth(payment.mes_correspondiente)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">{new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(payment.monto_pago)}</td>

@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Property, Contract, Payment, OccupancyStatus, PaymentStatus } from '../../types';
 import { StatCard } from '../shared/StatCard';
@@ -17,13 +16,14 @@ interface DashboardProps {
   contracts: Contract[];
   payments: Payment[];
   setView: (view: View) => void;
+  onSelectProperty: (id: string) => void;
 }
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
 };
 
-export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, payments, setView }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, payments, setView, onSelectProperty }) => {
 
   const stats = useMemo(() => {
     const totalProperties = properties.length;
@@ -68,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, pay
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 Propiedades Recientes</h3>
           <div className="space-y-4">
             {recentProperties.map(prop => (
-              <div key={prop.id} className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50">
+              <button key={prop.id} onClick={() => onSelectProperty(prop.id)} className="w-full text-left flex items-center justify-between p-2 rounded-md hover:bg-gray-50 transition-colors">
                 <div className="flex items-center">
                   <img src={prop.imageUrl} alt={prop.title} className="w-10 h-10 rounded-md object-cover mr-3" />
                   <div>
@@ -77,7 +77,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, contracts, pay
                   </div>
                 </div>
                 <Badge text={prop.estado_ocupacion} color={prop.estado_ocupacion === 'disponible' ? 'green' : 'blue'} />
-              </div>
+              </button>
             ))}
           </div>
         </Card>

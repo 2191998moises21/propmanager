@@ -68,7 +68,7 @@ export const TenantPortal: React.FC<TenantPortalProps> = ({ tenant, allData, onL
         case 'property':
             return <MyPropertyView property={tenantData.property} />;
         case 'contract':
-            return <MyContractView contract={tenantData.contract} property={tenantData.property} />;
+            return <MyContractView contract={tenantData.contract} property={tenantData.property} setView={setView} />;
         case 'tickets':
             return <TenantTicketsView tickets={tenantData.tickets} property={tenantData.property} tenant={tenant} addTicket={handlers.addTicket} />;
         case 'payments':
@@ -84,7 +84,7 @@ export const TenantPortal: React.FC<TenantPortalProps> = ({ tenant, allData, onL
     <div className="flex h-screen bg-background">
       <TenantSidebar currentView={view} setView={setView} isOpen={isSidebarOpen} toggle={toggleSidebar} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header toggleSidebar={toggleSidebar} user={tenant} onLogout={onLogout} />
+        <Header toggleSidebar={toggleSidebar} user={tenant} onLogout={onLogout} setView={setView} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
           {content}
         </main>

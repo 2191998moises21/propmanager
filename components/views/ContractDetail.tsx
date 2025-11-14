@@ -12,6 +12,7 @@ interface ContractDetailProps {
   tenant: Tenant | undefined;
   onBack: () => void;
   addDocument: (contractId: string, document: ContractDocument) => void;
+  onSelectProperty: (propertyId: string) => void;
 }
 
 const getStatusBadgeColor = (status: ContractStatus): 'green' | 'yellow' | 'red' | 'blue' | 'gray' => {
@@ -42,7 +43,7 @@ const DetailItem: React.FC<{ icon: React.ReactNode; label: string; value: string
   </div>
 );
 
-export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, property, tenant, onBack, addDocument }) => {
+export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, property, tenant, onBack, addDocument, onSelectProperty }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddDocument = (document: ContractDocument) => {
@@ -117,15 +118,16 @@ export const ContractDetail: React.FC<ContractDetailProps> = ({ contract, proper
           <div className="space-y-6">
             {property && (
               <Card>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Propiedad</h3>
                 <div className="space-y-4">
-                  <div className="flex items-center">
-                    <img src={property.imageUrl} alt={property.title} className="w-16 h-16 object-cover rounded-md" />
-                    <div className="ml-4">
-                        <p className="font-bold text-gray-900">{property.title}</p>
-                        <p className="text-sm text-gray-500">{property.ciudad}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-0">Propiedad</h3>
+                    <div className="flex items-center">
+                      <img src={property.imageUrl} alt={property.title} className="w-16 h-16 object-cover rounded-md" />
+                      <div className="ml-4">
+                          <p className="font-bold text-gray-900">{property.title}</p>
+                          <p className="text-sm text-gray-500">{property.ciudad}</p>
+                      </div>
                     </div>
-                  </div>
+                    <Button variant="ghost" className="w-full" onClick={() => onSelectProperty(property.id)}>Ver Propiedad</Button>
                 </div>
               </Card>
             )}

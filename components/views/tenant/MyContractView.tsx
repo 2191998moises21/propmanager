@@ -2,10 +2,12 @@ import React from 'react';
 import { Contract, Property } from '../../../types';
 import { Card } from '../../ui/Card';
 import { DocumentIcon, CalendarDaysIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { TenantView } from '../../../portals/TenantPortal';
 
 interface MyContractViewProps {
   contract: Contract;
   property: Property;
+  setView: (view: TenantView) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -28,7 +30,7 @@ const DetailItem: React.FC<{ icon: React.ReactNode; label: string; value: string
   </div>
 );
 
-export const MyContractView: React.FC<MyContractViewProps> = ({ contract, property }) => {
+export const MyContractView: React.FC<MyContractViewProps> = ({ contract, property, setView }) => {
   return (
     <div className="space-y-6">
       <header>
@@ -74,12 +76,14 @@ export const MyContractView: React.FC<MyContractViewProps> = ({ contract, proper
             </Card>
         </div>
         <div>
-          <Card>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Propiedad</h3>
-            <img src={property.imageUrl} alt={property.title} className="w-full h-40 object-cover rounded-md mb-4" />
-            <p className="font-bold text-gray-900">{property.title}</p>
-            <p className="text-sm text-gray-500">{property.direccion}</p>
-          </Card>
+           <button onClick={() => setView('property')} className="w-full text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-lg">
+            <Card>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Propiedad</h3>
+                <img src={property.imageUrl} alt={property.title} className="w-full h-40 object-cover rounded-md mb-4" />
+                <p className="font-bold text-gray-900">{property.title}</p>
+                <p className="text-sm text-gray-500">{property.direccion}</p>
+            </Card>
+           </button>
         </div>
       </div>
     </div>

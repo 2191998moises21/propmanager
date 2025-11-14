@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Contract, Property, Tenant, ContractStatus, Payment, PaymentStatus } from '../../types';
 // FIX: 'View' type is exported from LandlordPortal, not App.
@@ -13,13 +12,14 @@ interface IncomeProps {
   tenants: Tenant[];
   payments: Payment[];
   setView: (view: View) => void;
+  onSelectContract: (contractId: string) => void;
 }
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
 };
 
-export const Income: React.FC<IncomeProps> = ({ contracts, properties, tenants, payments, setView }) => {
+export const Income: React.FC<IncomeProps> = ({ contracts, properties, tenants, payments, setView, onSelectContract }) => {
 
   const activeContracts = useMemo(() => {
     return contracts.filter(c => c.estado_contrato === ContractStatus.Activo);
@@ -165,7 +165,7 @@ export const Income: React.FC<IncomeProps> = ({ contracts, properties, tenants, 
               {activeContracts.map(contract => {
                 const { property, tenant } = getRelatedData(contract);
                 return (
-                  <tr key={contract.id} className="hover:bg-gray-50">
+                  <tr key={contract.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onSelectContract(contract.id)}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{property?.title || 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant?.nombre_completo || 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{formatCurrency(contract.monto_mensual)}</td>

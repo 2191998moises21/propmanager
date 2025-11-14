@@ -122,12 +122,13 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({
                     {...selectedContractData}
                     onBack={handleDeselectContract}
                     addDocument={handlers.addDocumentToContract}
+                    onSelectProperty={handleSelectProperty}
                 />
     }
 
     switch (view) {
       case 'dashboard':
-        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} />;
+        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} onSelectProperty={handleSelectProperty} />;
       case 'properties':
         return <Properties properties={properties} addProperty={handleAddProperty} onSelectProperty={handleSelectProperty} />;
       case 'tenants':
@@ -135,15 +136,15 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({
       case 'contracts':
         return <Contracts contracts={contracts} properties={properties} tenants={tenants} addContract={handleAddContract} onSelectContract={handleSelectContract} />;
       case 'payments':
-        return <Payments payments={payments} contracts={contracts} tenants={tenants} properties={properties} addPayment={handlers.addPayment} updatePayment={handlers.updatePayment} />;
+        return <Payments payments={payments} contracts={contracts} tenants={tenants} properties={properties} addPayment={handlers.addPayment} updatePayment={handlers.updatePayment} onSelectContract={handleSelectContract} />;
       case 'tickets':
-        return <Tickets tickets={tickets} properties={properties} tenants={tenants} contractors={contractors} updateTicket={handlers.updateTicket} />;
+        return <Tickets tickets={tickets} properties={properties} tenants={tenants} contractors={contractors} updateTicket={handlers.updateTicket} onSelectProperty={handleSelectProperty} />;
       case 'income':
-        return <Income contracts={contracts} properties={properties} tenants={tenants} payments={payments} setView={setView} />;
+        return <Income contracts={contracts} properties={properties} tenants={tenants} payments={payments} setView={setView} onSelectContract={handleSelectContract} />;
       case 'profile':
         return <Profile owner={owner} onUpdate={handlers.updateOwner} />;
       default:
-        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} />;
+        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} onSelectProperty={handleSelectProperty} />;
     }
   }, [view, properties, tenants, contracts, payments, tickets, contractors, owner, selectedPropertyId, selectedPropertyData, selectedContractId, selectedContractData]);
 
@@ -151,7 +152,7 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({
     <div className="flex h-screen bg-background">
       <Sidebar currentView={view} setView={setView} isOpen={isSidebarOpen} toggle={toggleSidebar} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header toggleSidebar={toggleSidebar} user={owner} onLogout={onLogout} />
+        <Header toggleSidebar={toggleSidebar} user={owner} onLogout={onLogout} setView={setView} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
           {content}
         </main>
