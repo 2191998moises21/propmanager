@@ -1,38 +1,61 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Header } from '../components/layout/Header';
-import { Dashboard } from '../components/views/Dashboard';
-import { Properties } from '../components/views/Properties';
-import { Tenants } from '../components/views/Tenants';
-import { Contracts } from '../components/views/Contracts';
-import { Payments } from '../components/views/Payments';
-import { Income } from '../components/views/Income';
-import { Tickets } from '../components/views/Tickets';
-import { Profile } from '../components/views/Profile';
-import { PropertyDetail } from '../components/views/PropertyDetail';
-import { ContractDetail } from '../components/views/ContractDetail';
-import { Owner, Property, Tenant, Contract, Payment, Ticket, Contractor, OccupancyStatus } from '../types';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { Header } from '@/components/layout/Header';
+import { Dashboard } from '@/components/views/Dashboard';
+import { Properties } from '@/components/views/Properties';
+import { Tenants } from '@/components/views/Tenants';
+import { Contracts } from '@/components/views/Contracts';
+import { Payments } from '@/components/views/Payments';
+import { Income } from '@/components/views/Income';
+import { Tickets } from '@/components/views/Tickets';
+import { Profile } from '@/components/views/Profile';
+import { PropertyDetail } from '@/components/views/PropertyDetail';
+import { ContractDetail } from '@/components/views/ContractDetail';
+import { Owner } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { useApp } from '@/contexts/AppContext';
 
-export type View = 'dashboard' | 'properties' | 'tenants' | 'contracts' | 'payments' | 'tickets' | 'income' | 'profile';
+export type View =
+  | 'dashboard'
+  | 'properties'
+  | 'tenants'
+  | 'contracts'
+  | 'payments'
+  | 'tickets'
+  | 'income'
+  | 'profile';
 
 interface LandlordPortalProps {
-    owner: Owner;
-    properties: Property[];
-    tenants: Tenant[];
-    contracts: Contract[];
-    payments: Payment[];
-    tickets: Ticket[];
-    contractors: Contractor[];
-    onLogout: () => void;
-    handlers: any;
+  owner: Owner;
 }
 
-export const LandlordPortal: React.FC<LandlordPortalProps> = ({
-    owner, properties, tenants, contracts, payments, tickets, contractors, onLogout, handlers
-}) => {
+export const LandlordPortal: React.FC<LandlordPortalProps> = ({ owner }) => {
+  const { logout } = useAuth();
+  const {
+    properties,
+    tenants,
+    contracts,
+    payments,
+    tickets,
+    contractors,
+    addProperty,
+    updateProperty,
+    deleteProperty,
+    addTenant,
+    updateTenant,
+    addContract,
+    addPayment,
+    updatePayment,
+    updateTicket,
+    updateOwner,
+    terminateContract,
+    updatePropertyStatus,
+    addDocumentToContract,
+  } = useApp();
+
   const [view, setView] = useState<View>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
-  
+
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
 
@@ -46,24 +69,24 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
-  
-  const handleAddProperty = (property: Omit<Property, 'id'>) => {
-    handlers.addProperty(property);
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+
+  const handleAddProperty = (property: Parameters<typeof addProperty>[0]) => {
+    addProperty(property);
     setView('properties');
   };
 
-  const handleAddTenant = (tenant: Omit<Tenant, 'id'>) => {
-    handlers.addTenant(tenant);
+  const handleAddTenant = (tenant: Parameters<typeof addTenant>[0]) => {
+    addTenant(tenant);
     setView('tenants');
   };
 
-  const handleAddContract = (contract: Omit<Contract, 'id'>) => {
-    handlers.addContract(contract);
+  const handleAddContract = (contract: Parameters<typeof addContract>[0]) => {
+    addContract(contract);
     setSelectedPropertyId(null);
     setView('properties');
   };
-  
+
   const handleSelectProperty = (id: string) => {
     setView('properties');
     setSelectedPropertyId(id);
@@ -79,80 +102,159 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({
     setSelectedContractId(id);
     setSelectedPropertyId(null);
   };
-  
+
   const handleDeselectContract = () => {
     setSelectedContractId(null);
   };
 
   const selectedPropertyData = useMemo(() => {
     if (!selectedPropertyId) return null;
-    const property = properties.find(p => p.id === selectedPropertyId);
+    const property = properties.find((p) => p.id === selectedPropertyId);
     if (!property) return null;
-    const contract = contracts.find(c => c.propertyId === property.id && c.estado_contrato === 'activo');
-    const tenant = contract ? tenants.find(t => t.id === contract.tenantId) : null;
+    const contract = contracts.find(
+      (c) => c.propertyId === property.id && c.estado_contrato === 'activo'
+    );
+    const tenant = contract ? tenants.find((t) => t.id === contract.tenantId) : null;
     return { property, contract, tenant };
   }, [selectedPropertyId, properties, contracts, tenants]);
 
   const selectedContractData = useMemo(() => {
     if (!selectedContractId) return null;
-    const contract = contracts.find(c => c.id === selectedContractId);
+    const contract = contracts.find((c) => c.id === selectedContractId);
     if (!contract) return null;
-    const property = properties.find(p => p.id === contract.propertyId);
-    const tenant = tenants.find(t => t.id === contract.tenantId);
+    const property = properties.find((p) => p.id === contract.propertyId);
+    const tenant = tenants.find((t) => t.id === contract.tenantId);
     return { contract, property, tenant };
   }, [selectedContractId, properties, contracts, tenants]);
 
   const content = useMemo(() => {
     if (selectedPropertyId && selectedPropertyData) {
-        return <PropertyDetail 
-                    {...selectedPropertyData} 
-                    onBack={handleDeselectProperty} 
-                    tenants={tenants}
-                    addContract={handleAddContract}
-                    terminateContract={handlers.terminateContract}
-                    updatePropertyStatus={handlers.updatePropertyStatus}
-                    onSelectContract={handleSelectContract}
-                    updateProperty={handlers.updateProperty}
-                    deleteProperty={handlers.deleteProperty}
-                />;
+      return (
+        <PropertyDetail
+          {...selectedPropertyData}
+          onBack={handleDeselectProperty}
+          tenants={tenants}
+          addContract={handleAddContract}
+          terminateContract={terminateContract}
+          updatePropertyStatus={updatePropertyStatus}
+          onSelectContract={handleSelectContract}
+          updateProperty={updateProperty}
+          deleteProperty={deleteProperty}
+        />
+      );
     }
-    
+
     if (selectedContractId && selectedContractData) {
-        return <ContractDetail
-                    {...selectedContractData}
-                    onBack={handleDeselectContract}
-                    addDocument={handlers.addDocumentToContract}
-                    onSelectProperty={handleSelectProperty}
-                />
+      return (
+        <ContractDetail
+          {...selectedContractData}
+          onBack={handleDeselectContract}
+          addDocument={addDocumentToContract}
+          onSelectProperty={handleSelectProperty}
+        />
+      );
     }
 
     switch (view) {
       case 'dashboard':
-        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} onSelectProperty={handleSelectProperty} />;
+        return (
+          <Dashboard
+            properties={properties}
+            contracts={contracts}
+            payments={payments}
+            setView={setView}
+            onSelectProperty={handleSelectProperty}
+          />
+        );
       case 'properties':
-        return <Properties properties={properties} addProperty={handleAddProperty} onSelectProperty={handleSelectProperty} />;
+        return (
+          <Properties
+            properties={properties}
+            addProperty={handleAddProperty}
+            onSelectProperty={handleSelectProperty}
+          />
+        );
       case 'tenants':
-        return <Tenants tenants={tenants} addTenant={handleAddTenant} updateTenant={handlers.updateTenant} />;
+        return (
+          <Tenants tenants={tenants} addTenant={handleAddTenant} updateTenant={updateTenant} />
+        );
       case 'contracts':
-        return <Contracts contracts={contracts} properties={properties} tenants={tenants} addContract={handleAddContract} onSelectContract={handleSelectContract} />;
+        return (
+          <Contracts
+            contracts={contracts}
+            properties={properties}
+            tenants={tenants}
+            addContract={handleAddContract}
+            onSelectContract={handleSelectContract}
+          />
+        );
       case 'payments':
-        return <Payments payments={payments} contracts={contracts} tenants={tenants} properties={properties} addPayment={handlers.addPayment} updatePayment={handlers.updatePayment} onSelectContract={handleSelectContract} />;
+        return (
+          <Payments
+            payments={payments}
+            contracts={contracts}
+            tenants={tenants}
+            properties={properties}
+            addPayment={addPayment}
+            updatePayment={updatePayment}
+            onSelectContract={handleSelectContract}
+          />
+        );
       case 'tickets':
-        return <Tickets tickets={tickets} properties={properties} tenants={tenants} contractors={contractors} updateTicket={handlers.updateTicket} onSelectProperty={handleSelectProperty} />;
+        return (
+          <Tickets
+            tickets={tickets}
+            properties={properties}
+            tenants={tenants}
+            contractors={contractors}
+            updateTicket={updateTicket}
+            onSelectProperty={handleSelectProperty}
+          />
+        );
       case 'income':
-        return <Income contracts={contracts} properties={properties} tenants={tenants} payments={payments} setView={setView} onSelectContract={handleSelectContract} />;
+        return (
+          <Income
+            contracts={contracts}
+            properties={properties}
+            tenants={tenants}
+            payments={payments}
+            setView={setView}
+            onSelectContract={handleSelectContract}
+          />
+        );
       case 'profile':
-        return <Profile owner={owner} onUpdate={handlers.updateOwner} />;
+        return <Profile owner={owner} onUpdate={updateOwner} />;
       default:
-        return <Dashboard properties={properties} contracts={contracts} payments={payments} setView={setView} onSelectProperty={handleSelectProperty} />;
+        return (
+          <Dashboard
+            properties={properties}
+            contracts={contracts}
+            payments={payments}
+            setView={setView}
+            onSelectProperty={handleSelectProperty}
+          />
+        );
     }
-  }, [view, properties, tenants, contracts, payments, tickets, contractors, owner, selectedPropertyId, selectedPropertyData, selectedContractId, selectedContractData]);
+  }, [
+    view,
+    properties,
+    tenants,
+    contracts,
+    payments,
+    tickets,
+    contractors,
+    owner,
+    selectedPropertyId,
+    selectedPropertyData,
+    selectedContractId,
+    selectedContractData,
+  ]);
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar currentView={view} setView={setView} isOpen={isSidebarOpen} toggle={toggleSidebar} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header toggleSidebar={toggleSidebar} user={owner} onLogout={onLogout} setView={setView} />
+        <Header toggleSidebar={toggleSidebar} user={owner} onLogout={logout} setView={setView} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
           {content}
         </main>
