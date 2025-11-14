@@ -1,15 +1,21 @@
 import React from 'react';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AppProvider } from '@/contexts/AppContext';
+import { SuperAdminProvider } from '@/contexts/SuperAdminContext';
 import { LoginPage } from '@/pages/LoginPage';
 import { LandlordPortal } from '@/portals/LandlordPortal';
 import { TenantPortal } from '@/portals/TenantPortal';
+import { SuperAdminPortal } from '@/portals/SuperAdminPortal';
 
 const AppContent: React.FC = () => {
-  const { currentUser, isOwner, isTenant } = useAuth();
+  const { currentUser, isOwner, isTenant, isSuperAdmin } = useAuth();
 
   if (!currentUser) {
     return <LoginPage />;
+  }
+
+  if (isSuperAdmin && currentUser.type === 'superadmin') {
+    return <SuperAdminPortal superAdmin={currentUser.data} />;
   }
 
   if (isOwner && currentUser.type === 'owner') {
@@ -26,9 +32,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
+      <SuperAdminProvider>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </SuperAdminProvider>
     </AuthProvider>
   );
 };

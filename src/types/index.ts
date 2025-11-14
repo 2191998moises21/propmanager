@@ -51,6 +51,27 @@ export enum TicketUrgency {
     Alta = 'alta',
 }
 
+export enum UserStatus {
+    Activo = 'activo',
+    Suspendido = 'suspendido',
+    Inactivo = 'inactivo',
+}
+
+export enum LogAction {
+    Login = 'login',
+    Logout = 'logout',
+    CreateProperty = 'create_property',
+    UpdateProperty = 'update_property',
+    DeleteProperty = 'delete_property',
+    CreateContract = 'create_contract',
+    UpdatePayment = 'update_payment',
+    CreateTicket = 'create_ticket',
+    UpdateUser = 'update_user',
+    UpdateUserStatus = 'update_user_status',
+    DeleteUser = 'delete_user',
+    SystemConfig = 'system_config',
+}
+
 export interface Owner {
   id: string;
   nombre_completo: string;
@@ -143,4 +164,50 @@ export interface Ticket {
     fecha_creacion: string; // YYYY-MM-DD
     contratistaId?: string;
     facturaUrl?: string;
+}
+
+export interface SuperAdmin {
+    id: string;
+    nombre_completo: string;
+    email: string;
+    fotoUrl: string;
+    rol: 'superadmin';
+    permisos: string[];
+    fecha_creacion: string;
+}
+
+export interface ActivityLog {
+    id: string;
+    userId: string;
+    userType: 'owner' | 'tenant' | 'superadmin';
+    userName: string;
+    accion: LogAction;
+    descripcion: string;
+    fecha: string; // ISO timestamp
+    detalles?: Record<string, unknown>;
+}
+
+export interface SystemConfig {
+    id: string;
+    clave: string;
+    valor: string | number | boolean;
+    descripcion: string;
+    categoria: 'general' | 'pagos' | 'notificaciones' | 'seguridad';
+    fecha_modificacion: string;
+    modificado_por?: string;
+}
+
+export interface PlatformStats {
+    totalPropietarios: number;
+    totalInquilinos: number;
+    totalPropiedades: number;
+    propiedadesOcupadas: number;
+    propiedadesDisponibles: number;
+    totalContratos: number;
+    contratosActivos: number;
+    ingresosTotal: number;
+    ingresosMesActual: number;
+    ticketsAbiertos: number;
+    ticketsCerrados: number;
+    pagosEsperando: number;
 }

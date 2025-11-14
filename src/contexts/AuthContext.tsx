@@ -1,17 +1,21 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { Owner, Tenant } from '@/types';
+import { Owner, Tenant, SuperAdmin } from '@/types';
 import { STORAGE_KEYS } from '@/utils/constants';
 
-export type User = { type: 'owner'; data: Owner } | { type: 'tenant'; data: Tenant };
+export type User =
+  | { type: 'owner'; data: Owner }
+  | { type: 'tenant'; data: Tenant }
+  | { type: 'superadmin'; data: SuperAdmin };
 
 interface AuthContextType {
   currentUser: User | null;
   login: (user: User) => void;
   logout: () => void;
-  updateUser: (userData: Owner | Tenant) => void;
+  updateUser: (userData: Owner | Tenant | SuperAdmin) => void;
   isAuthenticated: boolean;
   isOwner: boolean;
   isTenant: boolean;
+  isSuperAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
   }, []);
 
-  const updateUser = useCallback((userData: Owner | Tenant) => {
+  const updateUser = useCallback((userData: Owner | Tenant | SuperAdmin) => {
     setCurrentUser((prev) => {
       if (!prev) return null;
 
@@ -63,6 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: currentUser !== null,
     isOwner: currentUser?.type === 'owner',
     isTenant: currentUser?.type === 'tenant',
+    isSuperAdmin: currentUser?.type === 'superadmin',
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
