@@ -68,7 +68,11 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ logs }) => (
   </div>
 );
 
-export const SuperAdminDashboard: React.FC = () => {
+interface SuperAdminDashboardProps {
+  onNavigate: (view: string) => void;
+}
+
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavigate }) => {
   const { platformStats, activityLogs, refreshPlatformStats } = useSuperAdmin();
   const { properties, contracts, payments, tickets, owners, tenants } = useApp();
 
@@ -159,17 +163,55 @@ export const SuperAdminDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Acciones Rápidas</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-blue-50 transition-colors text-center">
-            <UsersIcon className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+          <button
+            onClick={() => onNavigate('users')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-blue-50 transition-all hover:scale-105 text-center"
+          >
+            <UsersIcon className="w-8 h-8 mx-auto mb-2 text-blue-600" />
             <p className="font-medium text-gray-700">Gestionar Usuarios</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {owners.length + tenants.length} usuarios activos
+            </p>
           </button>
-          <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-blue-50 transition-colors text-center">
-            <ChartBarIcon className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+          <button
+            onClick={() => onNavigate('logs')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all hover:scale-105 text-center"
+          >
+            <ChartBarIcon className="w-8 h-8 mx-auto mb-2 text-green-600" />
             <p className="font-medium text-gray-700">Ver Logs Detallados</p>
+            <p className="text-xs text-gray-500 mt-1">{activityLogs.length} registros totales</p>
           </button>
-          <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-blue-50 transition-colors text-center">
-            <DocumentTextIcon className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+          <button
+            onClick={() => onNavigate('config')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all hover:scale-105 text-center"
+          >
+            <DocumentTextIcon className="w-8 h-8 mx-auto mb-2 text-purple-600" />
             <p className="font-medium text-gray-700">Configuración Sistema</p>
+            <p className="text-xs text-gray-500 mt-1">Ajustes globales</p>
+          </button>
+          <button
+            onClick={() => onNavigate('reports')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-yellow-500 hover:bg-yellow-50 transition-all hover:scale-105 text-center"
+          >
+            <DocumentTextIcon className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+            <p className="font-medium text-gray-700">Reportes Avanzados</p>
+            <p className="text-xs text-gray-500 mt-1">Analíticas y exportar</p>
+          </button>
+          <button
+            onClick={() => onNavigate('support')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all hover:scale-105 text-center"
+          >
+            <ExclamationTriangleIcon className="w-8 h-8 mx-auto mb-2 text-red-600" />
+            <p className="font-medium text-gray-700">Soporte Técnico</p>
+            <p className="text-xs text-gray-500 mt-1">Herramientas de ayuda</p>
+          </button>
+          <button
+            onClick={() => onNavigate('maintenance')}
+            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all hover:scale-105 text-center"
+          >
+            <HomeIcon className="w-8 h-8 mx-auto mb-2 text-indigo-600" />
+            <p className="font-medium text-gray-700">Mantenimiento</p>
+            <p className="text-xs text-gray-500 mt-1">Respaldos y limpieza</p>
           </button>
         </div>
       </div>
