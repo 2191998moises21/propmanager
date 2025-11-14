@@ -3,9 +3,14 @@ import { useAuth, User } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { Owner } from '@/types';
 import { generateId } from '@/utils/id';
+import { mockSuperAdmin } from '@/data/mockSuperAdminData';
 
 interface UseLoginReturn {
-  login: (email: string, password: string, role: 'owner' | 'tenant') => Promise<boolean>;
+  login: (
+    email: string,
+    password: string,
+    role: 'owner' | 'tenant' | 'superadmin'
+  ) => Promise<boolean>;
   register: (ownerData: Omit<Owner, 'id' | 'fotoUrl'>, password: string) => Promise<boolean>;
   isLoading: boolean;
   error: string | null;
@@ -23,7 +28,11 @@ export const useLogin = (): UseLoginReturn => {
   const { owners, tenants, addOwner } = useApp();
 
   const login = useCallback(
-    async (email: string, _password: string, role: 'owner' | 'tenant'): Promise<boolean> => {
+    async (
+      email: string,
+      _password: string,
+      role: 'owner' | 'tenant' | 'superadmin'
+    ): Promise<boolean> => {
       setIsLoading(true);
       setError(null);
 
@@ -31,7 +40,15 @@ export const useLogin = (): UseLoginReturn => {
         // Simulate API call delay
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        if (role === 'owner') {
+        if (role === 'superadmin') {
+          // Check for SuperAdmin credentials
+          if (mockSuperAdmin.email.toLowerCase() === email.toLowerCase()) {
+            // TODO: In production, verify password with backend
+            const user: User = { type: 'superadmin', data: mockSuperAdmin };
+            setAuthUser(user);
+            return true;
+          }
+        } else if (role === 'owner') {
           const owner = owners.find((o) => o.email.toLowerCase() === email.toLowerCase());
           if (owner) {
             // TODO: In production, verify password with backend

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BuildingOffice2Icon, UsersIcon } from '@heroicons/react/24/solid';
+import { BuildingOffice2Icon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useLogin } from '@/hooks/useLogin';
@@ -7,7 +7,7 @@ import { useLogin } from '@/hooks/useLogin';
 export const LoginPage: React.FC = () => {
   const { login, register, isLoading, error: hookError } = useLogin();
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [role, setRole] = useState<'owner' | 'tenant'>('owner');
+  const [role, setRole] = useState<'owner' | 'tenant' | 'superadmin'>('owner');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -66,9 +66,13 @@ export const LoginPage: React.FC = () => {
   };
 
   const getPlaceholderText = () => {
-    return role === 'owner'
-      ? 'Pruebe con: carlos.prop@email.com'
-      : 'Pruebe con: maria.r@email.com o carlos.silva@email.com.br';
+    if (role === 'owner') {
+      return 'Pruebe con: carlos.prop@email.com';
+    } else if (role === 'tenant') {
+      return 'Pruebe con: maria.r@email.com o carlos.silva@email.com.br';
+    } else {
+      return 'Pruebe con: admin@propmanager.com';
+    }
   };
 
   const renderLoginForm = () => (
@@ -78,26 +82,38 @@ export const LoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setRole('owner')}
-            className={`flex-1 py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-colors ${
               role === 'owner'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <BuildingOffice2Icon className="w-5 h-5" />
-            Soy Propietario
+            <BuildingOffice2Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Soy </span>Propietario
           </button>
           <button
             type="button"
             onClick={() => setRole('tenant')}
-            className={`flex-1 py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-colors ${
               role === 'tenant'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <UsersIcon className="w-5 h-5" />
-            Soy Inquilino
+            <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Soy </span>Inquilino
+          </button>
+          <button
+            type="button"
+            onClick={() => setRole('superadmin')}
+            className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-colors ${
+              role === 'superadmin'
+                ? 'text-purple-600 border-b-2 border-purple-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <ShieldCheckIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            Admin
           </button>
         </div>
 
