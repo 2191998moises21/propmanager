@@ -1,0 +1,76 @@
+# ========================================
+# Google Cloud Build Configuration
+# CI/CD para PropManager Backend
+# ========================================
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
+      - '.'
+    dir: 'backend'
+
+  # Step 2: Push image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'propmanager-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--add-cloudsql-instances'
+      - '${_CLOUD_SQL_CONNECTION}'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+      - '--set-env-vars'
+      - 'DB_HOST=${_DB_SOCKET_PATH}'
+      - '--set-env-vars'
+      - 'DB_NAME=${_DB_NAME}'
+      - '--set-env-vars'
+      - 'DB_USER=${_DB_USER}'
+      - '--update-secrets'
+      - 'DB_PASSWORD=propmanager-db-password:latest'
+      - '--update-secrets'
+      - 'JWT_SECRET=jwt-secret:latest'
+
+# Store images in Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
+
+# Substitutions (configure in Cloud Build trigger or pass as parameters)
+substitutions:
+  _CLOUD_SQL_CONNECTION: 'your-project:us-central1:propmanager-db'
+  _DB_SOCKET_PATH: '/cloudsql/your-project:us-central1:propmanager-db'
+  _DB_NAME: 'propmanager'
+  _DB_USER: 'propmanager-user'
+
+# Build timeout
+timeout: '1200s'
+
+# Options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'

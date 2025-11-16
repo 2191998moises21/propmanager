@@ -1,0 +1,208 @@
+import { Request, Response } from 'express';
+import * as authModel from '../models/authModel';
+import { generateToken, generateRefreshToken } from '../middleware/auth';
+import { UserRole, LoginRequest, LoginResponse } from '../types';
+import { ApiError } from '../middleware/errorHandler';
+import { logger } from '../config/logger';
+
+/**
+ * Login user
+ */
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): Promise<void> => {
+  const { email, password, role } = req.body;
+
+  // Find user by email and role
+  const user = await authModel.findUserByEmailAndRole(email, role);
+
+  if (!user || !user.password_hash) {
+    throw new ApiError(401, 'Invalid credentials');
+  }
+
+  // Verify password
+  const isValidPassword = await authModel.verifyPassword(password, user.password_hash);
+
+  if (!isValidPassword) {
+    throw new ApiError(401, 'Invalid credentials');
+  }
+
+  // Generate tokens
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    role,
+  });
+
+  const refreshToken = generateRefreshToken({
+    id: user.id,
+    email: user.email,
+    role,
+  });
+
+  logger.info('User logged in:', { userId: user.id, role });
+
+  // Remove password from response
+  const { password_hash, ...userWithoutPassword } = user;
+
+  const response: LoginResponse = {
+    token,
+    refreshToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      nombre_completo: user.nombre_completo,
+      role,
+    },
+  };
+
+  res.json({
+    success: true,
+    data: response,
+  });
+};
+
+/**
+ * Register new owner
+ */
+export const registerOwner = async (req: Request, res: Response): Promise<void> => {
+  const { nombre_completo, email, password, telefono, direccion } = req.body;
+
+  // Check if email already exists
+  const existingUser = await authModel.findUserByEmailAndRole(email, UserRole.Owner);
+
+  if (existingUser) {
+    throw new ApiError(409, 'Email already in use');
+  }
+
+  // Create owner
+  const owner = await authModel.createOwner({
+    nombre_completo,
+    email,
+    password,
+    telefono,
+    direccion,
+  });
+
+  // Generate tokens
+  const token = generateToken({
+    id: owner.id,
+    email: owner.email,
+    role: UserRole.Owner,
+  });
+
+  logger.info('New owner registered:', { ownerId: owner.id });
+
+  res.status(201).json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: owner.id,
+        email: owner.email,
+        nombre_completo: owner.nombre_completo,
+        role: UserRole.Owner,
+      },
+    },
+  });
+};
+
+/**
+ * Register new tenant
+ */
+export const registerTenant = async (req: Request, res: Response): Promise<void> => {
+  const { nombre_completo, documento_id, email, password, telefono } = req.body;
+
+  // Check if email or documento already exists
+  const existingUser = await authModel.findUserByEmailAndRole(email, UserRole.Tenant);
+
+  if (existingUser) {
+    throw new ApiError(409, 'Email already in use');
+  }
+
+  // Create tenant
+  const tenant = await authModel.createTenant({
+    nombre_completo,
+    documento_id,
+    email,
+    password,
+    telefono,
+  });
+
+  // Generate token
+  const token = generateToken({
+    id: tenant.id,
+    email: tenant.email,
+    role: UserRole.Tenant,
+  });
+
+  logger.info('New tenant registered:', { tenantId: tenant.id });
+
+  res.status(201).json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: tenant.id,
+        email: tenant.email,
+        nombre_completo: tenant.nombre_completo,
+        role: UserRole.Tenant,
+      },
+    },
+  });
+};
+
+/**
+ * Get current user profile
+ */
+export const getProfile = async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    throw new ApiError(401, 'Unauthorized');
+  }
+
+  const user = await authModel.findUserByEmailAndRole(req.user.email, req.user.role);
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const { password_hash, ...userWithoutPassword } = user;
+
+  res.json({
+    success: true,
+    data: userWithoutPassword,
+  });
+};
+
+/**
+ * Change password
+ */
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    throw new ApiError(401, 'Unauthorized');
+  }
+
+  const { currentPassword, newPassword } = req.body;
+
+  // Get user with password
+  const user = await authModel.findUserByEmailAndRole(req.user.email, req.user.role);
+
+  if (!user || !user.password_hash) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  // Verify current password
+  const isValid = await authModel.verifyPassword(currentPassword, user.password_hash);
+
+  if (!isValid) {
+    throw new ApiError(401, 'Current password is incorrect');
+  }
+
+  // Update password
+  await authModel.updatePassword(req.user.id, newPassword, req.user.role);
+
+  logger.info('Password changed:', { userId: req.user.id });
+
+  res.json({
+    success: true,
+    message: 'Password updated successfully',
+  });
+};
