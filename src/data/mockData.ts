@@ -1,4 +1,20 @@
-import { Owner, Property, Tenant, Contract, Payment, PropertyType, Currency, OccupancyStatus, ContractStatus, PaymentStatus, PaymentMethod, Ticket, Contractor, TicketStatus, TicketUrgency } from '../types';
+import {
+  Owner,
+  Property,
+  Tenant,
+  Contract,
+  Payment,
+  PropertyType,
+  Currency,
+  OccupancyStatus,
+  ContractStatus,
+  PaymentStatus,
+  PaymentMethod,
+  Ticket,
+  Contractor,
+  TicketStatus,
+  TicketUrgency,
+} from '../types';
 
 export const mockOwner: Owner = {
   id: 'owner1',
@@ -6,7 +22,7 @@ export const mockOwner: Owner = {
   email: 'carlos.prop@email.com',
   telefono: '+58 412-9876543',
   direccion: 'Av. Principal, Edificio Central, Piso 10, Caracas, Venezuela',
-  fotoUrl: 'https://i.pravatar.cc/150?u=owner'
+  fotoUrl: 'https://i.pravatar.cc/150?u=owner',
 };
 
 export const mockProperties: Property[] = [
@@ -86,7 +102,7 @@ export const mockProperties: Property[] = [
     moneda: Currency.USD,
     estado_ocupacion: OccupancyStatus.Disponible,
     imageUrl: 'https://picsum.photos/seed/5/400/300',
-  }
+  },
 ];
 
 export const mockTenants: Tenant[] = [
@@ -96,7 +112,7 @@ export const mockTenants: Tenant[] = [
     documento_id: 'V-12.345.678',
     email: 'maria.r@email.com',
     telefono: '+58 414-1234567',
-    fotoUrl: 'https://i.pravatar.cc/150?u=maria'
+    fotoUrl: 'https://i.pravatar.cc/150?u=maria',
   },
   {
     id: 'ten2',
@@ -104,7 +120,7 @@ export const mockTenants: Tenant[] = [
     documento_id: 'CPF 123.456.789-00',
     email: 'carlos.silva@email.com.br',
     telefono: '+55 11 98765-4321',
-    fotoUrl: 'https://i.pravatar.cc/150?u=carlos'
+    fotoUrl: 'https://i.pravatar.cc/150?u=carlos',
   },
   {
     id: 'ten3',
@@ -112,8 +128,8 @@ export const mockTenants: Tenant[] = [
     documento_id: 'DNI 98765432',
     email: 'pedro.g@email.pe',
     telefono: '+51 987 654 321',
-    fotoUrl: 'https://i.pravatar.cc/150?u=pedro'
-  }
+    fotoUrl: 'https://i.pravatar.cc/150?u=pedro',
+  },
 ];
 
 export const mockContracts: Contract[] = [
@@ -129,9 +145,12 @@ export const mockContracts: Contract[] = [
     dia_pago: 5,
     estado_contrato: ContractStatus.Activo,
     documentos: [
-        { nombre: 'Contrato Firmado.pdf', url: 'data:application/pdf;base64,JVBERi0xLjQKJ...' },
-        { nombre: 'Cédula Inquilino.jpg', url: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAA...' }
-    ]
+      { nombre: 'Contrato Firmado.pdf', url: 'data:application/pdf;base64,JVBERi0xLjQKJ...' },
+      {
+        nombre: 'Cédula Inquilino.jpg',
+        url: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAA...',
+      },
+    ],
   },
   {
     id: 'con2',
@@ -144,7 +163,7 @@ export const mockContracts: Contract[] = [
     moneda: Currency.USD,
     dia_pago: 1,
     estado_contrato: ContractStatus.Vencido,
-  }
+  },
 ];
 
 export const mockPayments: Payment[] = [
@@ -175,7 +194,7 @@ export const mockPayments: Payment[] = [
     metodo_pago: PaymentMethod.Transferencia,
     estado_pago: PaymentStatus.Pendiente,
   },
-   {
+  {
     id: 'pay4',
     contractId: 'con2',
     mes_correspondiente: '2024-04-01',
@@ -192,58 +211,79 @@ export const mockPayments: Payment[] = [
     fecha_pago: '2024-05-01', // Dummy placeholder
     metodo_pago: PaymentMethod.Deposito,
     estado_pago: PaymentStatus.Atrasado,
-  }
+  },
 ];
 
 export const mockContractors: Contractor[] = [
-    { id: 'ct1', nombre: 'Juan Pérez Plomería', especialidad: 'Plomería', telefono: '+58 412-5551234' },
-    { id: 'ct2', nombre: 'Ana García Electricidad', especialidad: 'Electricidad', telefono: '+51 999 888 777' },
-    { id: 'ct3', nombre: 'Servicios Generales SRL', especialidad: 'Aire Acondicionado', telefono: '+55 11 9999-8888' },
+  {
+    id: 'ct1',
+    nombre: 'Juan Pérez Plomería',
+    especialidad: 'Plomería',
+    telefono: '+58 412-5551234',
+  },
+  {
+    id: 'ct2',
+    nombre: 'Ana García Electricidad',
+    especialidad: 'Electricidad',
+    telefono: '+51 999 888 777',
+  },
+  {
+    id: 'ct3',
+    nombre: 'Servicios Generales SRL',
+    especialidad: 'Aire Acondicionado',
+    telefono: '+55 11 9999-8888',
+  },
 ];
 
 export const mockTickets: Ticket[] = [
-    {
-        id: 'tic1',
-        propertyId: 'prop1',
-        tenantId: 'ten1',
-        titulo: 'Fuga de agua en el baño principal',
-        descripcion: 'Hay una fuga constante en la base del inodoro del baño principal. Ha estado ocurriendo durante los últimos 2 días y está empezando a mojar el piso.',
-        fotos: ['https://picsum.photos/seed/leak/400/300', 'https://picsum.photos/seed/bathroom/400/300'],
-        costo_estimado: 80,
-        moneda: Currency.USD,
-        urgencia: TicketUrgency.Alta,
-        estado: TicketStatus.Abierto,
-        fecha_creacion: '2024-07-20',
-        contratistaId: 'ct1',
-    },
-    {
-        id: 'tic2',
-        propertyId: 'prop3',
-        tenantId: 'ten2',
-        titulo: 'Aire acondicionado no enfría',
-        descripcion: 'El sistema de aire acondicionado central de la oficina no está enfriando correctamente. Solo expulsa aire a temperatura ambiente.',
-        fotos: ['https://picsum.photos/seed/ac/400/300'],
-        costo_estimado: 250,
-        moneda: Currency.USD,
-        urgencia: TicketUrgency.Media,
-        estado: TicketStatus.EnProgreso,
-        fecha_creacion: '2024-07-18',
-        contratistaId: 'ct3',
-        facturaUrl: 'https://example.com/invoice123.pdf'
-    },
-    {
-        id: 'tic3',
-        propertyId: 'prop1',
-        tenantId: 'ten1',
-        titulo: 'Tomacorriente defectuoso en la cocina',
-        descripcion: 'Uno de los tomacorrientes cerca de la estufa dejó de funcionar. He probado varios aparatos y ninguno enciende.',
-        fotos: [],
-        costo_estimado: 50,
-        moneda: Currency.USD,
-        urgencia: TicketUrgency.Baja,
-        estado: TicketStatus.Cerrado,
-        fecha_creacion: '2024-06-15',
-        contratistaId: 'ct2',
-        facturaUrl: 'https://example.com/invoice456.pdf'
-    },
+  {
+    id: 'tic1',
+    propertyId: 'prop1',
+    tenantId: 'ten1',
+    titulo: 'Fuga de agua en el baño principal',
+    descripcion:
+      'Hay una fuga constante en la base del inodoro del baño principal. Ha estado ocurriendo durante los últimos 2 días y está empezando a mojar el piso.',
+    fotos: [
+      'https://picsum.photos/seed/leak/400/300',
+      'https://picsum.photos/seed/bathroom/400/300',
+    ],
+    costo_estimado: 80,
+    moneda: Currency.USD,
+    urgencia: TicketUrgency.Alta,
+    estado: TicketStatus.Abierto,
+    fecha_creacion: '2024-07-20',
+    contratistaId: 'ct1',
+  },
+  {
+    id: 'tic2',
+    propertyId: 'prop3',
+    tenantId: 'ten2',
+    titulo: 'Aire acondicionado no enfría',
+    descripcion:
+      'El sistema de aire acondicionado central de la oficina no está enfriando correctamente. Solo expulsa aire a temperatura ambiente.',
+    fotos: ['https://picsum.photos/seed/ac/400/300'],
+    costo_estimado: 250,
+    moneda: Currency.USD,
+    urgencia: TicketUrgency.Media,
+    estado: TicketStatus.EnProgreso,
+    fecha_creacion: '2024-07-18',
+    contratistaId: 'ct3',
+    facturaUrl: 'https://example.com/invoice123.pdf',
+  },
+  {
+    id: 'tic3',
+    propertyId: 'prop1',
+    tenantId: 'ten1',
+    titulo: 'Tomacorriente defectuoso en la cocina',
+    descripcion:
+      'Uno de los tomacorrientes cerca de la estufa dejó de funcionar. He probado varios aparatos y ninguno enciende.',
+    fotos: [],
+    costo_estimado: 50,
+    moneda: Currency.USD,
+    urgencia: TicketUrgency.Baja,
+    estado: TicketStatus.Cerrado,
+    fecha_creacion: '2024-06-15',
+    contratistaId: 'ct2',
+    facturaUrl: 'https://example.com/invoice456.pdf',
+  },
 ];

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AppProvider } from '@/contexts/AppContext';
 import { SuperAdminProvider } from '@/contexts/SuperAdminContext';
@@ -11,19 +12,35 @@ const AppContent: React.FC = () => {
   const { currentUser, isOwner, isTenant, isSuperAdmin } = useAuth();
 
   if (!currentUser) {
-    return <LoginPage />;
+    return (
+      <ErrorBoundary>
+        <LoginPage />
+      </ErrorBoundary>
+    );
   }
 
   if (isSuperAdmin && currentUser.type === 'superadmin') {
-    return <SuperAdminPortal superAdmin={currentUser.data} />;
+    return (
+      <ErrorBoundary>
+        <SuperAdminPortal superAdmin={currentUser.data} />
+      </ErrorBoundary>
+    );
   }
 
   if (isOwner && currentUser.type === 'owner') {
-    return <LandlordPortal owner={currentUser.data} />;
+    return (
+      <ErrorBoundary>
+        <LandlordPortal owner={currentUser.data} />
+      </ErrorBoundary>
+    );
   }
 
   if (isTenant && currentUser.type === 'tenant') {
-    return <TenantPortal tenant={currentUser.data} />;
+    return (
+      <ErrorBoundary>
+        <TenantPortal tenant={currentUser.data} />
+      </ErrorBoundary>
+    );
   }
 
   return null;
@@ -31,13 +48,15 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <SuperAdminProvider>
-        <AppProvider>
-          <AppContent />
-        </AppProvider>
-      </SuperAdminProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <SuperAdminProvider>
+          <AppProvider>
+            <AppContent />
+          </AppProvider>
+        </SuperAdminProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

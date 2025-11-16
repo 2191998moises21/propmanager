@@ -94,9 +94,7 @@ const ConfigItem: React.FC<ConfigItemProps> = ({ config, onUpdate }) => {
             </span>
           </div>
           <p className="text-sm text-gray-600 mb-3">{config.descripcion}</p>
-          <p className="text-xs text-gray-400">
-            Última modificación: {config.fecha_modificacion}
-          </p>
+          <p className="text-xs text-gray-400">Última modificación: {config.fecha_modificacion}</p>
         </div>
       </div>
 
@@ -140,13 +138,16 @@ export const SystemConfig: React.FC = () => {
   };
 
   // Group configs by category
-  const configsByCategory = systemConfig.reduce((acc, config) => {
-    if (!acc[config.categoria]) {
-      acc[config.categoria] = [];
-    }
-    acc[config.categoria].push(config);
-    return acc;
-  }, {} as Record<string, SystemConfigType[]>);
+  const configsByCategory = systemConfig.reduce(
+    (acc, config) => {
+      if (!acc[config.categoria]) {
+        acc[config.categoria] = [];
+      }
+      acc[config.categoria].push(config);
+      return acc;
+    },
+    {} as Record<string, SystemConfigType[]>
+  );
 
   const categoryTitles: Record<string, string> = {
     pagos: 'Configuración de Pagos',
@@ -165,9 +166,7 @@ export const SystemConfig: React.FC = () => {
           <Cog6ToothIcon className="w-8 h-8" />
           Configuración del Sistema
         </h1>
-        <p className="text-indigo-100">
-          Gestiona la configuración global de la plataforma
-        </p>
+        <p className="text-indigo-100">Gestiona la configuración global de la plataforma</p>
       </div>
 
       {/* Warning Banner */}
@@ -179,8 +178,8 @@ export const SystemConfig: React.FC = () => {
               Precaución al modificar configuraciones
             </h3>
             <p className="text-sm text-yellow-700 mt-1">
-              Los cambios en la configuración del sistema afectan a toda la plataforma. Asegúrate
-              de entender el impacto antes de realizar modificaciones.
+              Los cambios en la configuración del sistema afectan a toda la plataforma. Asegúrate de
+              entender el impacto antes de realizar modificaciones.
             </p>
           </div>
         </div>

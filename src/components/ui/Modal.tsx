@@ -36,7 +36,9 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
         style={{ animationFillMode: 'forwards' }} // Keep the final state of the animation
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 id="modal-title" className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 id="modal-title" className="text-lg font-semibold text-gray-900">
+            {title}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1"
@@ -45,9 +47,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[80vh]">
-          {children}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[80vh]">{children}</div>
       </div>
       <style>{`
         @keyframes fade-in-scale {

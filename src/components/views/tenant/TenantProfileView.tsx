@@ -103,10 +103,7 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
               <CheckIcon className="w-4 h-4" />
               Guardar
             </Button>
-            <Button
-              onClick={handleCancel}
-              className="flex items-center gap-2 bg-gray-600"
-            >
+            <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-600">
               <XMarkIcon className="w-4 h-4" />
               Cancelar
             </Button>
@@ -162,9 +159,7 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
 
           {isChangingPhoto && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-700 mb-3">
-                Selecciona una nueva foto de perfil:
-              </p>
+              <p className="text-sm text-gray-700 mb-3">Selecciona una nueva foto de perfil:</p>
               <div className="flex gap-3 flex-wrap">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <button
@@ -216,9 +211,7 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
                 <input
                   type="tel"
                   value={editedTenant.telefono}
-                  onChange={(e) =>
-                    setEditedTenant({ ...editedTenant, telefono: e.target.value })
-                  }
+                  onChange={(e) => setEditedTenant({ ...editedTenant, telefono: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
                   placeholder="Ej: +1234567890"
                 />

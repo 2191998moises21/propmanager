@@ -58,3 +58,67 @@ export const CURRENCY_FORMATS = {
   COP: { symbol: '$', locale: 'es-CO' },
   ARS: { symbol: '$', locale: 'es-AR' },
 } as const;
+
+/**
+ * UI/UX Constants
+ */
+export const UI_CONSTANTS = {
+  TOAST_DURATION: 3000, // milliseconds
+  MODAL_ANIMATION_DURATION: 300, // milliseconds
+  DEBOUNCE_DELAY: 300, // milliseconds
+  SEARCH_MIN_CHARS: 2,
+  MOBILE_BREAKPOINT: 768, // pixels
+} as const;
+
+/**
+ * Authentication Constants
+ */
+export const AUTH_CONSTANTS = {
+  LOGIN_SIMULATION_DELAY: 500, // milliseconds (for demo mode)
+  SESSION_TIMEOUT: 3600000, // 1 hour in milliseconds
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_MAX_LENGTH: 128,
+} as const;
+
+/**
+ * Validation Constants
+ */
+export const VALIDATION = {
+  MIN_NAME_LENGTH: 3,
+  MAX_NAME_LENGTH: 100,
+  MIN_PHONE_DIGITS: 10,
+  EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PHONE_REGEX: /^\+?[\d\s()-]{10,}$/,
+} as const;
+
+/**
+ * File Upload Constants
+ */
+export const FILE_UPLOAD = {
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'image/jpeg', 'image/png'],
+} as const;
+
+/**
+ * Error Messages
+ */
+export const ERROR_MESSAGES = {
+  NETWORK_ERROR: 'Error de conexión. Verifica tu internet.',
+  GENERIC_ERROR: 'Ocurrió un error inesperado. Intenta nuevamente.',
+  INVALID_CREDENTIALS: 'Email o contraseña incorrectos.',
+  SESSION_EXPIRED: 'Tu sesión ha expirado. Inicia sesión nuevamente.',
+  UNAUTHORIZED: 'No tienes permisos para realizar esta acción.',
+  NOT_FOUND: 'El recurso solicitado no fue encontrado.',
+} as const;
+
+/**
+ * Success Messages
+ */
+export const SUCCESS_MESSAGES = {
+  SAVE_SUCCESS: 'Guardado exitosamente',
+  UPDATE_SUCCESS: 'Actualizado exitosamente',
+  DELETE_SUCCESS: 'Eliminado exitosamente',
+  UPLOAD_SUCCESS: 'Archivo subido exitosamente',
+  EMAIL_SENT: 'Email enviado exitosamente',
+} as const;

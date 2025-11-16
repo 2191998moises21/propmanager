@@ -89,10 +89,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
   // Calculate this month's income
   const currentMonth = new Date().toISOString().slice(0, 7);
   const ingresosEsteMes = payments
-    .filter(
-      (p) =>
-        p.estado_pago === 'pagado' && p.mes_correspondiente.startsWith(currentMonth)
-    )
+    .filter((p) => p.estado_pago === 'pagado' && p.mes_correspondiente.startsWith(currentMonth))
     .reduce((sum, p) => sum + p.monto, 0);
 
   return (
@@ -100,9 +97,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
         <h1 className="text-3xl font-bold mb-2">Panel de SuperAdmin</h1>
-        <p className="text-purple-100">
-          Control y gestión completa de la plataforma PropManager
-        </p>
+        <p className="text-purple-100">Control y gestión completa de la plataforma PropManager</p>
       </div>
 
       {/* Stats Grid */}

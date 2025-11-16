@@ -308,9 +308,7 @@ export const Maintenance: React.FC = () => {
             <ClockIcon className="w-10 h-10 mb-3 text-red-600" />
             <h3 className="font-bold text-gray-900 mb-1">Limpiar Logs Antiguos</h3>
             <p className="text-sm text-gray-600">Eliminar logs de más de 30 días</p>
-            <p className="text-xs text-gray-500 mt-2">
-              {activityLogs.length} logs en el sistema
-            </p>
+            <p className="text-xs text-gray-500 mt-2">{activityLogs.length} logs en el sistema</p>
           </button>
 
           <div className="p-6 border-2 border-gray-200 rounded-lg">

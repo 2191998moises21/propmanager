@@ -5,140 +5,215 @@ import { Button } from '@/components/ui/Button';
 import { PencilIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 interface ProfileProps {
-    owner: Owner;
-    onUpdate: (owner: Owner) => void;
+  owner: Owner;
+  onUpdate: (owner: Owner) => void;
 }
 
-const InfoRow: React.FC<{ icon: React.ReactNode, label: string, value: string }> = ({ icon, label, value }) => (
-    <div>
-        <label className="text-xs text-gray-500">{label}</label>
-        <div className="flex items-center mt-1">
-            <span className="w-5 h-5 text-gray-400 mr-3">{icon}</span>
-            <p className="text-sm text-gray-800">{value}</p>
-        </div>
+const InfoRow: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({
+  icon,
+  label,
+  value,
+}) => (
+  <div>
+    <label className="text-xs text-gray-500">{label}</label>
+    <div className="flex items-center mt-1">
+      <span className="w-5 h-5 text-gray-400 mr-3">{icon}</span>
+      <p className="text-sm text-gray-800">{value}</p>
     </div>
+  </div>
 );
 
-const InputRow: React.FC<{ icon: React.ReactNode, label: string, name: string, value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, type?: string }> = ({ icon, label, name, value, onChange, type = 'text' }) => (
-    <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
-        <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <span className="text-gray-500 w-5 h-5">{icon}</span>
-            </div>
-            <input
-                type={type}
-                name={name}
-                id={name}
-                className="block w-full rounded-md border-gray-300 pl-10 focus:border-primary focus:ring-primary sm:text-sm"
-                value={value}
-                onChange={onChange}
-            />
-        </div>
+const InputRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+}> = ({ icon, label, name, value, onChange, type = 'text' }) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <div className="mt-1 relative rounded-md shadow-sm">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <span className="text-gray-500 w-5 h-5">{icon}</span>
+      </div>
+      <input
+        type={type}
+        name={name}
+        id={name}
+        className="block w-full rounded-md border-gray-300 pl-10 focus:border-primary focus:ring-primary sm:text-sm"
+        value={value}
+        onChange={onChange}
+      />
     </div>
+  </div>
 );
-
 
 export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState(owner);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(owner);
 
-    useEffect(() => {
-        setFormData(owner);
-    }, [owner]);
+  useEffect(() => {
+    setFormData(owner);
+  }, [owner]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const handleSave = () => {
-        onUpdate(formData);
-        setIsEditing(false);
-        alert('Perfil actualizado con éxito.');
-    };
+  const handleSave = () => {
+    onUpdate(formData);
+    setIsEditing(false);
+    alert('Perfil actualizado con éxito.');
+  };
 
-    const handleCancel = () => {
-        setFormData(owner);
-        setIsEditing(false);
-    };
-    
-    const handlePasswordChange = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        alert('Funcionalidad para cambiar contraseña no implementada en esta demo.');
-    }
+  const handleCancel = () => {
+    setFormData(owner);
+    setIsEditing(false);
+  };
 
-    return (
-        <div className="space-y-6 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900">Mi Perfil</h1>
+  const handlePasswordChange = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    alert('Funcionalidad para cambiar contraseña no implementada en esta demo.');
+  };
 
-            <Card>
-                <div className="p-4">
-                    <div className="flex items-center space-x-5">
-                        <img className="h-24 w-24 rounded-full object-cover ring-4 ring-gray-200" src={owner.fotoUrl} alt={owner.nombre_completo} />
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{owner.nombre_completo}</h2>
-                            <p className="text-md text-gray-500">{owner.email}</p>
-                        </div>
-                    </div>
-                </div>
-            </Card>
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-900">Mi Perfil</h1>
 
-            <Card>
-                <div className="flex justify-between items-center p-4 border-b">
-                    <h3 className="text-lg font-semibold text-gray-800">Información Personal</h3>
-                    {!isEditing && (
-                        <Button variant="ghost" icon={<PencilIcon className="w-4 h-4" />} onClick={() => setIsEditing(true)}>
-                            Editar
-                        </Button>
-                    )}
-                </div>
-                <div className="p-6">
-                    {isEditing ? (
-                        <div className="space-y-4">
-                            <InputRow icon={<PencilIcon />} label="Nombre Completo" name="nombre_completo" value={formData.nombre_completo} onChange={handleChange} />
-                            <InputRow icon={<EnvelopeIcon />} label="Email" name="email" value={formData.email} onChange={handleChange} type="email" />
-                            <InputRow icon={<PhoneIcon />} label="Teléfono" name="telefono" value={formData.telefono} onChange={handleChange} />
-                            <InputRow icon={<MapPinIcon />} label="Dirección" name="direccion" value={formData.direccion} onChange={handleChange} />
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <Button variant="ghost" onClick={handleCancel}>Cancelar</Button>
-                                <Button variant="primary" onClick={handleSave}>Guardar Cambios</Button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <InfoRow icon={<PencilIcon />} label="Nombre Completo" value={owner.nombre_completo} />
-                            <InfoRow icon={<EnvelopeIcon />} label="Email" value={owner.email} />
-                            <InfoRow icon={<PhoneIcon />} label="Teléfono" value={owner.telefono} />
-                            <InfoRow icon={<MapPinIcon />} label="Dirección" value={owner.direccion} />
-                        </div>
-                    )}
-                </div>
-            </Card>
-
-            <Card>
-                <div className="p-4 border-b">
-                    <h3 className="text-lg font-semibold text-gray-800">Seguridad</h3>
-                </div>
-                <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
-                     <div>
-                        <label htmlFor="current_password" className="block text-sm font-medium text-gray-700">Contraseña Actual</label>
-                        <input type="password" name="current_password" id="current_password" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
-                    </div>
-                     <div>
-                        <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
-                        <input type="password" name="new_password" id="new_password" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
-                    </div>
-                     <div>
-                        <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
-                        <input type="password" name="confirm_password" id="confirm_password" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
-                    </div>
-                    <div className="flex justify-end pt-2">
-                        <Button variant="primary" type="submit">Cambiar Contraseña</Button>
-                    </div>
-                </form>
-            </Card>
-
+      <Card>
+        <div className="p-4">
+          <div className="flex items-center space-x-5">
+            <img
+              className="h-24 w-24 rounded-full object-cover ring-4 ring-gray-200"
+              src={owner.fotoUrl}
+              alt={owner.nombre_completo}
+            />
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{owner.nombre_completo}</h2>
+              <p className="text-md text-gray-500">{owner.email}</p>
+            </div>
+          </div>
         </div>
-    );
+      </Card>
+
+      <Card>
+        <div className="flex justify-between items-center p-4 border-b">
+          <h3 className="text-lg font-semibold text-gray-800">Información Personal</h3>
+          {!isEditing && (
+            <Button
+              variant="ghost"
+              icon={<PencilIcon className="w-4 h-4" />}
+              onClick={() => setIsEditing(true)}
+            >
+              Editar
+            </Button>
+          )}
+        </div>
+        <div className="p-6">
+          {isEditing ? (
+            <div className="space-y-4">
+              <InputRow
+                icon={<PencilIcon />}
+                label="Nombre Completo"
+                name="nombre_completo"
+                value={formData.nombre_completo}
+                onChange={handleChange}
+              />
+              <InputRow
+                icon={<EnvelopeIcon />}
+                label="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+              />
+              <InputRow
+                icon={<PhoneIcon />}
+                label="Teléfono"
+                name="telefono"
+                value={formData.telefono}
+                onChange={handleChange}
+              />
+              <InputRow
+                icon={<MapPinIcon />}
+                label="Dirección"
+                name="direccion"
+                value={formData.direccion}
+                onChange={handleChange}
+              />
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button variant="ghost" onClick={handleCancel}>
+                  Cancelar
+                </Button>
+                <Button variant="primary" onClick={handleSave}>
+                  Guardar Cambios
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InfoRow
+                icon={<PencilIcon />}
+                label="Nombre Completo"
+                value={owner.nombre_completo}
+              />
+              <InfoRow icon={<EnvelopeIcon />} label="Email" value={owner.email} />
+              <InfoRow icon={<PhoneIcon />} label="Teléfono" value={owner.telefono} />
+              <InfoRow icon={<MapPinIcon />} label="Dirección" value={owner.direccion} />
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="p-4 border-b">
+          <h3 className="text-lg font-semibold text-gray-800">Seguridad</h3>
+        </div>
+        <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
+          <div>
+            <label htmlFor="current_password" className="block text-sm font-medium text-gray-700">
+              Contraseña Actual
+            </label>
+            <input
+              type="password"
+              name="current_password"
+              id="current_password"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
+              Nueva Contraseña
+            </label>
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">
+              Confirmar Nueva Contraseña
+            </label>
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirm_password"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            />
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="primary" type="submit">
+              Cambiar Contraseña
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
 };

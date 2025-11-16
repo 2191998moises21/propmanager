@@ -1,28 +1,15 @@
-import bcrypt from 'bcryptjs';
-
-const SALT_ROUNDS = 10;
-
 /**
- * Hashes a password using bcrypt
- * @param password - The plain text password to hash
- * @returns Promise resolving to the hashed password
+ * Authentication Utilities
+ *
+ * NOTE: Password hashing and verification functions removed from frontend.
+ * These operations MUST be handled by the backend API for security.
+ *
+ * When implementing backend authentication:
+ * - Use bcrypt/argon2 on the server
+ * - Never send plain passwords to frontend
+ * - Use JWT tokens for session management
+ * - Implement proper password reset flows
  */
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
-}
-
-/**
- * Compares a plain text password with a hashed password
- * @param password - The plain text password
- * @param hashedPassword - The hashed password to compare against
- * @returns Promise resolving to true if passwords match, false otherwise
- */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string
-): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
-}
 
 /**
  * Validates password strength

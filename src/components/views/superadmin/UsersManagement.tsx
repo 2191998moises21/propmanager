@@ -42,9 +42,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, userType, onStatusChange, onDel
       <td className="px-6 py-4">
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${
-            userType === 'owner'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-green-100 text-green-800'
+            userType === 'owner' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
           }`}
         >
           {userType === 'owner' ? 'Propietario' : 'Inquilino'}
@@ -147,9 +145,7 @@ export const UsersManagement: React.FC = () => {
               <UserCircleIcon className="w-8 h-8 text-primary" />
               Gestión de Usuarios
             </h1>
-            <p className="text-gray-600 mt-1">
-              Administra todos los usuarios de la plataforma
-            </p>
+            <p className="text-gray-600 mt-1">Administra todos los usuarios de la plataforma</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">

@@ -21,7 +21,9 @@ export const SupportTools: React.FC = () => {
   const { addActivityLog } = useSuperAdmin();
   const { toasts, removeToast, success, warning, error } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState<(Owner | Tenant) & { type: 'owner' | 'tenant' } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<
+    ((Owner | Tenant) & { type: 'owner' | 'tenant' }) | null
+  >(null);
 
   // Combine all users for search
   const allUsers = [
@@ -88,9 +90,7 @@ export const SupportTools: React.FC = () => {
       const userPayments = payments.filter((pay) =>
         userProperties.some((p) => p.id === pay.propertyId)
       );
-      const userTickets = tickets.filter((t) =>
-        userProperties.some((p) => p.id === t.propertyId)
-      );
+      const userTickets = tickets.filter((t) => userProperties.some((p) => p.id === t.propertyId));
 
       return {
         properties: userProperties.length,
@@ -122,9 +122,7 @@ export const SupportTools: React.FC = () => {
           <WrenchScrewdriverIcon className="w-8 h-8" />
           Herramientas de Soporte
         </h1>
-        <p className="text-red-100">
-          Impersonación, diagnóstico y soporte técnico para usuarios
-        </p>
+        <p className="text-red-100">Impersonación, diagnóstico y soporte técnico para usuarios</p>
       </div>
 
       {/* Warning Banner */}
@@ -179,9 +177,7 @@ export const SupportTools: React.FC = () => {
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-gray-900">
-                              {user.nombre_completo}
-                            </h3>
+                            <h3 className="font-semibold text-gray-900">{user.nombre_completo}</h3>
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-full ${
                                 user.type === 'owner'
