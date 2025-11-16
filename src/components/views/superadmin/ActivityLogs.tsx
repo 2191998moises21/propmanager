@@ -101,9 +101,7 @@ export const ActivityLogs: React.FC = () => {
               <ClockIcon className="w-8 h-8 text-primary" />
               Registro de Actividad
             </h1>
-            <p className="text-gray-600 mt-1">
-              Monitorea todas las acciones en la plataforma
-            </p>
+            <p className="text-gray-600 mt-1">Monitorea todas las acciones en la plataforma</p>
           </div>
           <button
             onClick={handleExport}
@@ -246,8 +244,7 @@ export const ActivityLogs: React.FC = () => {
           <p className="text-2xl font-bold text-blue-600">
             {
               activityLogs.filter(
-                (log) =>
-                  new Date(log.fecha).getTime() > Date.now() - 24 * 60 * 60 * 1000
+                (log) => new Date(log.fecha).getTime() > Date.now() - 24 * 60 * 60 * 1000
               ).length
             }
           </p>

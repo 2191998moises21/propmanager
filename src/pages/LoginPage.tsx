@@ -278,10 +278,7 @@ export const LoginPage: React.FC = () => {
             <p className="mt-1 text-xs text-gray-500">Mínimo 8 caracteres</p>
           </div>
           <div>
-            <label
-              htmlFor="regConfirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="regConfirmPassword" className="block text-sm font-medium text-gray-700">
               Confirmar Contraseña
             </label>
             <input

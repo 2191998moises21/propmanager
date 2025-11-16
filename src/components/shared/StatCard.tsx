@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/Card';
 
@@ -23,16 +22,22 @@ export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, o
   const selectedColor = colorClasses[color];
 
   const WrapperComponent = onClick ? 'button' : 'div';
-  const wrapperProps = onClick 
-    ? { onClick, className: 'text-left w-full h-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg' } 
+  const wrapperProps = onClick
+    ? {
+        onClick,
+        className:
+          'text-left w-full h-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg',
+      }
     : { className: 'w-full h-full' };
 
   return (
     <WrapperComponent {...wrapperProps}>
       <Card className="flex items-center w-full h-full">
-        <div className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-lg ${selectedColor.bg}`}>
+        <div
+          className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-lg ${selectedColor.bg}`}
+        >
           {React.cloneElement(icon, {
-            className: `w-6 h-6 ${selectedColor.text}`
+            className: `w-6 h-6 ${selectedColor.text}`,
           })}
         </div>
         <div className="ml-4">

@@ -58,7 +58,10 @@ interface AppContextType {
 
   // Ticket handlers
   addTicket: (
-    ticket: Omit<Ticket, 'id' | 'costo_estimado' | 'moneda' | 'urgencia' | 'estado' | 'fecha_creacion'>
+    ticket: Omit<
+      Ticket,
+      'id' | 'costo_estimado' | 'moneda' | 'urgencia' | 'estado' | 'fecha_creacion'
+    >
   ) => Ticket;
   updateTicket: (ticket: Ticket) => void;
 
@@ -93,24 +96,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const updateProperty = useCallback((updatedProperty: Property) => {
-    setProperties((prev) =>
-      prev.map((p) => (p.id === updatedProperty.id ? updatedProperty : p))
-    );
+    setProperties((prev) => prev.map((p) => (p.id === updatedProperty.id ? updatedProperty : p)));
   }, []);
 
   const deleteProperty = useCallback((propertyId: string) => {
     setProperties((prev) => prev.filter((p) => p.id !== propertyId));
   }, []);
 
-  const updatePropertyStatus = useCallback(
-    (propertyId: string, newStatus: OccupancyStatus) => {
-      if (newStatus === OccupancyStatus.Ocupada) return;
-      setProperties((prev) =>
-        prev.map((p) => (p.id === propertyId ? { ...p, estado_ocupacion: newStatus } : p))
-      );
-    },
-    []
-  );
+  const updatePropertyStatus = useCallback((propertyId: string, newStatus: OccupancyStatus) => {
+    if (newStatus === OccupancyStatus.Ocupada) return;
+    setProperties((prev) =>
+      prev.map((p) => (p.id === propertyId ? { ...p, estado_ocupacion: newStatus } : p))
+    );
+  }, []);
 
   // Tenant handlers
   const addTenant = useCallback((tenant: Omit<Tenant, 'id'>): Tenant => {
@@ -143,42 +141,42 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return newContract;
   }, []);
 
-  const terminateContract = useCallback((contractId: string) => {
-    let propertyToUpdateId: string | null = null;
-    const updatedContracts = contracts.map((c) => {
-      if (c.id === contractId) {
-        propertyToUpdateId = c.propertyId;
-        return { ...c, estado_contrato: ContractStatus.Terminado };
+  const terminateContract = useCallback(
+    (contractId: string) => {
+      let propertyToUpdateId: string | null = null;
+      const updatedContracts = contracts.map((c) => {
+        if (c.id === contractId) {
+          propertyToUpdateId = c.propertyId;
+          return { ...c, estado_contrato: ContractStatus.Terminado };
+        }
+        return c;
+      });
+
+      if (propertyToUpdateId) {
+        const updatedProperties = properties.map((p) =>
+          p.id === propertyToUpdateId
+            ? {
+                ...p,
+                estado_ocupacion: OccupancyStatus.Disponible,
+                fecha_disponible: new Date().toISOString().split('T')[0],
+              }
+            : p
+        );
+        setProperties(updatedProperties);
       }
-      return c;
-    });
 
-    if (propertyToUpdateId) {
-      const updatedProperties = properties.map((p) =>
-        p.id === propertyToUpdateId
-          ? {
-              ...p,
-              estado_ocupacion: OccupancyStatus.Disponible,
-              fecha_disponible: new Date().toISOString().split('T')[0],
-            }
-          : p
-      );
-      setProperties(updatedProperties);
-    }
-
-    setContracts(updatedContracts);
-  }, [contracts, properties]);
-
-  const addDocumentToContract = useCallback(
-    (contractId: string, document: ContractDocument) => {
-      setContracts((prev) =>
-        prev.map((c) =>
-          c.id === contractId ? { ...c, documentos: [...(c.documentos || []), document] } : c
-        )
-      );
+      setContracts(updatedContracts);
     },
-    []
+    [contracts, properties]
   );
+
+  const addDocumentToContract = useCallback((contractId: string, document: ContractDocument) => {
+    setContracts((prev) =>
+      prev.map((c) =>
+        c.id === contractId ? { ...c, documentos: [...(c.documentos || []), document] } : c
+      )
+    );
+  }, []);
 
   // Payment handlers
   const addPayment = useCallback((payment: Omit<Payment, 'id'>): Payment => {

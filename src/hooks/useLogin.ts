@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import { useAuth, User } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { Owner } from '@/types';
-import { generateId } from '@/utils/id';
 import { mockSuperAdmin } from '@/data/mockSuperAdminData';
+import { AUTH_CONSTANTS, ERROR_MESSAGES } from '@/utils/constants';
 
 interface UseLoginReturn {
   login: (
@@ -37,8 +37,8 @@ export const useLogin = (): UseLoginReturn => {
       setError(null);
 
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Simulate API call delay (demo mode only)
+        await new Promise((resolve) => setTimeout(resolve, AUTH_CONSTANTS.LOGIN_SIMULATION_DELAY));
 
         if (role === 'superadmin') {
           // Check for SuperAdmin credentials
@@ -67,10 +67,10 @@ export const useLogin = (): UseLoginReturn => {
           }
         }
 
-        setError('Credenciales inválidas. Por favor, intente de nuevo.');
+        setError(ERROR_MESSAGES.INVALID_CREDENTIALS);
         return false;
       } catch (err) {
-        setError('Error al iniciar sesión. Por favor, intente de nuevo.');
+        setError(ERROR_MESSAGES.GENERIC_ERROR);
         return false;
       } finally {
         setIsLoading(false);
@@ -80,16 +80,13 @@ export const useLogin = (): UseLoginReturn => {
   );
 
   const register = useCallback(
-    async (
-      ownerData: Omit<Owner, 'id' | 'fotoUrl'>,
-      _password: string
-    ): Promise<boolean> => {
+    async (ownerData: Omit<Owner, 'id' | 'fotoUrl'>, _password: string): Promise<boolean> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Simulate API call delay (demo mode only)
+        await new Promise((resolve) => setTimeout(resolve, AUTH_CONSTANTS.LOGIN_SIMULATION_DELAY));
 
         // Check if email already exists
         if (owners.some((o) => o.email.toLowerCase() === ownerData.email.toLowerCase())) {
@@ -104,7 +101,7 @@ export const useLogin = (): UseLoginReturn => {
         setAuthUser(user);
         return true;
       } catch (err) {
-        setError('Error al registrarse. Por favor, intente de nuevo.');
+        setError(ERROR_MESSAGES.GENERIC_ERROR);
         return false;
       } finally {
         setIsLoading(false);

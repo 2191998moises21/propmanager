@@ -10,11 +10,7 @@ import {
   LogAction,
 } from '@/types';
 import { generateId } from '@/utils/id';
-import {
-  mockSuperAdmin,
-  mockActivityLogs,
-  mockSystemConfig,
-} from '@/data/mockSuperAdminData';
+import { mockSuperAdmin, mockActivityLogs, mockSystemConfig } from '@/data/mockSuperAdminData';
 
 interface SuperAdminContextType {
   // State
@@ -63,17 +59,14 @@ export const SuperAdminProvider: React.FC<SuperAdminProviderProps> = ({ children
   });
 
   // Log handlers
-  const addActivityLog = useCallback(
-    (log: Omit<ActivityLog, 'id' | 'fecha'>) => {
-      const newLog: ActivityLog = {
-        ...log,
-        id: generateId('log'),
-        fecha: new Date().toISOString(),
-      };
-      setActivityLogs((prev) => [newLog, ...prev]);
-    },
-    []
-  );
+  const addActivityLog = useCallback((log: Omit<ActivityLog, 'id' | 'fecha'>) => {
+    const newLog: ActivityLog = {
+      ...log,
+      id: generateId('log'),
+      fecha: new Date().toISOString(),
+    };
+    setActivityLogs((prev) => [newLog, ...prev]);
+  }, []);
 
   const getLogsByUser = useCallback(
     (userId: string): ActivityLog[] => {

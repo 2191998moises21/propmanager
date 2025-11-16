@@ -117,9 +117,7 @@ export const Reports: React.FC = () => {
       const activeContract = contracts.find(
         (c) => c.propertyId === p.id && c.estado_contrato === 'activo'
       );
-      const tenant = activeContract
-        ? tenants.find((t) => t.id === activeContract.tenantId)
-        : null;
+      const tenant = activeContract ? tenants.find((t) => t.id === activeContract.tenantId) : null;
 
       return [
         p.direccion,
@@ -209,10 +207,10 @@ export const Reports: React.FC = () => {
                 {range === 'week'
                   ? 'Semana'
                   : range === 'month'
-                  ? 'Mes'
-                  : range === 'year'
-                  ? 'Año'
-                  : 'Todo'}
+                    ? 'Mes'
+                    : range === 'year'
+                      ? 'Año'
+                      : 'Todo'}
               </button>
             ))}
           </div>

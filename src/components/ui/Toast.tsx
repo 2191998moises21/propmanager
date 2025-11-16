@@ -5,6 +5,7 @@ import {
   InformationCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
+import { UI_CONSTANTS } from '@/utils/constants';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -15,7 +16,12 @@ interface ToastProps {
   duration?: number;
 }
 
-export const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 3000 }) => {
+export const Toast: React.FC<ToastProps> = ({
+  message,
+  type,
+  onClose,
+  duration = UI_CONSTANTS.TOAST_DURATION,
+}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();

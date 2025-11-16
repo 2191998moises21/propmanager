@@ -157,10 +157,7 @@ export const SuperAdminPortal: React.FC<SuperAdminPortalProps> = ({ superAdmin }
         {/* Top Bar */}
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <button
-              onClick={toggleSidebar}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
-            >
+            <button onClick={toggleSidebar} className="md:hidden p-2 rounded-lg hover:bg-gray-100">
               <Bars3Icon className="w-6 h-6 text-gray-600" />
             </button>
             <div className="flex items-center gap-2">

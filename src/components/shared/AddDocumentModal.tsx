@@ -9,7 +9,11 @@ interface AddDocumentModalProps {
   onAddDocument: (document: ContractDocument) => void;
 }
 
-export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({ isOpen, onClose, onAddDocument }) => {
+export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
+  isOpen,
+  onClose,
+  onAddDocument,
+}) => {
   const [documentName, setDocumentName] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -70,12 +74,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({ isOpen, onCl
           <div className="mt-1 flex items-center">
             <label className="cursor-pointer py-2 px-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
               <span>Seleccionar archivo</span>
-              <input
-                type="file"
-                className="sr-only"
-                onChange={handleFileChange}
-                required
-              />
+              <input type="file" className="sr-only" onChange={handleFileChange} required />
             </label>
             {file && <span className="ml-3 text-sm text-gray-500 truncate">{file.name}</span>}
           </div>

@@ -40,36 +40,36 @@ export enum PaymentMethod {
 }
 
 export enum TicketStatus {
-    Abierto = 'abierto',
-    EnProgreso = 'en progreso',
-    Cerrado = 'cerrado',
+  Abierto = 'abierto',
+  EnProgreso = 'en progreso',
+  Cerrado = 'cerrado',
 }
 
 export enum TicketUrgency {
-    Baja = 'baja',
-    Media = 'media',
-    Alta = 'alta',
+  Baja = 'baja',
+  Media = 'media',
+  Alta = 'alta',
 }
 
 export enum UserStatus {
-    Activo = 'activo',
-    Suspendido = 'suspendido',
-    Inactivo = 'inactivo',
+  Activo = 'activo',
+  Suspendido = 'suspendido',
+  Inactivo = 'inactivo',
 }
 
 export enum LogAction {
-    Login = 'login',
-    Logout = 'logout',
-    CreateProperty = 'create_property',
-    UpdateProperty = 'update_property',
-    DeleteProperty = 'delete_property',
-    CreateContract = 'create_contract',
-    UpdatePayment = 'update_payment',
-    CreateTicket = 'create_ticket',
-    UpdateUser = 'update_user',
-    UpdateUserStatus = 'update_user_status',
-    DeleteUser = 'delete_user',
-    SystemConfig = 'system_config',
+  Login = 'login',
+  Logout = 'logout',
+  CreateProperty = 'create_property',
+  UpdateProperty = 'update_property',
+  DeleteProperty = 'delete_property',
+  CreateContract = 'create_contract',
+  UpdatePayment = 'update_payment',
+  CreateTicket = 'create_ticket',
+  UpdateUser = 'update_user',
+  UpdateUserStatus = 'update_user_status',
+  DeleteUser = 'delete_user',
+  SystemConfig = 'system_config',
 }
 
 export interface Owner {
@@ -113,8 +113,8 @@ export interface Tenant {
 }
 
 export interface ContractDocument {
-    nombre: string;
-    url: string; // Data URL
+  nombre: string;
+  url: string; // Data URL
 }
 
 export interface Contract {
@@ -144,70 +144,70 @@ export interface Payment {
 }
 
 export interface Contractor {
-    id: string;
-    nombre: string;
-    especialidad: string;
-    telefono: string;
+  id: string;
+  nombre: string;
+  especialidad: string;
+  telefono: string;
 }
 
 export interface Ticket {
-    id: string;
-    propertyId: string;
-    tenantId: string;
-    titulo: string;
-    descripcion: string;
-    fotos: string[];
-    costo_estimado: number;
-    moneda: Currency;
-    urgencia: TicketUrgency;
-    estado: TicketStatus;
-    fecha_creacion: string; // YYYY-MM-DD
-    contratistaId?: string;
-    facturaUrl?: string;
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  titulo: string;
+  descripcion: string;
+  fotos: string[];
+  costo_estimado: number;
+  moneda: Currency;
+  urgencia: TicketUrgency;
+  estado: TicketStatus;
+  fecha_creacion: string; // YYYY-MM-DD
+  contratistaId?: string;
+  facturaUrl?: string;
 }
 
 export interface SuperAdmin {
-    id: string;
-    nombre_completo: string;
-    email: string;
-    fotoUrl: string;
-    rol: 'superadmin';
-    permisos: string[];
-    fecha_creacion: string;
+  id: string;
+  nombre_completo: string;
+  email: string;
+  fotoUrl: string;
+  rol: 'superadmin';
+  permisos: string[];
+  fecha_creacion: string;
 }
 
 export interface ActivityLog {
-    id: string;
-    userId: string;
-    userType: 'owner' | 'tenant' | 'superadmin';
-    userName: string;
-    accion: LogAction;
-    descripcion: string;
-    fecha: string; // ISO timestamp
-    detalles?: Record<string, unknown>;
+  id: string;
+  userId: string;
+  userType: 'owner' | 'tenant' | 'superadmin';
+  userName: string;
+  accion: LogAction;
+  descripcion: string;
+  fecha: string; // ISO timestamp
+  detalles?: Record<string, unknown>;
 }
 
 export interface SystemConfig {
-    id: string;
-    clave: string;
-    valor: string | number | boolean;
-    descripcion: string;
-    categoria: 'general' | 'pagos' | 'notificaciones' | 'seguridad';
-    fecha_modificacion: string;
-    modificado_por?: string;
+  id: string;
+  clave: string;
+  valor: string | number | boolean;
+  descripcion: string;
+  categoria: 'general' | 'pagos' | 'notificaciones' | 'seguridad';
+  fecha_modificacion: string;
+  modificado_por?: string;
 }
 
 export interface PlatformStats {
-    totalPropietarios: number;
-    totalInquilinos: number;
-    totalPropiedades: number;
-    propiedadesOcupadas: number;
-    propiedadesDisponibles: number;
-    totalContratos: number;
-    contratosActivos: number;
-    ingresosTotal: number;
-    ingresosMesActual: number;
-    ticketsAbiertos: number;
-    ticketsCerrados: number;
-    pagosEsperando: number;
+  totalPropietarios: number;
+  totalInquilinos: number;
+  totalPropiedades: number;
+  propiedadesOcupadas: number;
+  propiedadesDisponibles: number;
+  totalContratos: number;
+  contratosActivos: number;
+  ingresosTotal: number;
+  ingresosMesActual: number;
+  ticketsAbiertos: number;
+  ticketsCerrados: number;
+  pagosEsperando: number;
 }
