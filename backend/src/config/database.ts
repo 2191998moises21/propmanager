@@ -7,28 +7,29 @@ dotenv.config();
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Google Cloud SQL configuration
-const poolConfig: PoolConfig = isProduction && process.env.CLOUD_SQL_CONNECTION_NAME
-  ? {
-      // Cloud SQL via Unix socket
-      host: process.env.DB_SOCKET_PATH,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    }
-  : {
-      // Local development or Cloud SQL via TCP
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME || 'propmanager',
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    };
+const poolConfig: PoolConfig =
+  isProduction && process.env.CLOUD_SQL_CONNECTION_NAME
+    ? {
+        // Cloud SQL via Unix socket
+        host: process.env.DB_SOCKET_PATH,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      }
+    : {
+        // Local development or Cloud SQL via TCP
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME || 'propmanager',
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      };
 
 export const pool = new Pool(poolConfig);
 
@@ -43,7 +44,7 @@ pool.on('error', (err) => {
 });
 
 // Helper function to execute queries
-export const query = async (text: string, params?: any[]) => {
+export const query = async (text: string, params?: unknown[]) => {
   const start = Date.now();
   try {
     const res = await pool.query(text, params);

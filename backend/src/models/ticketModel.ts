@@ -14,9 +14,9 @@ export const getTicketsByPropertyId = async (propertyId: string): Promise<Ticket
     [propertyId]
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     ...row,
-    fotos: row.fotos || []
+    fotos: row.fotos || [],
   }));
 };
 
@@ -34,9 +34,9 @@ export const getTicketsByOwnerId = async (ownerId: string): Promise<Ticket[]> =>
     [ownerId]
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     ...row,
-    fotos: row.fotos || []
+    fotos: row.fotos || [],
   }));
 };
 
@@ -53,9 +53,9 @@ export const getTicketsByTenantId = async (tenantId: string): Promise<Ticket[]> 
     [tenantId]
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     ...row,
-    fotos: row.fotos || []
+    fotos: row.fotos || [],
   }));
 };
 
@@ -77,7 +77,7 @@ export const getTicketById = async (ticketId: string): Promise<Ticket | null> =>
 
   return {
     ...result.rows[0],
-    fotos: result.rows[0].fotos || []
+    fotos: result.rows[0].fotos || [],
   };
 };
 
@@ -114,16 +114,16 @@ export const createTicket = async (
   // Insert photos if provided
   if (data.fotos && data.fotos.length > 0) {
     for (const photoUrl of data.fotos) {
-      await pool.query(
-        `INSERT INTO ticket_photos (ticket_id, photo_url) VALUES ($1, $2)`,
-        [ticket.id, photoUrl]
-      );
+      await pool.query(`INSERT INTO ticket_photos (ticket_id, photo_url) VALUES ($1, $2)`, [
+        ticket.id,
+        photoUrl,
+      ]);
     }
   }
 
   return {
     ...ticket,
-    fotos: data.fotos || []
+    fotos: data.fotos || [],
   };
 };
 
@@ -135,11 +135,17 @@ export const updateTicket = async (
   data: Partial<Ticket>
 ): Promise<Ticket | null> => {
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && key !== 'id' && key !== 'created_at' && key !== 'updated_at' && key !== 'fotos') {
+    if (
+      value !== undefined &&
+      key !== 'id' &&
+      key !== 'created_at' &&
+      key !== 'updated_at' &&
+      key !== 'fotos'
+    ) {
       fields.push(`${key} = $${paramCounter}`);
       values.push(value);
       paramCounter++;
@@ -169,7 +175,7 @@ export const updateTicket = async (
 
   return {
     ...result.rows[0],
-    fotos: photosResult.rows.map(r => r.photo_url)
+    fotos: photosResult.rows.map((r) => r.photo_url),
   };
 };
 
@@ -177,10 +183,10 @@ export const updateTicket = async (
  * Add photo to ticket
  */
 export const addTicketPhoto = async (ticketId: string, photoUrl: string): Promise<void> => {
-  await pool.query(
-    `INSERT INTO ticket_photos (ticket_id, photo_url) VALUES ($1, $2)`,
-    [ticketId, photoUrl]
-  );
+  await pool.query(`INSERT INTO ticket_photos (ticket_id, photo_url) VALUES ($1, $2)`, [
+    ticketId,
+    photoUrl,
+  ]);
 };
 
 /**

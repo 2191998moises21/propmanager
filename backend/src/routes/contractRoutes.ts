@@ -16,11 +16,7 @@ router.get('/my', asyncHandler(contractController.getMyContracts));
 router.get('/:id', asyncHandler(contractController.getContractById));
 
 // Create contract (Owner only)
-router.post(
-  '/',
-  authorize(UserRole.Owner),
-  asyncHandler(contractController.createContract)
-);
+router.post('/', authorize(UserRole.Owner), asyncHandler(contractController.createContract));
 
 // Update contract
 router.put('/:id', asyncHandler(contractController.updateContract));

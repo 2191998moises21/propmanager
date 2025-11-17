@@ -33,10 +33,7 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
   }
 
   // Check ownership (owners can only see their own properties, admins can see all)
-  if (
-    req.user?.role === UserRole.Owner &&
-    property.owner_id !== req.user.id
-  ) {
+  if (req.user?.role === UserRole.Owner && property.owner_id !== req.user.id) {
     throw new ApiError(403, 'Forbidden');
   }
 
@@ -78,10 +75,7 @@ export const updateProperty = async (req: Request, res: Response): Promise<void>
   }
 
   // Check ownership
-  if (
-    req.user?.role === UserRole.Owner &&
-    existingProperty.owner_id !== req.user.id
-  ) {
+  if (req.user?.role === UserRole.Owner && existingProperty.owner_id !== req.user.id) {
     throw new ApiError(403, 'Forbidden');
   }
 
@@ -109,10 +103,7 @@ export const deleteProperty = async (req: Request, res: Response): Promise<void>
   }
 
   // Check ownership
-  if (
-    req.user?.role === UserRole.Owner &&
-    existingProperty.owner_id !== req.user.id
-  ) {
+  if (req.user?.role === UserRole.Owner && existingProperty.owner_id !== req.user.id) {
     throw new ApiError(403, 'Forbidden');
   }
 

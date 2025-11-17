@@ -11,8 +11,70 @@ export default [
   {
     ignores: ['dist', 'node_modules', 'coverage', 'build'],
   },
+  // Backend configuration (Node.js)
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['backend/**/*.ts'],
+    ignores: ['backend/**/*.test.ts', 'backend/**/tests/**'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parser: tsParser,
+      globals: {
+        ...globals.node,
+        ...globals.es2022,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      prettier: prettier,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      ...prettierConfig.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-namespace': 'off', // Allow namespaces in backend for Express types
+      'prettier/prettier': 'warn',
+      'no-console': 'off', // Allow console in backend
+    },
+  },
+  // Backend test files (Jest)
+  {
+    files: ['backend/**/*.test.ts', 'backend/**/tests/**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parser: tsParser,
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+        ...globals.es2022,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      prettier: prettier,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
+      ...prettierConfig.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-explicit-any': 'error',
+      'prettier/prettier': 'warn',
+      'no-console': 'off', // Allow console in tests
+    },
+  },
+  // Frontend configuration (Browser + React)
+  {
+    files: ['src/**/*.{ts,tsx}', 'vite.config.ts'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',

@@ -33,11 +33,7 @@ router.post(
 );
 
 // Update property
-router.put(
-  '/:id',
-  validate(updatePropertySchema),
-  asyncHandler(propertyController.updateProperty)
-);
+router.put('/:id', validate(updatePropertySchema), asyncHandler(propertyController.updateProperty));
 
 // Delete property
 router.delete('/:id', asyncHandler(propertyController.deleteProperty));

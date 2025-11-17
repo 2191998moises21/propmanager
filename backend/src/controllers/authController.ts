@@ -8,7 +8,10 @@ import { logger } from '../config/logger';
 /**
  * Login user
  */
-export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): Promise<void> => {
+export const login = async (
+  req: Request<object, object, LoginRequest>,
+  res: Response
+): Promise<void> => {
   const { email, password, role } = req.body;
 
   // Find user by email and role
@@ -39,9 +42,6 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): 
   });
 
   logger.info('User logged in:', { userId: user.id, role });
-
-  // Remove password from response
-  const { password_hash, ...userWithoutPassword } = user;
 
   const response: LoginResponse = {
     token,
@@ -164,7 +164,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
     throw new ApiError(404, 'User not found');
   }
 
-  const { password_hash, ...userWithoutPassword } = user;
+  const { password_hash: _password_hash, ...userWithoutPassword } = user;
 
   res.json({
     success: true,

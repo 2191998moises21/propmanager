@@ -125,8 +125,5 @@ export const updatePassword = async (
       throw new Error('Invalid role');
   }
 
-  await pool.query(`UPDATE ${table} SET password_hash = $1 WHERE id = $2`, [
-    passwordHash,
-    userId,
-  ]);
+  await pool.query(`UPDATE ${table} SET password_hash = $1 WHERE id = $2`, [passwordHash, userId]);
 };

@@ -36,7 +36,7 @@ export const updateTenant = async (
   data: Partial<Tenant>
 ): Promise<Tenant | null> => {
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   Object.entries(data).forEach(([key, value]) => {

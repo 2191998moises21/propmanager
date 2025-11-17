@@ -63,10 +63,9 @@ export const createContract = async (
   );
 
   // Update property status to occupied
-  await pool.query(
-    `UPDATE properties SET estado_ocupacion = 'ocupada' WHERE id = $1`,
-    [data.property_id]
-  );
+  await pool.query(`UPDATE properties SET estado_ocupacion = 'ocupada' WHERE id = $1`, [
+    data.property_id,
+  ]);
 
   return result.rows[0];
 };
@@ -79,7 +78,7 @@ export const updateContract = async (
   data: Partial<Contract>
 ): Promise<Contract | null> => {
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   Object.entries(data).forEach(([key, value]) => {
