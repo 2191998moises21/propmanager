@@ -88,7 +88,7 @@ export const updatePayment = async (
   data: Partial<Payment>
 ): Promise<Payment | null> => {
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   Object.entries(data).forEach(([key, value]) => {
@@ -144,7 +144,7 @@ export const getPendingPayments = async (ownerId?: string): Promise<Payment[]> =
     WHERE p.estado_pago IN ('pendiente', 'atrasado')
   `;
 
-  const values: any[] = [];
+  const values: unknown[] = [];
 
   if (ownerId) {
     query += ` AND pr.owner_id = $1`;

@@ -70,7 +70,7 @@ export const updateProperty = async (
   data: Partial<Property>
 ): Promise<Property | null> => {
   const fields: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   // Build dynamic UPDATE query
@@ -116,7 +116,7 @@ export const searchProperties = async (filters: {
   offset?: number;
 }): Promise<{ properties: Property[]; total: number }> => {
   const conditions: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCounter = 1;
 
   if (filters.ciudad) {

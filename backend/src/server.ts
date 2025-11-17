@@ -86,7 +86,6 @@ const startServer = async () => {
       logger.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
       gracefulShutdown('UNHANDLED_REJECTION');
     });
-
   } catch (error) {
     logger.error('❌ Failed to start server:', error);
     process.exit(1);

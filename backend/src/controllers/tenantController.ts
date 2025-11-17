@@ -53,10 +53,7 @@ export const updateTenant = async (req: Request, res: Response): Promise<void> =
   const { id } = req.params;
 
   // Tenants can only update their own profile, owners/admins can update any
-  if (
-    req.user?.role === UserRole.Tenant &&
-    req.user.id !== id
-  ) {
+  if (req.user?.role === UserRole.Tenant && req.user.id !== id) {
     throw new ApiError(403, 'You can only update your own profile');
   }
 

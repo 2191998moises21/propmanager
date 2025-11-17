@@ -24,11 +24,11 @@ export const errorHandler = (
   err: Error | ApiError | ZodError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   let statusCode = 500;
   let message = 'Internal Server Error';
-  let errors: any = undefined;
+  let errors: Array<{ field: string; message: string }> | undefined = undefined;
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
@@ -48,8 +48,7 @@ export const errorHandler = (
   else if (err.message.includes('duplicate key')) {
     statusCode = 409;
     message = 'Resource already exists';
-  }
-  else if (err.message.includes('foreign key')) {
+  } else if (err.message.includes('foreign key')) {
     statusCode = 400;
     message = 'Invalid reference. Related resource not found.';
   }
@@ -85,7 +84,9 @@ export const notFoundHandler = (req: Request, res: Response): void => {
 /**
  * Async handler wrapper to catch errors in async route handlers
  */
-export const asyncHandler = (fn: Function) => {
+export const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
