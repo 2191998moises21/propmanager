@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useAuth, User } from '@/contexts/AuthContext';
-import { useApp } from '@/contexts/AppContext';
-import { Owner } from '@/types';
-import { mockSuperAdmin } from '@/data/mockSuperAdminData';
-import { AUTH_CONSTANTS, ERROR_MESSAGES } from '@/utils/constants';
+import { Owner, Tenant } from '@/types';
+import { authAPI, setAuthToken } from '@/services/api';
+import { ERROR_MESSAGES } from '@/utils/constants';
 
 interface UseLoginReturn {
   login: (
@@ -18,57 +17,42 @@ interface UseLoginReturn {
 
 /**
  * Custom hook for handling authentication
- * This is a simplified version for demo purposes
- * In production, this should communicate with a real backend API
+ * Communicates with backend API for real authentication
  */
 export const useLogin = (): UseLoginReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { login: setAuthUser } = useAuth();
-  const { owners, tenants, addOwner } = useApp();
 
   const login = useCallback(
     async (
       email: string,
-      _password: string,
+      password: string,
       role: 'owner' | 'tenant' | 'superadmin'
     ): Promise<boolean> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Simulate API call delay (demo mode only)
-        await new Promise((resolve) => setTimeout(resolve, AUTH_CONSTANTS.LOGIN_SIMULATION_DELAY));
+        // Call backend API
+        const response = await authAPI.login(email, password, role);
 
-        if (role === 'superadmin') {
-          // Check for SuperAdmin credentials
-          if (mockSuperAdmin.email.toLowerCase() === email.toLowerCase()) {
-            // TODO: In production, verify password with backend
-            const user: User = { type: 'superadmin', data: mockSuperAdmin };
-            setAuthUser(user);
-            return true;
-          }
-        } else if (role === 'owner') {
-          const owner = owners.find((o) => o.email.toLowerCase() === email.toLowerCase());
-          if (owner) {
-            // TODO: In production, verify password with backend
-            // For now, we're accepting any password for demo purposes
-            const user: User = { type: 'owner', data: owner };
-            setAuthUser(user);
-            return true;
-          }
+        if (response.success && response.data) {
+          // Store JWT token
+          setAuthToken(response.data.token);
+
+          // Create user object
+          const user: User = {
+            type: role,
+            data: response.data.user as Owner | Tenant,
+          };
+
+          setAuthUser(user);
+          return true;
         } else {
-          const tenant = tenants.find((t) => t.email.toLowerCase() === email.toLowerCase());
-          if (tenant) {
-            // TODO: In production, verify password with backend
-            const user: User = { type: 'tenant', data: tenant };
-            setAuthUser(user);
-            return true;
-          }
+          setError(response.error || ERROR_MESSAGES.INVALID_CREDENTIALS);
+          return false;
         }
-
-        setError(ERROR_MESSAGES.INVALID_CREDENTIALS);
-        return false;
       } catch (err) {
         setError(ERROR_MESSAGES.GENERIC_ERROR);
         return false;
@@ -76,30 +60,37 @@ export const useLogin = (): UseLoginReturn => {
         setIsLoading(false);
       }
     },
-    [owners, tenants, setAuthUser]
+    [setAuthUser]
   );
 
   const register = useCallback(
-    async (ownerData: Omit<Owner, 'id' | 'fotoUrl'>, _password: string): Promise<boolean> => {
+    async (ownerData: Omit<Owner, 'id' | 'fotoUrl'>, password: string): Promise<boolean> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Simulate API call delay (demo mode only)
-        await new Promise((resolve) => setTimeout(resolve, AUTH_CONSTANTS.LOGIN_SIMULATION_DELAY));
+        // Call backend API
+        const response = await authAPI.registerOwner({
+          ...ownerData,
+          password,
+        });
 
-        // Check if email already exists
-        if (owners.some((o) => o.email.toLowerCase() === ownerData.email.toLowerCase())) {
-          setError('El correo electrónico ya está en uso.');
+        if (response.success && response.data) {
+          // Store JWT token
+          setAuthToken(response.data.token);
+
+          // Create user object
+          const user: User = {
+            type: 'owner',
+            data: response.data.user as Owner,
+          };
+
+          setAuthUser(user);
+          return true;
+        } else {
+          setError(response.error || 'Error al registrar usuario');
           return false;
         }
-
-        // TODO: In production, hash password and send to backend
-        // For now, we're just creating the owner
-        const newOwner = addOwner(ownerData);
-        const user: User = { type: 'owner', data: newOwner };
-        setAuthUser(user);
-        return true;
       } catch (err) {
         setError(ERROR_MESSAGES.GENERIC_ERROR);
         return false;
@@ -107,7 +98,7 @@ export const useLogin = (): UseLoginReturn => {
         setIsLoading(false);
       }
     },
-    [owners, addOwner, setAuthUser]
+    [setAuthUser]
   );
 
   return {
