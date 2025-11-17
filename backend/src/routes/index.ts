@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
 import propertyRoutes from './propertyRoutes';
+import contractRoutes from './contractRoutes';
+import paymentRoutes from './paymentRoutes';
+import ticketRoutes from './ticketRoutes';
+import tenantRoutes from './tenantRoutes';
 
 const router = Router();
 
@@ -10,17 +14,23 @@ router.get('/health', (req, res) => {
     success: true,
     message: 'PropManager API is running',
     timestamp: new Date().toISOString(),
+    endpoints: {
+      auth: '/api/v1/auth',
+      properties: '/api/v1/properties',
+      contracts: '/api/v1/contracts',
+      payments: '/api/v1/payments',
+      tickets: '/api/v1/tickets',
+      tenants: '/api/v1/tenants',
+    },
   });
 });
 
 // API routes
 router.use('/auth', authRoutes);
 router.use('/properties', propertyRoutes);
-
-// TODO: Add more routes
-// router.use('/tenants', tenantRoutes);
-// router.use('/contracts', contractRoutes);
-// router.use('/payments', paymentRoutes);
-// router.use('/tickets', ticketRoutes);
+router.use('/contracts', contractRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/tickets', ticketRoutes);
+router.use('/tenants', tenantRoutes);
 
 export default router;
