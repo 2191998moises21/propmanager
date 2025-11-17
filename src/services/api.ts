@@ -12,7 +12,7 @@ const getAuthToken = (): string | null => {
 
 // Set token in localStorage
 export const setAuthToken = (token: string): void => {
-  localStorage.setItem('authToken');
+  localStorage.setItem('authToken', token);
 };
 
 // Remove token from localStorage

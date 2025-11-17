@@ -70,7 +70,7 @@ El servidor estará disponible en `http://localhost:3001`
 
 ## 📡 Endpoints de API
 
-### Autenticación
+### Autenticación (5 endpoints)
 
 ```
 POST   /api/v1/auth/login                 - Login de usuario
@@ -80,7 +80,7 @@ GET    /api/v1/auth/profile               - Obtener perfil (requiere auth)
 POST   /api/v1/auth/change-password       - Cambiar contraseña (requiere auth)
 ```
 
-### Propiedades
+### Propiedades (6 endpoints)
 
 ```
 GET    /api/v1/properties/my              - Mis propiedades (Owner)
@@ -91,12 +91,59 @@ PUT    /api/v1/properties/:id             - Actualizar propiedad
 DELETE /api/v1/properties/:id             - Eliminar propiedad
 ```
 
+### Contratos (7 endpoints)
+
+```
+GET    /api/v1/contracts/my               - Mis contratos
+GET    /api/v1/contracts/:id              - Obtener contrato por ID
+POST   /api/v1/contracts                  - Crear nuevo contrato
+PUT    /api/v1/contracts/:id              - Actualizar contrato
+POST   /api/v1/contracts/:id/terminate    - Terminar contrato
+GET    /api/v1/contracts/:id/documents    - Obtener documentos del contrato
+POST   /api/v1/contracts/:id/documents    - Agregar documento al contrato
+```
+
+### Pagos (8 endpoints)
+
+```
+GET    /api/v1/payments/my                - Mis pagos
+GET    /api/v1/payments/pending           - Pagos pendientes
+GET    /api/v1/payments/contract/:id      - Pagos por contrato
+GET    /api/v1/payments/:id               - Obtener pago por ID
+POST   /api/v1/payments                   - Crear nuevo pago
+PUT    /api/v1/payments/:id               - Actualizar pago
+POST   /api/v1/payments/:id/proof         - Subir comprobante de pago
+DELETE /api/v1/payments/:id               - Eliminar pago
+```
+
+### Tickets de Mantenimiento (6 endpoints)
+
+```
+GET    /api/v1/tickets/my                 - Mis tickets
+GET    /api/v1/tickets/property/:id       - Tickets por propiedad
+GET    /api/v1/tickets/:id                - Obtener ticket por ID
+POST   /api/v1/tickets                    - Crear nuevo ticket
+PUT    /api/v1/tickets/:id                - Actualizar ticket
+DELETE /api/v1/tickets/:id                - Eliminar ticket
+```
+
+### Inquilinos (4 endpoints)
+
+```
+GET    /api/v1/tenants                    - Listar inquilinos
+GET    /api/v1/tenants/:id                - Obtener inquilino por ID
+PUT    /api/v1/tenants/:id                - Actualizar inquilino
+DELETE /api/v1/tenants/:id                - Eliminar inquilino
+```
+
 ### Health Check
 
 ```
 GET    /api/v1/health                     - Estado del servidor
 GET    /                                  - Información de la API
 ```
+
+**Total: 31 endpoints implementados** ✅
 
 ## 🧪 Tests
 
@@ -246,34 +293,51 @@ Ver `.env.example` para la lista completa de variables. Las más importantes:
 ```
 backend/
 ├── src/
-│   ├── config/          # Configuración (DB, logger)
-│   │   ├── database.ts
-│   │   ├── logger.ts
-│   │   └── schema.sql
-│   ├── controllers/     # Lógica de negocio
+│   ├── config/             # Configuración (DB, logger)
+│   │   ├── database.ts     # Conexión PostgreSQL + Cloud SQL
+│   │   ├── logger.ts       # Winston logging
+│   │   └── schema.sql      # Schema completo de base de datos
+│   ├── controllers/        # Lógica de negocio (6 módulos)
 │   │   ├── authController.ts
-│   │   └── propertyController.ts
-│   ├── middleware/      # Middleware personalizado
-│   │   ├── auth.ts
-│   │   ├── errorHandler.ts
-│   │   └── validator.ts
-│   ├── models/          # Acceso a datos
+│   │   ├── propertyController.ts
+│   │   ├── contractController.ts
+│   │   ├── paymentController.ts
+│   │   ├── ticketController.ts
+│   │   └── tenantController.ts
+│   ├── middleware/         # Middleware personalizado
+│   │   ├── auth.ts         # JWT authentication & authorization
+│   │   ├── errorHandler.ts # Error handling centralizado
+│   │   └── validator.ts    # Validación con Zod
+│   ├── models/             # Acceso a datos (6 módulos)
 │   │   ├── authModel.ts
-│   │   └── propertyModel.ts
-│   ├── routes/          # Rutas de API
+│   │   ├── propertyModel.ts
+│   │   ├── contractModel.ts
+│   │   ├── paymentModel.ts
+│   │   ├── ticketModel.ts
+│   │   └── tenantModel.ts
+│   ├── routes/             # Rutas de API (6 módulos)
 │   │   ├── authRoutes.ts
 │   │   ├── propertyRoutes.ts
-│   │   └── index.ts
-│   ├── types/           # Tipos TypeScript
-│   │   └── index.ts
-│   ├── validators/      # Esquemas de validación Zod
+│   │   ├── contractRoutes.ts
+│   │   ├── paymentRoutes.ts
+│   │   ├── ticketRoutes.ts
+│   │   ├── tenantRoutes.ts
+│   │   └── index.ts        # Agregador de rutas
+│   ├── types/              # Tipos TypeScript
+│   │   └── index.ts        # Todas las interfaces y enums
+│   ├── validators/         # Esquemas de validación Zod
 │   │   ├── authValidators.ts
 │   │   └── propertyValidators.ts
-│   ├── app.ts           # Configuración de Express
-│   └── server.ts        # Entry point
-├── .env.example         # Variables de entorno de ejemplo
+│   ├── app.ts              # Configuración de Express
+│   └── server.ts           # Entry point con graceful shutdown
+├── tests/                  # Tests con Jest
+│   └── (pendiente)
+├── .env.example            # Variables de entorno de ejemplo
 ├── .dockerignore
-├── Dockerfile
+├── .gcloudignore
+├── Dockerfile              # Multi-stage build para producción
+├── cloudbuild.yaml         # CI/CD con Google Cloud Build
+├── jest.config.js
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -291,15 +355,26 @@ backend/
 
 ISC
 
+## ✅ Completado
+
+- ✅ **Implementar endpoints de Contratos** (7 endpoints)
+- ✅ **Implementar endpoints de Pagos** (8 endpoints)
+- ✅ **Implementar endpoints de Tickets** (6 endpoints)
+- ✅ **Implementar endpoints de Inquilinos** (4 endpoints)
+- ✅ **Autenticación JWT** con refresh tokens
+- ✅ **Validación de inputs** con Zod
+- ✅ **Error handling** centralizado
+- ✅ **Logging** estructurado con Winston
+- ✅ **Docker** multi-stage build
+- ✅ **Cloud Build** configuración para CI/CD
+
 ## 💡 Próximos pasos (TODO)
 
-- [ ] Implementar endpoints de Contratos
-- [ ] Implementar endpoints de Pagos
-- [ ] Implementar endpoints de Tickets
-- [ ] Implementar endpoints de Inquilinos
 - [ ] Agregar upload de archivos a Cloud Storage
 - [ ] Implementar WebSockets para notificaciones en tiempo real
 - [ ] Agregar Swagger/OpenAPI documentation
 - [ ] Implementar sistema de roles y permisos más granular
 - [ ] Agregar tests de integración completos
-- [ ] Implementar CI/CD con Cloud Build
+- [ ] Implementar paginación en endpoints de listado
+- [ ] Agregar búsqueda avanzada con filtros
+- [ ] Implementar soft delete para registros
