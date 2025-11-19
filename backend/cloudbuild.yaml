@@ -62,8 +62,8 @@ images:
 
 # Substitutions (configure in Cloud Build trigger or pass as parameters)
 substitutions:
-  _CLOUD_SQL_CONNECTION: 'your-project:us-central1:propmanager-db'
-  _DB_SOCKET_PATH: '/cloudsql/your-project:us-central1:propmanager-db'
+  _CLOUD_SQL_CONNECTION: 'propmanager-production-478716:us-central1:propmanager-db'
+  _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
   _DB_USER: 'propmanager-user'
 
