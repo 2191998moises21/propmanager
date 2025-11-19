@@ -89,7 +89,7 @@ export const LoginPage: React.FC = () => {
             }`}
           >
             <BuildingOffice2Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">Soy </span>Propietario
+            Propietario
           </button>
           <button
             type="button"
@@ -101,7 +101,7 @@ export const LoginPage: React.FC = () => {
             }`}
           >
             <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">Soy </span>Inquilino
+            Inquilino
           </button>
           <button
             type="button"

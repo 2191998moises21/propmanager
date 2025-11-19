@@ -1,0 +1,78 @@
+# ========================================
+# Google Cloud Build Configuration
+# CI/CD para PropManager Frontend
+# ========================================
+
+steps:
+  # Step 1: Build Docker image with build args
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/propmanager-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/propmanager-frontend:latest'
+      - '--build-arg'
+      - 'VITE_API_URL=${_API_URL}'
+      - '--build-arg'
+      - 'VITE_GCP_PROJECT_ID=$PROJECT_ID'
+      - '--build-arg'
+      - 'VITE_ENV=production'
+      - '.'
+
+  # Step 2: Push image to Container Registry (commit SHA)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/propmanager-frontend:$COMMIT_SHA'
+
+  # Step 3: Push image to Container Registry (latest)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/propmanager-frontend:latest'
+
+  # Step 4: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'propmanager-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/propmanager-frontend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--max-instances'
+      - '10'
+      - '--min-instances'
+      - '0'
+      - '--memory'
+      - '256Mi'
+      - '--cpu'
+      - '1'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+
+# Store images in Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/propmanager-frontend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/propmanager-frontend:latest'
+
+# Substitutions (configure in Cloud Build trigger or pass as parameters)
+substitutions:
+  # Update this with your actual backend Cloud Run URL after backend deployment
+  _API_URL: 'https://propmanager-backend-REPLACE_WITH_ACTUAL_HASH-uc.a.run.app/api/v1'
+
+# Build timeout
+timeout: '1200s'
+
+# Options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'

@@ -1,0 +1,98 @@
+# ========================================
+# Google Cloud Ignore File
+# Files and directories to exclude from Cloud Build
+# ========================================
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# TypeScript source (we only need compiled JS)
+*.ts
+!src/**/*.ts
+tsconfig.json
+tsconfig.*.json
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+coverage/
+.nyc_output/
+jest.config.js
+jest.config.ts
+
+# Source maps
+*.map
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Docker (not needed for Cloud Build)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Documentation
+README.md
+*.md
+docs/
+CHANGELOG.md
+LICENSE
+
+# Build output (will be generated during build)
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+
+# Linting and formatting
+.eslintrc.js
+.eslintrc.json
+.prettierrc
+.prettierrc.json
+.editorconfig
+
+# Other config files not needed in production
+.npmrc
+.nvmrc
+nodemon.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary files
+tmp/
+temp/
+*.tmp
