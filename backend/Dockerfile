@@ -39,7 +39,7 @@ RUN mkdir -p logs
 ENV NODE_ENV=production
 
 # Expose port (Cloud Run will set PORT env var)
-EXPOSE 3001
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
