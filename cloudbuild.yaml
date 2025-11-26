@@ -66,7 +66,19 @@ images:
 
 # Substitutions (configure in Cloud Build trigger or pass as parameters)
 substitutions:
-  # Update this with your actual backend Cloud Run URL after backend deployment
+  # IMPORTANT: Update this with your actual backend Cloud Run URL
+  #
+  # To get your backend URL, run:
+  #   gcloud run services describe propmanager-backend \
+  #     --project=propmanager-production-478716 \
+  #     --region=us-central1 \
+  #     --format='value(status.url)'
+  #
+  # Then update this line with: YOUR_BACKEND_URL/api/v1
+  #
+  # OR use the automated script:
+  #   ./scripts/update-frontend-api-url.sh
+  #
   _API_URL: 'https://propmanager-backend-REPLACE_WITH_ACTUAL_HASH-uc.a.run.app/api/v1'
 
 # Build timeout
