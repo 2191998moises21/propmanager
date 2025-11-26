@@ -4,13 +4,13 @@
 # ========================================
 
 # Stage 1: Build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies (including devDependencies for build)
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY . .
@@ -19,7 +19,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
