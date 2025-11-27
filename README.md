@@ -506,6 +506,50 @@ Ver `backend/src/config/schema.sql`
 
 ---
 
+## 📚 Documentación
+
+PropManager incluye documentación completa organizada por categorías:
+
+### 🚀 Deployment y Configuración
+- **[Guía de Google Cloud Platform](docs/deployment/google-cloud.md)** - Guía completa de deployment en GCP (recomendado)
+  - 9 fases paso a paso desde cero hasta producción
+  - Cloud Run, Cloud SQL, Secret Manager, Cloud Storage
+  - CI/CD automatizado con Cloud Build
+  - Costos estimados y optimización
+- **[Plataformas Alternativas](docs/deployment/alternative-platforms.md)** - Vercel, Netlify, AWS, DigitalOcean, Render
+- **[Variables de Entorno](docs/development/environment-variables.md)** - Flujo dev vs producción explicado
+
+### 💻 Desarrollo
+- **[Setup Local](docs/development/local-setup.md)** - Guía rápida para empezar a desarrollar
+  - 3 opciones: Docker Compose, PostgreSQL nativo, o datos mock
+  - Troubleshooting de errores comunes
+  - Test de la aplicación
+- **[Arquitectura Técnica](docs/development/architecture.md)** - Diseño del sistema completo
+  - Stack detallado (frontend + backend)
+  - 31 endpoints API documentados
+  - 11 tablas de base de datos con ER diagrams
+  - Patrones de autenticación y seguridad
+
+### 🛠️ Operaciones
+- **[Runbook](docs/operations/runbook.md)** - Procedimientos operacionales
+  - Checklists diarios, semanales, mensuales
+  - Procedimientos de incidentes (SEV 1-4)
+  - Troubleshooting común
+  - SLAs y métricas
+- **[Plan de Recuperación de Desastres](docs/operations/disaster-recovery.md)** - DRP completo
+  - 4 escenarios de desastre con procedimientos
+  - RTO: 1 hora, RPO: 24 horas
+  - Estrategias de backup y restauración
+  - Plantillas de comunicación
+
+### 📖 Referencia Adicional
+- **[Backend README](backend/README.md)** - Documentación específica del backend
+  - Estructura del código backend
+  - Guía de desarrollo del API
+  - Testing y debugging
+
+---
+
 ## 🤝 Contribuir
 
 1. Fork el proyecto
@@ -535,7 +579,9 @@ Este proyecto está bajo la Licencia MIT.
 Para preguntas o problemas:
 - 📧 Email: support@propmanager.com
 - 🐛 Issues: [GitHub Issues](https://github.com/2191998moises21/propmanager/issues)
-- 📖 Docs: Ver `backend/README.md` para documentación detallada del backend
+- 📖 Docs: Ver la [sección de documentación](#-documentación) arriba
+- 🚀 Deployment: [Guía de Google Cloud](docs/deployment/google-cloud.md)
+- 💻 Setup Local: [Guía de desarrollo local](docs/development/local-setup.md)
 
 ---
 
