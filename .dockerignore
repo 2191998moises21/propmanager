@@ -1,6 +1,3 @@
-# Backend (frontend build doesn't need backend code)
-backend/
-
 # Git
 .git/
 .gitignore
