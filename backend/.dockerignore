@@ -6,7 +6,7 @@ yarn-error.log
 # TypeScript
 *.ts
 !src/**/*.ts
-tsconfig.json
+# tsconfig.json is needed for build
 
 # Tests
 **/*.test.ts
