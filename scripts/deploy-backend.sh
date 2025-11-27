@@ -54,17 +54,13 @@ gcloud services enable run.googleapis.com cloudbuild.googleapis.com --quiet
 log_info "Iniciando build y deployment..."
 echo ""
 
-cd backend
-
 # Obtener commit SHA actual
 COMMIT_SHA=$(git rev-parse --short HEAD)
 log_info "Commit SHA: $COMMIT_SHA"
 
 gcloud builds submit \
-    --config=cloudbuild.yaml \
+    --config=backend/cloudbuild.yaml \
     --substitutions=COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user"
-
-cd ..
 
 # Obtener URL del servicio
 log_info "Obteniendo URL del servicio..."
