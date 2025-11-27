@@ -1,0 +1,61 @@
+# Backend (frontend build doesn't need backend code)
+backend/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Node
+node_modules/
+
+# Environment files (sensitive data)
+.env
+.env.*
+!.env.example
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# Build artifacts
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Scripts (deployment scripts not needed in container)
+scripts/
+
+# Docker files
+docker-compose.yml
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+
+# Misc
+.eslintrc.js
+.prettierrc
+jest.config.js
+.gcloudignore
