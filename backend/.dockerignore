@@ -3,10 +3,8 @@ node_modules
 npm-debug.log
 yarn-error.log
 
-# TypeScript
-*.ts
-!src/**/*.ts
-# tsconfig.json is needed for build
+# TypeScript - Keep source files for build, only exclude tests
+# tsconfig.json and src/**/*.ts are needed for compilation
 
 # Tests
 **/*.test.ts
