@@ -38,7 +38,7 @@ RUN mkdir -p logs
 # Set environment
 ENV NODE_ENV=production
 
-# Expose port (Cloud Run will override with PORT env var, defaults to 8080)
+# Expose port (Cloud Run will set PORT env var)
 EXPOSE 8080
 
 # Health check (uses PORT env var if set, defaults to 8080)
