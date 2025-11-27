@@ -1,5 +1,9 @@
 # 🚀 Guía de Despliegue - PropManager
 
+> **⚠️ IMPORTANTE:** Este proyecto está optimizado y completamente configurado para **Google Cloud Platform**.
+> Para deployment en GCP, consulta [`google-cloud.md`](./google-cloud.md).
+> Esta guía cubre plataformas **alternativas** (Vercel, Netlify, AWS, etc.) que requieren configuración adicional.
+
 Esta guía proporciona instrucciones paso a paso para desplegar PropManager en producción utilizando diferentes plataformas de hosting.
 
 ---

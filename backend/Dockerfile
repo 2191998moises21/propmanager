@@ -41,9 +41,9 @@ ENV NODE_ENV=production
 # Expose port (Cloud Run will set PORT env var)
 EXPOSE 8080
 
-# Health check
+# Health check (uses PORT env var if set, defaults to 8080)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/api/v1/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+  CMD node -e "const port = process.env.PORT || 8080; require('http').get(`http://localhost:${port}/api/v1/health`, (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Run as non-root user for security
 USER node

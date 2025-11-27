@@ -20,9 +20,9 @@ Esta guía proporciona instrucciones paso a paso para desplegar PropManager en G
 10. [Fase 6: Configuración de CI/CD](#fase-6-configuración-de-cicd)
 11. [Fase 7: Dominio y SSL](#fase-7-dominio-y-ssl)
 12. [Fase 8: Monitoreo y Logging](#fase-8-monitoreo-y-logging)
-13. [Verificación y Testing](#verificación-y-testing)
+13. [Fase 9: Verificación Final y Post-Deployment](#fase-9-verificación-final-y-post-deployment)
 14. [Costos Estimados](#costos-estimados)
-15. [Troubleshooting](#troubleshooting)
+15. [Troubleshooting Completo](#troubleshooting-completo)
 16. [Mantenimiento](#mantenimiento)
 
 ---
@@ -773,6 +773,173 @@ gsutil rm gs://propmanager-uploads/test/test.txt
 
 ---
 
+## 🎯 Fase 9: Verificación Final y Post-Deployment
+
+Una vez completadas las Fases 1-8, sigue estos pasos para verificar que todo funcione correctamente y configurar los ajustes finales.
+
+### 9.1 Verificar Deployments
+
+```bash
+# Listar servicios desplegados
+gcloud run services list \
+  --project=propmanager-production-478716 \
+  --region=us-central1
+
+# Verificar el backend
+BACKEND_URL=$(gcloud run services describe propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='value(status.url)')
+
+echo "Backend URL: $BACKEND_URL"
+
+# Verificar el frontend
+FRONTEND_URL=$(gcloud run services describe propmanager-frontend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='value(status.url)')
+
+echo "Frontend URL: $FRONTEND_URL"
+```
+
+**Resultado esperado:**
+```
+Backend URL: https://propmanager-340512713682.us-central1.run.app
+Frontend URL: https://propmanager-frontend-XXXXX-uc.a.run.app
+```
+
+### 9.2 Configurar CORS (CRÍTICO)
+
+El frontend necesita permisos para hacer llamadas al backend:
+
+```bash
+# Actualizar backend con CORS_ORIGIN del frontend
+gcloud run services update propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --update-env-vars CORS_ORIGIN="$FRONTEND_URL"
+```
+
+**Verificar configuración:**
+```bash
+gcloud run services describe propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='yaml(spec.template.spec.containers[0].env)'
+```
+
+Busca `CORS_ORIGIN` en la salida y verifica que tiene la URL correcta del frontend.
+
+### 9.3 Verificación del Backend
+
+```bash
+# Test de health check
+curl $BACKEND_URL/api/v1/health
+
+# Debe responder:
+# {"success":true,"data":{"status":"ok","timestamp":"..."}}
+```
+
+**Si falla:**
+- Verifica logs: `gcloud run services logs read propmanager-backend --limit=50`
+- Verifica Cloud SQL está corriendo: `gcloud sql instances list`
+- Verifica conexión Cloud SQL configurada en Cloud Run
+
+### 9.4 Verificación del Frontend
+
+#### Test 1: Verificar que el sitio carga
+```bash
+curl -I $FRONTEND_URL
+```
+
+**Debe responder:** `HTTP/2 200`
+
+#### Test 2: Verificar API URL en el navegador
+
+1. Abre `$FRONTEND_URL` en Chrome/Firefox
+2. Abre DevTools (F12) → Console
+3. Ejecuta:
+   ```javascript
+   console.log(import.meta.env.VITE_API_URL)
+   ```
+4. **Debe mostrar:** `https://propmanager-340512713682.us-central1.run.app/api/v1`
+
+**Si muestra un placeholder o URL incorrecta:**
+- El frontend se desplegó con configuración incorrecta
+- Re-despliega: `gcloud builds submit --config=cloudbuild.yaml`
+
+### 9.5 Test End-to-End de Registro
+
+1. Abre el frontend en el navegador
+2. Click en "Registrarse"
+3. Selecciona "Propietario"
+4. Llena el formulario:
+   ```
+   Nombre: Test User
+   Email: test@example.com
+   Password: Test123456
+   Teléfono: +1234567890
+   Dirección: Test Address 123
+   ```
+5. Click "Crear Cuenta"
+
+**Resultado esperado:**
+- ✅ No hay error "Failed to fetch"
+- ✅ No hay error "CORS policy blocked"
+- ✅ Eres redirigido al dashboard
+- ✅ En Network tab (DevTools) ves request exitoso a `/api/v1/auth/register/owner` con status 201
+
+**Si hay errores:**
+- Ver sección [Troubleshooting Completo](#troubleshooting-completo) abajo
+
+### 9.6 Verificar Datos en Cloud SQL
+
+```bash
+# Conectarse a la base de datos
+gcloud sql connect propmanager-db \
+  --user=propmanager-user \
+  --database=propmanager
+
+# Verificar que el usuario se creó
+SELECT email, nombre_completo, tipo FROM owners WHERE email = 'test@example.com';
+
+# Salir
+\q
+```
+
+### 9.7 Checklist Final
+
+Antes de considerar el deployment completo, verifica:
+
+- [ ] **Backend desplegado y respondiendo** - `curl $BACKEND_URL/api/v1/health` retorna 200
+- [ ] **Frontend desplegado y cargando** - `curl -I $FRONTEND_URL` retorna 200
+- [ ] **CORS configurado** - Frontend puede hacer llamadas al backend sin errores
+- [ ] **API URL correcta en frontend** - `import.meta.env.VITE_API_URL` muestra URL real del backend
+- [ ] **Cloud SQL conectado** - Backend puede leer/escribir en la base de datos
+- [ ] **Registro funciona** - Puedes crear una cuenta desde el frontend
+- [ ] **Login funciona** - Puedes iniciar sesión con la cuenta creada
+- [ ] **Cloud Storage configurado** - Bucket existe y tiene permisos correctos
+- [ ] **Secrets Manager configurado** - DB_PASSWORD y JWT_SECRET existen
+- [ ] **Monitoreo activo** - Logs aparecen en Cloud Logging
+- [ ] **Backups automáticos** - Cloud SQL tiene backups habilitados
+
+### 9.8 URLs de Referencia
+
+Guarda estas URLs para acceso rápido:
+
+| Servicio | URL | Notas |
+|----------|-----|-------|
+| **Frontend (App)** | `$FRONTEND_URL` | URL pública de la aplicación |
+| **Backend API** | `$BACKEND_URL/api/v1` | Base URL para todas las llamadas API |
+| **Health Check** | `$BACKEND_URL/api/v1/health` | Verificación del backend |
+| **Cloud Console** | https://console.cloud.google.com | Panel de administración GCP |
+| **Cloud Run** | https://console.cloud.google.com/run?project=propmanager-production-478716 | Servicios desplegados |
+| **Cloud SQL** | https://console.cloud.google.com/sql?project=propmanager-production-478716 | Base de datos |
+| **Cloud Build** | https://console.cloud.google.com/cloud-build?project=propmanager-production-478716 | Historial de builds |
+| **Logs** | https://console.cloud.google.com/logs?project=propmanager-production-478716 | Logs centralizados |
+
+---
+
 ## 💰 Costos Estimados
 
 ### Desglose Mensual (Primeros 1000 usuarios)
@@ -839,7 +1006,155 @@ gcloud run services update propmanager-backend \
 
 ---
 
-## 🔧 Troubleshooting
+## 🔧 Troubleshooting Completo
+
+Esta sección cubre los problemas más comunes encontrados durante y después del deployment.
+
+### ⚠️ ERROR CRÍTICO: "Failed to fetch" en el Frontend
+
+**Síntomas:**
+- Al hacer login/registro aparece error "TypeError: Failed to fetch"
+- Network tab en DevTools muestra requests fallidos
+- Console muestra errores de red
+
+**Causa raíz:**
+El frontend está intentando conectarse a una URL placeholder o incorrecta del backend.
+
+**Solución paso a paso:**
+
+```bash
+# 1. Verificar que el backend está desplegado
+gcloud run services list \
+  --project=propmanager-production-478716 \
+  --region=us-central1
+
+# 2. Obtener URL real del backend
+BACKEND_URL=$(gcloud run services describe propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='value(status.url)')
+
+echo "Backend URL: $BACKEND_URL"
+
+# 3. Verificar que el backend responde
+curl $BACKEND_URL/api/v1/health
+
+# 4. Si el backend responde correctamente, el problema está en el frontend
+# Verificar la API URL configurada en cloudbuild.yaml (línea 82)
+# Debe ser: _API_URL: 'https://propmanager-340512713682.us-central1.run.app/api/v1'
+
+# 5. Re-desplegar frontend con URL correcta
+gcloud builds submit \
+  --config=cloudbuild.yaml \
+  --project=propmanager-production-478716
+
+# 6. Verificar en el navegador
+# Abrir DevTools → Console
+# Ejecutar: console.log(import.meta.env.VITE_API_URL)
+# Debe mostrar: https://propmanager-340512713682.us-central1.run.app/api/v1
+```
+
+**Script automatizado:**
+```bash
+./scripts/update-frontend-api-url.sh
+```
+
+---
+
+### ⚠️ ERROR CRÍTICO: "CORS policy blocked"
+
+**Síntomas:**
+- Error en Console: "blocked by CORS policy"
+- Frontend puede cargar pero no puede hacer llamadas API
+- Network tab muestra requests con status "(blocked:cors)"
+
+**Causa:**
+El backend no tiene configurada la URL del frontend en CORS_ORIGIN.
+
+**Solución:**
+
+```bash
+# 1. Obtener URL del frontend
+FRONTEND_URL=$(gcloud run services describe propmanager-frontend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='value(status.url)')
+
+echo "Frontend URL: $FRONTEND_URL"
+
+# 2. Actualizar backend con CORS
+gcloud run services update propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --update-env-vars CORS_ORIGIN="$FRONTEND_URL"
+
+# 3. Verificar configuración
+gcloud run services describe propmanager-backend \
+  --project=propmanager-production-478716 \
+  --region=us-central1 \
+  --format='yaml(spec.template.spec.containers[0].env)' | grep CORS_ORIGIN
+```
+
+---
+
+### ⚠️ ERROR: Build failed "vite: not found"
+
+**Síntomas:**
+- Cloud Build falla con "sh: vite: not found"
+- Error code 127 en el build step
+- Build warning: "EBADENGINE Unsupported engine"
+
+**Causa:**
+- Dockerfile usa Node.js 18 en lugar de Node.js 20
+- O usa `npm ci --only=production` que no instala devDependencies (Vite está en devDependencies)
+
+**Solución:**
+
+Verifica que el Dockerfile tenga:
+
+```dockerfile
+# Frontend Dockerfile
+FROM node:20-alpine AS builder  # ← Debe ser Node 20, no 18
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci  # ← Debe ser solo "npm ci", NO "--only=production"
+# ... resto del Dockerfile
+```
+
+```dockerfile
+# Backend Dockerfile
+FROM node:20-alpine AS builder  # ← Debe ser Node 20, no 18
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci  # ← En el builder, instala TODO (incluyendo devDependencies)
+# ... resto del Dockerfile
+```
+
+---
+
+### ⚠️ ERROR: Build failed "invalid build: invalid image name"
+
+**Síntomas:**
+- Error: `invalid image name "gcr.io/.../:"`
+- Build falla inmediatamente al subir el código
+
+**Causa:**
+La variable `$COMMIT_SHA` está vacía cuando ejecutas el build manualmente.
+
+**Solución:**
+
+```bash
+# En lugar de:
+gcloud builds submit --config=cloudbuild.yaml
+
+# Usa:
+gcloud builds submit \
+  --config=cloudbuild.yaml \
+  --project=propmanager-production-478716 \
+  --substitutions=COMMIT_SHA=$(git rev-parse --short HEAD)
+```
+
+---
 
 ### Problema: Backend no se conecta a Cloud SQL
 
