@@ -185,8 +185,7 @@ if gcloud secrets describe propmanager-db-password &> /dev/null; then
 else
     echo -n "$DB_PASSWORD" | gcloud secrets create propmanager-db-password \
         --data-file=- \
-        --replication-policy=automatic \
-        --labels=env=production,app=propmanager
+        --replication-policy=automatic
 fi
 log_success "Secret de DB password configurado"
 
@@ -199,8 +198,7 @@ if gcloud secrets describe jwt-secret &> /dev/null; then
 else
     echo -n "$JWT_SECRET" | gcloud secrets create jwt-secret \
         --data-file=- \
-        --replication-policy=automatic \
-        --labels=env=production,app=propmanager
+        --replication-policy=automatic
 fi
 log_success "Secret de JWT configurado"
 
