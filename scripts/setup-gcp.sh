@@ -130,12 +130,10 @@ else
         --storage-size=10GB \
         --storage-auto-increase \
         --backup-start-time=03:00 \
-        --enable-bin-log \
         --maintenance-window-day=SUN \
         --maintenance-window-hour=04 \
         --maintenance-release-channel=production \
-        --availability-type=zonal \
-        --labels=env=production,app=propmanager
+        --availability-type=zonal
     log_success "Instancia de Cloud SQL creada"
 fi
 
