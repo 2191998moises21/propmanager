@@ -79,7 +79,7 @@ substitutions:
   # OR use the automated script:
   #   ./scripts/update-frontend-api-url.sh
   #
-  _API_URL: 'https://propmanager-backend-REPLACE_WITH_ACTUAL_HASH-uc.a.run.app/api/v1'
+  _API_URL: 'https://propmanager-340512713682.us-central1.run.app/api/v1'
 
 # Build timeout
 timeout: '1200s'
