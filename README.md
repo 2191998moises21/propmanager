@@ -48,7 +48,8 @@
 - **React Hook Form 7.66** - Gestión de formularios
 - **Zod 4.1** - Validación de esquemas type-safe
 
-### Backend (✨ NUEVO)
+### Backend
+- **Node.js 20** - Runtime moderno
 - **Express.js 4.18** - Framework web robusto
 - **TypeScript 5.3** - Backend tipado
 - **PostgreSQL 14+** - Base de datos relacional
@@ -70,17 +71,52 @@
 
 ## 📋 Requisitos Previos
 
-- **Node.js** >= 18.0.0 (recomendado 20.x LTS)
+- **Node.js** >= 20.0.0 (REQUERIDO - el proyecto usa Node 20)
 - **npm** >= 9.0.0
-- **PostgreSQL** >= 14.0
+- **PostgreSQL** >= 14.0 (o usa Docker Compose)
 - **Git** >= 2.30.0
-- **Google Cloud SDK** (para despliegue)
+- **Docker** (opcional - recomendado para desarrollo local)
+- **Google Cloud SDK** (solo para despliegue en GCP)
 
 ---
 
 ## 🛠️ Instalación Completa
 
-### Opción 1: Instalación Rápida (Todo en uno)
+### ⚡ Opción 1: Docker Compose (Recomendado - Más Fácil)
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/2191998moises21/propmanager.git
+cd propmanager
+
+# 2. Iniciar PostgreSQL con Docker Compose
+docker-compose up -d
+# Espera 5 segundos para que PostgreSQL inicie
+
+# 3. Instalar dependencias del frontend
+npm install
+
+# 4. Instalar dependencias del backend
+cd backend
+npm install
+
+# 5. Iniciar backend (Terminal 1)
+npm run dev
+# Backend corriendo en http://localhost:3001
+
+# 6. Iniciar frontend (Terminal 2)
+cd ..
+npm run dev
+# Frontend corriendo en http://localhost:5173
+```
+
+**Ventajas de Docker Compose:**
+- ✅ PostgreSQL listo en 5 segundos
+- ✅ Schema SQL ejecutado automáticamente
+- ✅ No necesitas instalar PostgreSQL manualmente
+- ✅ Datos persistentes en volumen Docker
+
+### Opción 2: PostgreSQL Nativo
 
 ```bash
 # 1. Clonar repositorio
@@ -94,7 +130,7 @@ npm install
 cd backend
 npm install
 
-# 4. Configurar PostgreSQL
+# 4. Configurar PostgreSQL (instalación nativa requerida)
 createdb propmanager
 psql -d propmanager -f src/config/schema.sql
 
@@ -112,68 +148,7 @@ npm run dev
 # Frontend corriendo en http://localhost:5173
 ```
 
-### Opción 2: Instalación Detallada
-
-#### A. Frontend
-
-```bash
-# 1. Clonar e instalar
-git clone https://github.com/2191998moises21/propmanager.git
-cd propmanager
-npm install
-
-# 2. Configurar variables de entorno
-cp .env.example .env
-```
-
-Editar `.env`:
-```env
-VITE_APP_NAME=PropManager
-VITE_APP_VERSION=1.0.0
-VITE_API_URL=http://localhost:3001/api/v1
-VITE_ENV=development
-```
-
-```bash
-# 3. Iniciar frontend
-npm run dev
-```
-
-#### B. Backend
-
-```bash
-# 1. Navegar al backend
-cd backend
-npm install
-
-# 2. Configurar PostgreSQL
-createdb propmanager
-
-# 3. Ejecutar migraciones
-psql -d propmanager -f src/config/schema.sql
-
-# 4. Configurar variables de entorno
-cp .env.example .env
-```
-
-Editar `backend/.env`:
-```env
-NODE_ENV=development
-PORT=3001
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=propmanager
-DB_USER=postgres
-DB_PASSWORD=tu_password
-JWT_SECRET=tu-secret-super-seguro-cambialo
-JWT_EXPIRES_IN=7d
-CORS_ORIGIN=http://localhost:5173
-```
-
-```bash
-# 5. Iniciar backend
-npm run dev
-```
+**💡 Guía Completa:** Para más opciones de setup y troubleshooting, consulta [docs/development/local-setup.md](docs/development/local-setup.md)
 
 ---
 
@@ -308,7 +283,7 @@ Password: admin123
 
 ```
 propmanager/
-├── backend/                      # 🆕 Backend Express + TypeScript
+├── backend/                      # Backend Express + TypeScript
 │   ├── src/
 │   │   ├── config/              # Configuración (DB, logger, schema)
 │   │   ├── controllers/         # Controladores de API (6 módulos)
@@ -320,13 +295,31 @@ propmanager/
 │   │   ├── tests/               # Tests de integración
 │   │   ├── app.ts               # Configuración Express
 │   │   └── server.ts            # Entry point
-│   ├── Dockerfile               # Container para Cloud Run
+│   ├── Dockerfile               # Container para Cloud Run (Node 20)
 │   ├── cloudbuild.yaml          # CI/CD Google Cloud
-│   ├── jest.config.js           # Configuración Jest
+│   ├── .env.example             # Variables de entorno backend
 │   ├── package.json             # Dependencias backend
-│   ├── tsconfig.json            # TypeScript config
 │   └── README.md                # Documentación backend
-├── src/                          # Frontend React
+├── docs/                        # 📚 Documentación organizada
+│   ├── deployment/
+│   │   ├── google-cloud.md      # Guía completa GCP (9 fases)
+│   │   └── alternative-platforms.md  # Vercel, Netlify, AWS, etc.
+│   ├── development/
+│   │   ├── local-setup.md       # Setup local con Docker Compose
+│   │   ├── architecture.md      # Arquitectura técnica
+│   │   └── environment-variables.md  # Variables de entorno
+│   └── operations/
+│       ├── runbook.md           # Procedimientos operacionales
+│       └── disaster-recovery.md # Plan de recuperación
+├── scripts/                     # Scripts de automatización
+│   ├── setup-gcp.sh            # Setup inicial infraestructura GCP
+│   ├── deploy-backend.sh       # Deployment backend
+│   ├── deploy-frontend.sh      # Deployment frontend
+│   ├── update-frontend-api-url.sh  # Actualizar API URL automáticamente
+│   ├── health-check.sh         # Verificación de salud
+│   ├── backup.sh               # Backup de Cloud SQL
+│   └── run-schema.sh           # Ejecutar schema en Cloud SQL
+├── src/                         # Frontend React
 │   ├── components/
 │   │   ├── layout/              # Header, Sidebar
 │   │   ├── shared/              # Componentes compartidos
@@ -336,104 +329,131 @@ propmanager/
 │   ├── hooks/                   # Custom hooks
 │   ├── pages/                   # Páginas
 │   ├── portals/                 # Portales (Owner, Tenant, Admin)
-│   ├── services/                # 🆕 API service layer
+│   ├── services/                # API service layer
 │   ├── types/                   # Tipos TypeScript
 │   ├── utils/                   # Utilidades
 │   ├── App.tsx                  # Componente raíz
 │   └── main.tsx                 # Entry point
 ├── public/                      # Archivos estáticos
+├── Dockerfile                   # Container frontend para Cloud Run (Node 20)
+├── docker-compose.yml           # PostgreSQL local con Docker
+├── nginx.conf                   # Configuración Nginx para producción
+├── cloudbuild.yaml              # CI/CD frontend Google Cloud
+├── cors.json                    # CORS para Cloud Storage
 ├── .env.example                 # Variables de entorno frontend
-├── .gcloudignore               # 🆕 Despliegue Google Cloud
+├── .gcloudignore               # Archivos excluidos de Cloud Build
 ├── package.json                 # Dependencias frontend
-├── tsconfig.json                # TypeScript config
 ├── vite.config.ts               # Configuración Vite
 └── README.md                    # Este archivo
 ```
 
 ---
 
-## 🌐 Despliegue en Google Cloud
+## 🌐 Despliegue en Google Cloud Platform
 
-### Prerrequisitos
-- Cuenta de Google Cloud
-- gcloud CLI instalado
-- Proyecto de GCP creado
+PropManager está **completamente configurado y listo** para GCP con infraestructura completa de producción.
 
-### 1. Backend en Cloud Run + Cloud SQL
+### 🎯 Arquitectura de Producción
 
-```bash
-# Crear instancia Cloud SQL PostgreSQL
-gcloud sql instances create propmanager-db \
-  --database-version=POSTGRES_14 \
-  --tier=db-f1-micro \
-  --region=us-central1
-
-# Crear base de datos
-gcloud sql databases create propmanager \
-  --instance=propmanager-db
-
-# Crear usuario
-gcloud sql users create propmanager-user \
-  --instance=propmanager-db \
-  --password=SECURE_PASSWORD
-
-# Conectar y ejecutar migraciones
-gcloud sql connect propmanager-db --user=postgres
-# En psql: \c propmanager
-# Copiar y pegar contenido de backend/src/config/schema.sql
-
-# Crear secrets
-echo -n "YOUR_DB_PASSWORD" | gcloud secrets create propmanager-db-password --data-file=-
-echo -n "YOUR_JWT_SECRET" | gcloud secrets create jwt-secret --data-file=-
-
-# Desplegar backend en Cloud Run
-cd backend
-gcloud run deploy propmanager-backend \
-  --source=. \
-  --platform=managed \
-  --region=us-central1 \
-  --allow-unauthenticated \
-  --add-cloudsql-instances=YOUR_PROJECT:us-central1:propmanager-db \
-  --set-env-vars="NODE_ENV=production" \
-  --update-secrets="DB_PASSWORD=propmanager-db-password:latest" \
-  --update-secrets="JWT_SECRET=jwt-secret:latest"
+```
+┌─────────────────────────────────────────────────────┐
+│                    Internet                          │
+└──────────────────────┬──────────────────────────────┘
+                       │
+       ┌───────────────┴────────────────┐
+       │                                 │
+       ▼                                 ▼
+┌──────────────┐                  ┌──────────────┐
+│  Cloud Run   │                  │  Cloud Run   │
+│  (Frontend)  │◄─────────────────┤  (Backend)   │
+│              │   API Calls      │              │
+│  Nginx       │                  │  Express.js  │
+│  React App   │                  │  TypeScript  │
+└──────────────┘                  └──────┬───────┘
+                                         │
+                                         │ Unix Socket
+                                         ▼
+                                  ┌──────────────┐
+                                  │  Cloud SQL   │
+                                  │  PostgreSQL  │
+                                  └──────────────┘
 ```
 
-### 2. Frontend en Cloud Storage + Cloud CDN
+### ⚡ Deployment Automatizado (Recomendado)
+
+El proyecto incluye scripts automatizados para deployment completo:
 
 ```bash
-# Build frontend
-npm run build
+# 1. Setup inicial de infraestructura GCP (una sola vez)
+./scripts/setup-gcp.sh
+# Crea: Cloud SQL, Secret Manager, Cloud Storage, habilita APIs
 
-# Crear bucket
-gsutil mb -l us-central1 gs://propmanager-frontend
+# 2. Desplegar backend
+./scripts/deploy-backend.sh
+# Despliega backend a Cloud Run con Cloud Build
 
-# Configurar para hosting web
-gsutil web set -m index.html -e index.html gs://propmanager-frontend
+# 3. Desplegar frontend
+./scripts/deploy-frontend.sh
+# Despliega frontend a Cloud Run con Cloud Build
+# Detecta automáticamente la URL del backend
 
-# Subir archivos
-gsutil -m cp -r dist/* gs://propmanager-frontend
-
-# Hacer público
-gsutil iam ch allUsers:objectViewer gs://propmanager-frontend
+# 4. Verificar deployment
+./scripts/health-check.sh
+# Verifica salud de todos los servicios
 ```
 
-### CI/CD Automático
+### 📋 Servicios Incluidos
 
-El proyecto incluye `cloudbuild.yaml` para despliegue automático:
+| Servicio | Propósito | Configuración |
+|----------|-----------|---------------|
+| **Cloud Run** | Frontend (Nginx + React) | Auto-scaling 0-10 instancias |
+| **Cloud Run** | Backend (Express + TypeScript) | Auto-scaling 0-10 instancias |
+| **Cloud SQL** | PostgreSQL 14 | db-f1-micro, backups automáticos |
+| **Secret Manager** | JWT_SECRET, DB_PASSWORD | Secrets encriptados |
+| **Cloud Storage** | Uploads de usuarios | Bucket con CORS configurado |
+| **Cloud Build** | CI/CD pipeline | Triggers automáticos |
+| **Cloud Logging** | Logs centralizados | Retención 30 días |
+
+### 🔧 Deployment Manual
+
+Si prefieres hacerlo paso a paso, consulta la guía completa:
+
+**📖 [Guía Completa de Google Cloud Platform](docs/deployment/google-cloud.md)**
+
+Incluye:
+- 9 fases paso a paso desde cero
+- Configuración de Cloud SQL, Secrets, Storage
+- CI/CD con Cloud Build
+- Monitoreo y logging
+- Troubleshooting completo
+- Costos estimados ($20-30/mes para startup)
+
+### 🚀 CI/CD Automático
+
+El proyecto ya incluye `cloudbuild.yaml` configurado:
 
 ```bash
-# Conectar repositorio a Cloud Build
-gcloud builds submit --config=backend/cloudbuild.yaml
+# Deploy manual usando Cloud Build
+gcloud builds submit \
+  --config=cloudbuild.yaml \
+  --project=propmanager-production-478716
 
-# Deploy automático en cada push a main
+# O crear trigger automático para deployment en cada push
 gcloud builds triggers create github \
   --repo-name=propmanager \
+  --repo-owner=2191998moises21 \
   --branch-pattern="^main$" \
-  --build-config=backend/cloudbuild.yaml
+  --build-config=cloudbuild.yaml
 ```
 
-Ver más detalles en `backend/README.md`
+### 📊 Información del Proyecto
+
+```yaml
+Proyecto: PropManager Production
+Project ID: propmanager-production-478716
+Número: 340512713682
+Región: us-central1
+```
 
 ---
 
@@ -587,4 +607,8 @@ Para preguntas o problemas:
 
 **Hecho con ❤️ para la comunidad latinoamericana**
 
-**Stack:** React 19 + TypeScript + Tailwind CSS + Express + PostgreSQL + Google Cloud
+**Stack:** React 19 + TypeScript + Tailwind CSS + Node.js 20 + Express + PostgreSQL + Google Cloud
+
+---
+
+*Última actualización: 2025-11-27 - README completamente actualizado con nueva estructura de documentación*
