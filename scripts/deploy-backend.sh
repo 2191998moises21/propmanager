@@ -56,7 +56,22 @@ echo ""
 
 # Obtener commit SHA actual
 COMMIT_SHA=$(git rev-parse --short HEAD)
+if [ -z "$COMMIT_SHA" ]; then
+    log_error "Failed to get git commit SHA"
+    exit 1
+fi
 log_info "Commit SHA: $COMMIT_SHA"
+
+# Validar variables requeridas
+if [ -z "$PROJECT_ID" ]; then
+    log_error "PROJECT_ID is not set"
+    exit 1
+fi
+
+if [ -z "$REGION" ]; then
+    log_error "REGION is not set"
+    exit 1
+fi
 
 gcloud builds submit \
     --config=backend/cloudbuild.yaml \

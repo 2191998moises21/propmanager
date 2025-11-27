@@ -50,6 +50,8 @@ steps:
       - 'DB_NAME=${_DB_NAME}'
       - '--set-env-vars'
       - 'DB_USER=${_DB_USER}'
+      - '--set-env-vars'
+      - 'CORS_ORIGIN=${_CORS_ORIGIN}'
       - '--update-secrets'
       - 'DB_PASSWORD=propmanager-db-password:latest'
       - '--update-secrets'
@@ -66,6 +68,7 @@ substitutions:
   _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
   _DB_USER: 'propmanager-user'
+  _CORS_ORIGIN: 'https://propmanager.com,https://www.propmanager.com'
 
 # Build timeout
 timeout: '1200s'
