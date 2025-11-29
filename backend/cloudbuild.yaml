@@ -9,12 +9,12 @@ steps:
     args:
       - 'build'
       - '-f'
-      - 'backend/Dockerfile'  # Apuntar al Dockerfile dentro de 'backend'
+      - 'Dockerfile'
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:v1.0'  # Usar una etiqueta fija, por ejemplo v1.0
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'  # Usar la etiqueta latest
-      - './backend'  # Usar 'backend' como el contexto de construcción
+      - './'
 
   # Step 2: Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
