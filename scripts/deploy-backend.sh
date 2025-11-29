@@ -73,9 +73,17 @@ if [ -z "$REGION" ]; then
     exit 1
 fi
 
+# Escapar sustituciones para Cloud Build
+escape() {
+    echo "$1" | sed 's/,/\\,/g' | sed 's/:/\\:/g'
+}
+
+CLOUD_SQL_CONNECTION_ESCAPED=$(escape "$PROJECT_ID:$REGION:propmanager-db")
+DB_SOCKET_PATH_ESCAPED=$(escape "/cloudsql/$PROJECT_ID:$REGION:propmanager-db")
+
 gcloud builds submit \
     --config=backend/cloudbuild.yaml \
-    --substitutions=COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user"
+    --substitutions=COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$CLOUD_SQL_CONNECTION_ESCAPED",_DB_SOCKET_PATH="$DB_SOCKET_PATH_ESCAPED",_DB_NAME="propmanager",_DB_USER="propmanager-user"
 
 # Obtener URL del servicio
 log_info "Obteniendo URL del servicio..."
