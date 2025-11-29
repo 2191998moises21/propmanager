@@ -102,7 +102,7 @@ echo ""
 
 # Health check
 log_info "Verificando health check..."
-sleep 5  # Esperar a que el servicio esté listo
+sleep 15  # Esperar a que el servicio esté listo
 
 if curl -f -s "$BACKEND_URL/api/v1/health" > /dev/null; then
     log_success "Health check OK ✓"
