@@ -69,7 +69,7 @@ substitutions:
   _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
   _DB_USER: 'propmanager-user'
-  _CORS_ORIGIN: 'https://propmanager.com,https://www.propmanager.com'
+  _CORS_ORIGIN: 'https://propmanager.org/,https://www.propmanager.org'
 
 # Build timeout
 timeout: '1200s'
