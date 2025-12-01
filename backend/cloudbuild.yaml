@@ -9,7 +9,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
       - '.'
@@ -19,7 +19,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -34,9 +34,9 @@ steps:
       - 'deploy'
       - 'propmanager-backend'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
       - '--region'
-      - 'us-central1'
+      - '${_REGION}'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
@@ -59,11 +59,13 @@ steps:
 
 # Store images in Container Registry
 images:
-  - 'gcr.io/$PROJECT_ID/propmanager-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
   - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
 
 # Substitutions (configure in Cloud Build trigger or pass as parameters)
 substitutions:
+  _COMMIT_SHA: 'latest'
+  _REGION: 'us-central1'
   _CLOUD_SQL_CONNECTION: 'propmanager-production-478716:us-central1:propmanager-db'
   _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
