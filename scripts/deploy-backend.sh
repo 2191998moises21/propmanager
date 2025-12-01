@@ -73,7 +73,7 @@ if [ -z "$REGION" ]; then
     exit 1
 fi
 
-gcloud builds submit \
+gcloud builds submit backend/ \
     --config=backend/cloudbuild.yaml \
     --substitutions=_COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user",_REGION="$REGION"
 
