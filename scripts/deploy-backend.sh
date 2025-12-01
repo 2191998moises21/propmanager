@@ -73,15 +73,7 @@ if [ -z "$REGION" ]; then
     exit 1
 fi
 
-# Escapar sustituciones para Cloud Build
-escape() {
-    echo "$1" | sed 's/,/\\,/g' | sed 's/:/\\:/g'
-}
-
-CLOUD_SQL_CONNECTION_ESCAPED=$(escape "$PROJECT_ID:$REGION:propmanager-db")
-DB_SOCKET_PATH_ESCAPED=$(escape "/cloudsql/$PROJECT_ID:$REGION:propmanager-db")
-
-gcloud builds submit \
+gcloud builds submit backend/ \
     --config=backend/cloudbuild.yaml \
     --substitutions=_COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user",_REGION="$REGION"
 

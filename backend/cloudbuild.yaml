@@ -5,6 +5,7 @@
 
 steps:
   # Step 1: Build Docker image
+  # Contexto: backend/ (especificado en gcloud builds submit)
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -13,8 +14,8 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'  # Usar la etiqueta latest
-      - './'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
+      - '.'
 
   # Step 2: Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
