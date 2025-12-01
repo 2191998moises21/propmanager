@@ -83,7 +83,7 @@ DB_SOCKET_PATH_ESCAPED=$(escape "/cloudsql/$PROJECT_ID:$REGION:propmanager-db")
 
 gcloud builds submit \
     --config=backend/cloudbuild.yaml \
-    --substitutions=_COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user",_REGION="$REGION"
+    --substitutions=COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$CLOUD_SQL_CONNECTION_ESCAPED",_DB_SOCKET_PATH="$DB_SOCKET_PATH_ESCAPED",_DB_NAME="propmanager",_DB_USER="propmanager-user"
 
 # Obtener URL del servicio
 log_info "Obteniendo URL del servicio..."

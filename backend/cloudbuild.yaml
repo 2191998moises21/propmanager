@@ -8,12 +8,13 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
+      - '-f'
+      - 'Dockerfile'
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
-      - '.'
-    dir: 'backend'
+      - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'  # Usar la etiqueta latest
+      - './'
 
   # Step 2: Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -70,7 +71,7 @@ substitutions:
   _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
   _DB_USER: 'propmanager-user'
-  _CORS_ORIGIN: 'https://propmanager.com,https://www.propmanager.com'
+  _CORS_ORIGIN: 'https://propmanager-340512713682.us-central1.run.app'  # URL del frontend
 
 # Build timeout
 timeout: '1200s'

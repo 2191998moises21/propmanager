@@ -83,7 +83,7 @@ DB_SOCKET_PATH_ESCAPED=$(escape "/cloudsql/$PROJECT_ID:$REGION:propmanager-db")
 
 gcloud builds submit \
     --config=backend/cloudbuild.yaml \
-    --substitutions=_COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$PROJECT_ID:$REGION:propmanager-db",_DB_SOCKET_PATH="/cloudsql/$PROJECT_ID:$REGION:propmanager-db",_DB_NAME="propmanager",_DB_USER="propmanager-user",_REGION="$REGION"
+    --substitutions=COMMIT_SHA="$COMMIT_SHA",_CLOUD_SQL_CONNECTION="$CLOUD_SQL_CONNECTION_ESCAPED",_DB_SOCKET_PATH="$DB_SOCKET_PATH_ESCAPED",_DB_NAME="propmanager",_DB_USER="propmanager-user"
 
 # Obtener URL del servicio
 log_info "Obteniendo URL del servicio..."
@@ -102,7 +102,7 @@ echo ""
 
 # Health check
 log_info "Verificando health check..."
-sleep 5  # Esperar a que el servicio esté listo
+sleep 15  # Esperar a que el servicio esté listo
 
 if curl -f -s "$BACKEND_URL/api/v1/health" > /dev/null; then
     log_success "Health check OK ✓"
