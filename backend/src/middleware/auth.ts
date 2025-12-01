@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { JWTPayload, UserRole } from '../types';
 import { logger } from '../config/logger';
 
@@ -12,7 +12,11 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+// Ensure JWT secret exists
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
 
 /**
  * Middleware to verify JWT token
@@ -23,10 +27,9 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get token from header
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader?.startsWith('Bearer ')) {
       res.status(401).json({
         success: false,
         error: 'No token provided. Authorization header required.',
@@ -34,30 +37,23 @@ export const authenticate = async (
       return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
 
-    // Verify token
+    // Verify token with explicit secret type
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
 
-    // Attach user to request
     req.user = decoded;
 
     logger.debug('User authenticated:', { userId: decoded.id, role: decoded.role });
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({
-        success: false,
-        error: 'Invalid token',
-      });
+      res.status(401).json({ success: false, error: 'Invalid token' });
       return;
     }
 
     if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({
-        success: false,
-        error: 'Token expired',
-      });
+      res.status(401).json({ success: false, error: 'Token expired' });
       return;
     }
 
@@ -110,7 +106,6 @@ export const authorizeOwner = (ownerIdParam: string = 'ownerId') => {
     const ownerId = req.params[ownerIdParam] || req.body[ownerIdParam];
 
     if (req.user.role === UserRole.SuperAdmin) {
-      // Super admins can access any resource
       next();
       return;
     }
@@ -130,30 +125,39 @@ export const authorizeOwner = (ownerIdParam: string = 'ownerId') => {
 /**
  * Generate JWT token
  */
-export const generateToken = (payload: Omit<JWTPayload, 'iat' | 'exp'>): string => {
+export const generateToken = (
+  payload: Omit<JWTPayload, 'iat' | 'exp'>
+): string => {
   const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
 
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn,
-  });
+  return jwt.sign(
+    payload,
+    JWT_SECRET,
+    { expiresIn } as SignOptions
+  );
 };
 
 /**
  * Generate refresh token
  */
-export const generateRefreshToken = (payload: Omit<JWTPayload, 'iat' | 'exp'>): string => {
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
+export const generateRefreshToken = (
+  payload: Omit<JWTPayload, 'iat' | 'exp'>
+): string => {
+  const refreshSecret = (process.env.JWT_REFRESH_SECRET || JWT_SECRET) as string;
   const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 
-  return jwt.sign(payload, refreshSecret, {
-    expiresIn,
-  });
+  return jwt.sign(
+    payload,
+    refreshSecret,
+    { expiresIn } as SignOptions
+  );
 };
 
 /**
  * Verify refresh token
  */
 export const verifyRefreshToken = (token: string): JWTPayload => {
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
+  const refreshSecret = (process.env.JWT_REFRESH_SECRET || JWT_SECRET) as string;
   return jwt.verify(token, refreshSecret) as JWTPayload;
 };
+

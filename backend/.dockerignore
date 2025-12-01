@@ -2,6 +2,9 @@
 node_modules
 npm-debug.log
 yarn-error.log
+dist
+Dockerfile
+cloudbuild.yaml
 
 # TypeScript - Keep source files for build, only exclude tests
 # tsconfig.json and src/**/*.ts are needed for compilation

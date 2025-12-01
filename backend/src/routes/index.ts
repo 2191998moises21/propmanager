@@ -9,7 +9,7 @@ import tenantRoutes from './tenantRoutes';
 const router = Router();
 
 // Health check
-router.get('/health', (req, res) => {
+router.get('/health', (_, res) => {
   res.json({
     success: true,
     message: 'PropManager API is running',

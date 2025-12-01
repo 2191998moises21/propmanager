@@ -77,7 +77,7 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 app.use(`/api/${API_VERSION}`, routes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.json({
     success: true,
     message: 'PropManager API',
