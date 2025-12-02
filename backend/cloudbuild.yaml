@@ -72,7 +72,7 @@ substitutions:
   _DB_SOCKET_PATH: '/cloudsql/propmanager-production-478716:us-central1:propmanager-db'
   _DB_NAME: 'propmanager'
   _DB_USER: 'propmanager-user'
-  _CORS_ORIGIN: 'https://propmanager-340512713682.us-central1.run.app,http://localhost:3000'  # URLs del frontend (producción y desarrollo)
+  _CORS_ORIGIN: 'https://propmanager-340512713682.us-central1.run.app'  # URL del frontend en producción
 
 # Build timeout
 timeout: '1200s'
