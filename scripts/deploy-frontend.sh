@@ -97,7 +97,7 @@ fi
 
 gcloud builds submit \
     --config=cloudbuild.yaml \
-    --substitutions=COMMIT_SHA="$COMMIT_SHA",_API_URL="$API_URL"
+    --substitutions=_COMMIT_SHA="$COMMIT_SHA",_API_URL="$API_URL"
 
 # Obtener URL del servicio
 log_info "Obteniendo URL del servicio..."
