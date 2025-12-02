@@ -8,7 +8,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 yarn.lock
-package-lock.json
+# NOTE: package-lock.json es necesario para npm ci en Cloud Build
 
 # TypeScript source (we only need compiled JS)
 *.ts
