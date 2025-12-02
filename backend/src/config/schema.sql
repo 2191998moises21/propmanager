@@ -257,10 +257,10 @@ CREATE TRIGGER update_super_admins_updated_at BEFORE UPDATE ON super_admins
 -- SAMPLE DATA (for development)
 -- ========================================
 
--- Insert sample owner (password: 'password123')
+-- Insert sample owner
 INSERT INTO owners (nombre_completo, email, password_hash, telefono, direccion)
 VALUES ('Carlos Propietario', 'carlos.prop@email.com', '$2a$10$rOzL1q8QY7jKB5jV5P5/8.xCVKZ4Q9oGj7PzQYZVKx7YZxL8Q9oGj', '+1234567890', '123 Main St');
 
--- Insert sample tenant (password: 'password123')
+-- Insert sample tenant
 INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono)
 VALUES ('Maria Rodriguez', 'DOC-12345', 'maria.r@email.com', '$2a$10$rOzL1q8QY7jKB5jV5P5/8.xCVKZ4Q9oGj7PzQYZVKx7YZxL8Q9oGj', '+0987654321');
