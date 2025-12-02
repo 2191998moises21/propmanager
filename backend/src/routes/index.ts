@@ -5,6 +5,7 @@ import contractRoutes from './contractRoutes';
 import paymentRoutes from './paymentRoutes';
 import ticketRoutes from './ticketRoutes';
 import tenantRoutes from './tenantRoutes';
+import contractorRoutes from './contractorRoutes';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.get('/health', (_, res) => {
       payments: '/api/v1/payments',
       tickets: '/api/v1/tickets',
       tenants: '/api/v1/tenants',
+      contractors: '/api/v1/contractors',
     },
   });
 });
@@ -32,5 +34,6 @@ router.use('/contracts', contractRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/tickets', ticketRoutes);
 router.use('/tenants', tenantRoutes);
+router.use('/contractors', contractorRoutes);
 
 export default router;
