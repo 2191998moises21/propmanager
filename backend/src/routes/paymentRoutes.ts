@@ -2,7 +2,13 @@ import { Router } from 'express';
 import * as paymentController from '../controllers/paymentController';
 import { authenticate, authorize } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validate } from '../middleware/validator';
 import { UserRole } from '../types';
+import {
+  createPaymentSchema,
+  updatePaymentSchema,
+  uploadPaymentProofSchema,
+} from '../validators/paymentValidators';
 
 const router = Router();
 
@@ -41,6 +47,7 @@ router.get(
 router.post(
   '/',
   authorize(UserRole.Owner, UserRole.Tenant),
+  validate(createPaymentSchema),
   asyncHandler(paymentController.createPayment)
 );
 
@@ -48,6 +55,7 @@ router.post(
 router.put(
   '/:id',
   authorize(UserRole.Owner, UserRole.Tenant),
+  validate(updatePaymentSchema),
   asyncHandler(paymentController.updatePayment)
 );
 
@@ -55,6 +63,7 @@ router.put(
 router.post(
   '/:id/proof',
   authorize(UserRole.Owner, UserRole.Tenant),
+  validate(uploadPaymentProofSchema),
   asyncHandler(paymentController.uploadPaymentProof)
 );
 

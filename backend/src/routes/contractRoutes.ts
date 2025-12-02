@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import * as contractController from '../controllers/contractController';
 import { authenticate, authorize } from '../middleware/auth';
+import { validate } from '../middleware/validator';
 import { asyncHandler } from '../middleware/errorHandler';
 import { UserRole } from '../types';
+import {
+  createContractSchema,
+  updateContractSchema,
+  addContractDocumentSchema,
+} from '../validators/contractValidators';
 
 const router = Router();
 
@@ -24,12 +30,18 @@ router.get(
 );
 
 // Create contract (Owner only)
-router.post('/', authorize(UserRole.Owner), asyncHandler(contractController.createContract));
+router.post(
+  '/',
+  authorize(UserRole.Owner),
+  validate(createContractSchema),
+  asyncHandler(contractController.createContract)
+);
 
 // Update contract (Owner only - controller validates ownership)
 router.put(
   '/:id',
   authorize(UserRole.Owner),
+  validate(updateContractSchema),
   asyncHandler(contractController.updateContract)
 );
 
@@ -52,6 +64,7 @@ router.get(
 router.post(
   '/:id/documents',
   authorize(UserRole.Owner),
+  validate(addContractDocumentSchema),
   asyncHandler(contractController.addContractDocument)
 );
 

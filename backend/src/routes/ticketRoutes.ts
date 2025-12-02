@@ -2,7 +2,12 @@ import { Router } from 'express';
 import * as ticketController from '../controllers/ticketController';
 import { authenticate, authorize } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validate } from '../middleware/validator';
 import { UserRole } from '../types';
+import {
+  createTicketSchema,
+  updateTicketSchema,
+} from '../validators/ticketValidators';
 
 const router = Router();
 
@@ -34,6 +39,7 @@ router.get(
 router.post(
   '/',
   authorize(UserRole.Owner, UserRole.Tenant),
+  validate(createTicketSchema),
   asyncHandler(ticketController.createTicket)
 );
 
@@ -41,6 +47,7 @@ router.post(
 router.put(
   '/:id',
   authorize(UserRole.Owner, UserRole.Tenant),
+  validate(updateTicketSchema),
   asyncHandler(ticketController.updateTicket)
 );
 

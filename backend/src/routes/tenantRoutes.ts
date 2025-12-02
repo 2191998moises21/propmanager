@@ -2,7 +2,9 @@ import { Router } from 'express';
 import * as tenantController from '../controllers/tenantController';
 import { authenticate, authorize } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validate } from '../middleware/validator';
 import { UserRole } from '../types';
+import { updateTenantSchema } from '../validators/tenantValidators';
 
 const router = Router();
 
@@ -27,6 +29,7 @@ router.get(
 router.put(
   '/:id',
   authorize(UserRole.Owner, UserRole.Tenant, UserRole.SuperAdmin),
+  validate(updateTenantSchema),
   asyncHandler(tenantController.updateTenant)
 );
 
