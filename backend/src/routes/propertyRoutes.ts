@@ -21,8 +21,12 @@ router.get(
   asyncHandler(propertyController.searchProperties)
 );
 
-// Get property by ID
-router.get('/:id', asyncHandler(propertyController.getPropertyById));
+// Get property by ID (Owner and SuperAdmin can view)
+router.get(
+  '/:id',
+  authorize(UserRole.Owner, UserRole.SuperAdmin),
+  asyncHandler(propertyController.getPropertyById)
+);
 
 // Create property (Owner only)
 router.post(
@@ -32,10 +36,19 @@ router.post(
   asyncHandler(propertyController.createProperty)
 );
 
-// Update property
-router.put('/:id', validate(updatePropertySchema), asyncHandler(propertyController.updateProperty));
+// Update property (Owner only - controller validates ownership)
+router.put(
+  '/:id',
+  authorize(UserRole.Owner),
+  validate(updatePropertySchema),
+  asyncHandler(propertyController.updateProperty)
+);
 
-// Delete property
-router.delete('/:id', asyncHandler(propertyController.deleteProperty));
+// Delete property (Owner only - controller validates ownership)
+router.delete(
+  '/:id',
+  authorize(UserRole.Owner),
+  asyncHandler(propertyController.deleteProperty)
+);
 
 export default router;
