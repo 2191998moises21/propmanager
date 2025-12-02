@@ -279,3 +279,38 @@ export const tenantsAPI = {
     });
   },
 };
+
+// Contractors API
+export const contractorsAPI = {
+  getAll: async () => {
+    return fetchAPI('/contractors');
+  },
+
+  getById: async (id: string) => {
+    return fetchAPI(`/contractors/${id}`);
+  },
+
+  search: async (searchTerm: string) => {
+    return fetchAPI(`/contractors/search?q=${encodeURIComponent(searchTerm)}`);
+  },
+
+  create: async (data: { nombre: string; especialidad: string; telefono: string }) => {
+    return fetchAPI('/contractors', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: async (id: string, data: { nombre?: string; especialidad?: string; telefono?: string }) => {
+    return fetchAPI(`/contractors/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete: async (id: string) => {
+    return fetchAPI(`/contractors/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};

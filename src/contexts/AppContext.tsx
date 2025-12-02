@@ -21,10 +21,10 @@ import {
   paymentsAPI,
   ticketsAPI,
   tenantsAPI,
+  contractorsAPI,
 } from '@/services/api';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/useToast';
-import { mockContractors } from '@/data/mockData';
 
 interface AppContextType {
   // State
@@ -72,6 +72,12 @@ interface AppContextType {
   ) => Promise<Ticket | null>;
   updateTicket: (ticket: Ticket) => Promise<void>;
 
+  // Contractor handlers
+  addContractor: (contractor: Omit<Contractor, 'id' | 'created_at'>) => Promise<Contractor | null>;
+  updateContractor: (contractor: Contractor) => Promise<void>;
+  deleteContractor: (contractorId: string) => Promise<void>;
+  searchContractors: (searchTerm: string) => Promise<Contractor[]>;
+
   // Owner handlers
   addOwner: (owner: Omit<Owner, 'id' | 'fotoUrl'>) => Promise<Owner | null>;
   updateOwner: (owner: Owner) => Promise<void>;
@@ -93,7 +99,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [contractors] = useState<Contractor[]>(mockContractors); // Still using mock for contractors
+  const [contractors, setContractors] = useState<Contractor[]>([]);
   const [owners, setOwners] = useState<Owner[]>([]);
 
   // Loading and error states
@@ -109,6 +115,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setContracts([]);
       setPayments([]);
       setTickets([]);
+      setContractors([]);
       setOwners([]);
       return;
     }
@@ -121,14 +128,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       // Fetch based on user role
       if (userType === 'owner') {
-        // For owners: fetch properties, contracts, payments, tickets, tenants
-        const [propsRes, contractsRes, paymentsRes, ticketsRes, tenantsRes] = await Promise.all([
-          propertiesAPI.getMyProperties(),
-          contractsAPI.getMyContracts(),
-          paymentsAPI.getMyPayments(),
-          ticketsAPI.getMyTickets(),
-          tenantsAPI.getTenants(),
-        ]);
+        // For owners: fetch properties, contracts, payments, tickets, tenants, contractors
+        const [propsRes, contractsRes, paymentsRes, ticketsRes, tenantsRes, contractorsRes] =
+          await Promise.all([
+            propertiesAPI.getMyProperties(),
+            contractsAPI.getMyContracts(),
+            paymentsAPI.getMyPayments(),
+            ticketsAPI.getMyTickets(),
+            tenantsAPI.getTenants(),
+            contractorsAPI.getAll(),
+          ]);
 
         if (propsRes.success && propsRes.data) {
           setProperties(propsRes.data as Property[]);
@@ -144,6 +153,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         }
         if (tenantsRes.success && tenantsRes.data) {
           setTenants(tenantsRes.data as Tenant[]);
+        }
+        if (contractorsRes.success && contractorsRes.data) {
+          setContractors(contractorsRes.data as Contractor[]);
         }
       } else if (userType === 'tenant') {
         // For tenants: fetch their contract, payments, tickets
@@ -546,6 +558,94 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   );
 
   // Owner handlers
+  // Contractor handlers
+  const addContractor = useCallback(
+    async (contractor: Omit<Contractor, 'id' | 'created_at'>): Promise<Contractor | null> => {
+      try {
+        const result = await contractorsAPI.create(contractor);
+
+        if (result.success && result.data) {
+          const newContractor = result.data as Contractor;
+          setContractors((prev) => [newContractor, ...prev]);
+          success('Contratista agregado exitosamente');
+          return newContractor;
+        } else {
+          showError(result.error || 'Error al agregar contratista');
+          return null;
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Error al agregar contratista';
+        showError(errorMsg);
+        return null;
+      }
+    },
+    [success, showError]
+  );
+
+  const updateContractor = useCallback(
+    async (updatedContractor: Contractor) => {
+      try {
+        const result = await contractorsAPI.update(updatedContractor.id, {
+          nombre: updatedContractor.nombre,
+          especialidad: updatedContractor.especialidad,
+          telefono: updatedContractor.telefono,
+        });
+
+        if (result.success) {
+          setContractors((prev) =>
+            prev.map((c) => (c.id === updatedContractor.id ? updatedContractor : c))
+          );
+          success('Contratista actualizado exitosamente');
+        } else {
+          showError(result.error || 'Error al actualizar contratista');
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar contratista';
+        showError(errorMsg);
+      }
+    },
+    [success, showError]
+  );
+
+  const deleteContractor = useCallback(
+    async (contractorId: string) => {
+      try {
+        const result = await contractorsAPI.delete(contractorId);
+
+        if (result.success) {
+          setContractors((prev) => prev.filter((c) => c.id !== contractorId));
+          success('Contratista eliminado exitosamente');
+        } else {
+          showError(result.error || 'Error al eliminar contratista');
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar contratista';
+        showError(errorMsg);
+      }
+    },
+    [success, showError]
+  );
+
+  const searchContractors = useCallback(
+    async (searchTerm: string): Promise<Contractor[]> => {
+      try {
+        const result = await contractorsAPI.search(searchTerm);
+
+        if (result.success && result.data) {
+          return result.data as Contractor[];
+        } else {
+          showError(result.error || 'Error al buscar contratistas');
+          return [];
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Error al buscar contratistas';
+        showError(errorMsg);
+        return [];
+      }
+    },
+    [showError]
+  );
+
   const addOwner = useCallback(
     async (owner: Omit<Owner, 'id' | 'fotoUrl'>): Promise<Owner | null> => {
       // Note: There's no create owner endpoint in the API
@@ -591,6 +691,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     uploadPaymentProof,
     addTicket,
     updateTicket,
+    addContractor,
+    updateContractor,
+    deleteContractor,
+    searchContractors,
     addOwner,
     updateOwner,
   };
