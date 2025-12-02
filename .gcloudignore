@@ -1,5 +1,7 @@
 # This file specifies files that are *not* uploaded to Google Cloud
 # using gcloud. It follows the same syntax as .gitignore
+# NOTE: Este .gcloudignore es para deployments del FRONTEND desde raíz
+# El backend tiene su propio .gcloudignore en backend/
 
 .gcloudignore
 .git
@@ -8,11 +10,11 @@
 # Node.js dependencies
 node_modules/
 
-# Build output
+# Build output (se genera durante el build)
 dist/
 build/
 
-# Environment
+# Environment files (se pasan como build args)
 .env
 .env.local
 
@@ -24,11 +26,8 @@ build/
 coverage/
 **/*.test.ts
 **/*.spec.ts
+**/*.test.tsx
+**/*.spec.tsx
 
-# Frontend (if deploying only backend)
-src/
-public/
-index.html
-vite.config.ts
-tailwind.config.js
-postcss.config.js
+# Backend directory (no necesario para frontend)
+backend/
