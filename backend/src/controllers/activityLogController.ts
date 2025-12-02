@@ -1,19 +1,19 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import * as activityLogModel from '../models/activityLogModel';
-import { AppError } from '../middleware/errorHandler';
-import { AuthRequest, UserRole } from '../types';
+import { ApiError } from '../middleware/errorHandler';
+import { UserRole } from '../types';
 
 /**
  * Create activity log
  * @route POST /api/activity-logs
  * @access SuperAdmin, Owner, Tenant (can log their own actions)
  */
-export async function createActivityLog(req: AuthRequest, res: Response) {
+export async function createActivityLog(req: Request, res: Response) {
   const { user_id, user_type, user_name, accion, descripcion, detalles } = req.body;
 
   // Verify user can only create logs for themselves (except SuperAdmin)
   if (req.user?.role !== UserRole.SuperAdmin && req.user?.id !== user_id) {
-    throw new AppError('You can only create logs for your own actions', 403);
+    throw new ApiError('You can only create logs for your own actions', 403);
   }
 
   const log = await activityLogModel.createActivityLog({
@@ -36,7 +36,7 @@ export async function createActivityLog(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs
  * @access SuperAdmin only
  */
-export async function getAllActivityLogs(req: AuthRequest, res: Response) {
+export async function getAllActivityLogs(req: Request, res: Response) {
   const {
     limit,
     offset,
@@ -76,13 +76,13 @@ export async function getAllActivityLogs(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs/:id
  * @access SuperAdmin only
  */
-export async function getActivityLogById(req: AuthRequest, res: Response) {
+export async function getActivityLogById(req: Request, res: Response) {
   const { id } = req.params;
 
   const log = await activityLogModel.getActivityLogById(id);
 
   if (!log) {
-    throw new AppError('Activity log not found', 404);
+    throw new ApiError('Activity log not found', 404);
   }
 
   res.json({
@@ -96,13 +96,13 @@ export async function getActivityLogById(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs/user/:userId
  * @access SuperAdmin, or the user themselves
  */
-export async function getActivityLogsByUser(req: AuthRequest, res: Response) {
+export async function getActivityLogsByUser(req: Request, res: Response) {
   const { userId } = req.params;
   const { limit, offset } = req.query;
 
   // Verify user can only view their own logs (except SuperAdmin)
   if (req.user?.role !== UserRole.SuperAdmin && req.user?.id !== userId) {
-    throw new AppError('You can only view your own activity logs', 403);
+    throw new ApiError('You can only view your own activity logs', 403);
   }
 
   const result = await activityLogModel.getActivityLogsByUser(
@@ -128,7 +128,7 @@ export async function getActivityLogsByUser(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs/action/:accion
  * @access SuperAdmin only
  */
-export async function getActivityLogsByAction(req: AuthRequest, res: Response) {
+export async function getActivityLogsByAction(req: Request, res: Response) {
   const { accion } = req.params;
   const { limit, offset } = req.query;
 
@@ -155,7 +155,7 @@ export async function getActivityLogsByAction(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs/recent
  * @access SuperAdmin only
  */
-export async function getRecentActivityLogs(req: AuthRequest, res: Response) {
+export async function getRecentActivityLogs(req: Request, res: Response) {
   const { limit } = req.query;
 
   const logs = await activityLogModel.getRecentActivityLogs(
@@ -173,7 +173,7 @@ export async function getRecentActivityLogs(req: AuthRequest, res: Response) {
  * @route GET /api/activity-logs/stats
  * @access SuperAdmin only
  */
-export async function getActivityStats(req: AuthRequest, res: Response) {
+export async function getActivityStats(req: Request, res: Response) {
   const { fecha_desde, fecha_hasta } = req.query;
 
   const stats = await activityLogModel.getActivityStats({
@@ -192,7 +192,7 @@ export async function getActivityStats(req: AuthRequest, res: Response) {
  * @route DELETE /api/activity-logs/cleanup
  * @access SuperAdmin only
  */
-export async function deleteOldActivityLogs(req: AuthRequest, res: Response) {
+export async function deleteOldActivityLogs(req: Request, res: Response) {
   const { daysToKeep } = req.query;
 
   const deleted = await activityLogModel.deleteOldActivityLogs(

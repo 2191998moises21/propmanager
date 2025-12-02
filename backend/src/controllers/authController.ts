@@ -18,14 +18,14 @@ export const login = async (
   const user = await authModel.findUserByEmailAndRole(email, role);
 
   if (!user || !user.password_hash) {
-    throw new ApiError(401, 'Invalid credentials');
+    throw new ApiError('Invalid credentials', 401);
   }
 
   // Verify password
   const isValidPassword = await authModel.verifyPassword(password, user.password_hash);
 
   if (!isValidPassword) {
-    throw new ApiError(401, 'Invalid credentials');
+    throw new ApiError('Invalid credentials', 401);
   }
 
   // Generate tokens
@@ -70,7 +70,7 @@ export const registerOwner = async (req: Request, res: Response): Promise<void> 
   const existingUser = await authModel.findUserByEmailAndRole(email, UserRole.Owner);
 
   if (existingUser) {
-    throw new ApiError(409, 'Email already in use');
+    throw new ApiError('Email already in use', 409);
   }
 
   // Create owner
@@ -115,7 +115,7 @@ export const registerTenant = async (req: Request, res: Response): Promise<void>
   const existingUser = await authModel.findUserByEmailAndRole(email, UserRole.Tenant);
 
   if (existingUser) {
-    throw new ApiError(409, 'Email already in use');
+    throw new ApiError('Email already in use', 409);
   }
 
   // Create tenant
@@ -155,13 +155,13 @@ export const registerTenant = async (req: Request, res: Response): Promise<void>
  */
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   const user = await authModel.findUserByEmailAndRole(req.user.email, req.user.role);
 
   if (!user) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError('User not found', 404);
   }
 
   const { password_hash: _password_hash, ...userWithoutPassword } = user;
@@ -177,7 +177,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
  */
 export const changePassword = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   const { currentPassword, newPassword } = req.body;
@@ -186,14 +186,14 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
   const user = await authModel.findUserByEmailAndRole(req.user.email, req.user.role);
 
   if (!user || !user.password_hash) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError('User not found', 404);
   }
 
   // Verify current password
   const isValid = await authModel.verifyPassword(currentPassword, user.password_hash);
 
   if (!isValid) {
-    throw new ApiError(401, 'Current password is incorrect');
+    throw new ApiError('Current password is incorrect', 401);
   }
 
   // Update password

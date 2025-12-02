@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { UserStatus } from '../types';
 
 // Helper to validate image URL or data URI
 const imageFileSchema = z
@@ -103,6 +102,5 @@ export const updateTenantSchema = z.object({
     documento_id_url: documentFileSchema.optional(),
     referencias_url: documentFileSchema.optional(),
     comprobante_ingresos_url: documentFileSchema.optional(),
-    estado_usuario: z.nativeEnum(UserStatus).optional(),
   }),
 });
