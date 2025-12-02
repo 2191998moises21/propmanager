@@ -9,7 +9,7 @@ import { logger } from '../config/logger';
  */
 export const getMyPayments = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   let payments;
@@ -19,7 +19,7 @@ export const getMyPayments = async (req: Request, res: Response): Promise<void> 
   } else if (req.user.role === UserRole.Tenant) {
     payments = await paymentModel.getPaymentsByTenantId(req.user.id);
   } else {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   res.json({
@@ -51,7 +51,7 @@ export const getPaymentById = async (req: Request, res: Response): Promise<void>
   const payment = await paymentModel.getPaymentById(id);
 
   if (!payment) {
-    throw new ApiError(404, 'Payment not found');
+    throw new ApiError('Payment not found', 404);
   }
 
   res.json({
@@ -83,7 +83,7 @@ export const updatePayment = async (req: Request, res: Response): Promise<void> 
   const updatedPayment = await paymentModel.updatePayment(id, req.body);
 
   if (!updatedPayment) {
-    throw new ApiError(404, 'Payment not found');
+    throw new ApiError('Payment not found', 404);
   }
 
   logger.info('Payment updated:', { paymentId: id });
@@ -102,13 +102,13 @@ export const uploadPaymentProof = async (req: Request, res: Response): Promise<v
   const { proofUrl } = req.body;
 
   if (!proofUrl) {
-    throw new ApiError(400, 'Proof URL is required');
+    throw new ApiError('Proof URL is required', 400);
   }
 
   const payment = await paymentModel.uploadPaymentProof(id, proofUrl);
 
   if (!payment) {
-    throw new ApiError(404, 'Payment not found');
+    throw new ApiError('Payment not found', 404);
   }
 
   logger.info('Payment proof uploaded:', { paymentId: id });
@@ -124,7 +124,7 @@ export const uploadPaymentProof = async (req: Request, res: Response): Promise<v
  */
 export const getPendingPayments = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   const ownerId = req.user.role === UserRole.Owner ? req.user.id : undefined;

@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 import * as contractorModel from '../models/contractorModel';
-import { AppError } from '../middleware/errorHandler';
-import { AuthRequest } from '../types';
+import { ApiError } from '../middleware/errorHandler';
 
 /**
  * Get all contractors
  * @route GET /api/contractors
  * @access Owner, SuperAdmin
  */
-export async function getAllContractors(req: AuthRequest, res: Response) {
+export async function getAllContractors(_req: Request, res: Response) {
   const contractors = await contractorModel.getAllContractors();
 
   res.json({
@@ -22,13 +21,13 @@ export async function getAllContractors(req: AuthRequest, res: Response) {
  * @route GET /api/contractors/:id
  * @access Owner, SuperAdmin
  */
-export async function getContractorById(req: AuthRequest, res: Response) {
+export async function getContractorById(req: Request, res: Response) {
   const { id } = req.params;
 
   const contractor = await contractorModel.getContractorById(id);
 
   if (!contractor) {
-    throw new AppError('Contractor not found', 404);
+    throw new ApiError('Contractor not found', 404);
   }
 
   res.json({
@@ -42,7 +41,7 @@ export async function getContractorById(req: AuthRequest, res: Response) {
  * @route POST /api/contractors
  * @access Owner, SuperAdmin
  */
-export async function createContractor(req: AuthRequest, res: Response) {
+export async function createContractor(req: Request, res: Response) {
   const { nombre, especialidad, telefono } = req.body;
 
   const newContractor = await contractorModel.createContractor({
@@ -62,14 +61,14 @@ export async function createContractor(req: AuthRequest, res: Response) {
  * @route PUT /api/contractors/:id
  * @access Owner, SuperAdmin
  */
-export async function updateContractor(req: AuthRequest, res: Response) {
+export async function updateContractor(req: Request, res: Response) {
   const { id } = req.params;
   const { nombre, especialidad, telefono } = req.body;
 
   // Check if contractor exists
   const existingContractor = await contractorModel.getContractorById(id);
   if (!existingContractor) {
-    throw new AppError('Contractor not found', 404);
+    throw new ApiError('Contractor not found', 404);
   }
 
   const updatedContractor = await contractorModel.updateContractor(id, {
@@ -89,19 +88,19 @@ export async function updateContractor(req: AuthRequest, res: Response) {
  * @route DELETE /api/contractors/:id
  * @access Owner, SuperAdmin
  */
-export async function deleteContractor(req: AuthRequest, res: Response) {
+export async function deleteContractor(req: Request, res: Response) {
   const { id } = req.params;
 
   // Check if contractor exists
   const existingContractor = await contractorModel.getContractorById(id);
   if (!existingContractor) {
-    throw new AppError('Contractor not found', 404);
+    throw new ApiError('Contractor not found', 404);
   }
 
   const deleted = await contractorModel.deleteContractor(id);
 
   if (!deleted) {
-    throw new AppError('Failed to delete contractor', 500);
+    throw new ApiError('Failed to delete contractor', 500);
   }
 
   res.json({
@@ -115,11 +114,11 @@ export async function deleteContractor(req: AuthRequest, res: Response) {
  * @route GET /api/contractors/search?q=searchTerm
  * @access Owner, SuperAdmin
  */
-export async function searchContractors(req: AuthRequest, res: Response) {
+export async function searchContractors(req: Request, res: Response) {
   const { q } = req.query;
 
   if (!q || typeof q !== 'string') {
-    throw new AppError('Search term is required', 400);
+    throw new ApiError('Search term is required', 400);
   }
 
   const contractors = await contractorModel.searchContractors(q);

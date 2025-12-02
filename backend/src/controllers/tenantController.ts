@@ -27,7 +27,7 @@ const generateTemporaryPassword = (): string => {
  */
 export const createTenant = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role === UserRole.Tenant) {
-    throw new ApiError(403, 'Only owners and admins can create tenants');
+    throw new ApiError('Only owners and admins can create tenants', 403);
   }
 
   const { nombre_completo, documento_id, email, telefono, password } = req.body;
@@ -35,7 +35,7 @@ export const createTenant = async (req: Request, res: Response): Promise<void> =
   // Check if email already exists
   const existingTenant = await authModel.findUserByEmailAndRole(email, UserRole.Tenant);
   if (existingTenant) {
-    throw new ApiError(409, 'Email already in use');
+    throw new ApiError('Email already in use', 409);
   }
 
   // Generate temporary password if not provided
@@ -67,7 +67,7 @@ export const createTenant = async (req: Request, res: Response): Promise<void> =
  */
 export const getTenants = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   let tenants;
@@ -77,7 +77,7 @@ export const getTenants = async (req: Request, res: Response): Promise<void> => 
   } else if (req.user.role === UserRole.Owner) {
     tenants = await tenantModel.getTenantsByOwnerId(req.user.id);
   } else {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   res.json({
@@ -95,7 +95,7 @@ export const getTenantById = async (req: Request, res: Response): Promise<void> 
   const tenant = await tenantModel.getTenantById(id);
 
   if (!tenant) {
-    throw new ApiError(404, 'Tenant not found');
+    throw new ApiError('Tenant not found', 404);
   }
 
   res.json({
@@ -112,13 +112,13 @@ export const updateTenant = async (req: Request, res: Response): Promise<void> =
 
   // Tenants can only update their own profile, owners/admins can update any
   if (req.user?.role === UserRole.Tenant && req.user.id !== id) {
-    throw new ApiError(403, 'You can only update your own profile');
+    throw new ApiError('You can only update your own profile', 403);
   }
 
   const updatedTenant = await tenantModel.updateTenant(id, req.body);
 
   if (!updatedTenant) {
-    throw new ApiError(404, 'Tenant not found');
+    throw new ApiError('Tenant not found', 404);
   }
 
   logger.info('Tenant updated:', { tenantId: id });
@@ -134,7 +134,7 @@ export const updateTenant = async (req: Request, res: Response): Promise<void> =
  */
 export const deleteTenant = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role === UserRole.Tenant) {
-    throw new ApiError(403, 'Only owners and admins can delete tenants');
+    throw new ApiError('Only owners and admins can delete tenants', 403);
   }
 
   const { id } = req.params;
@@ -142,7 +142,7 @@ export const deleteTenant = async (req: Request, res: Response): Promise<void> =
   const deleted = await tenantModel.deleteTenant(id);
 
   if (!deleted) {
-    throw new ApiError(404, 'Tenant not found');
+    throw new ApiError('Tenant not found', 404);
   }
 
   logger.info('Tenant deleted:', { tenantId: id });

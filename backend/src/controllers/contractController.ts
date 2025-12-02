@@ -9,7 +9,7 @@ import { logger } from '../config/logger';
  */
 export const getMyContracts = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   let contracts;
@@ -19,7 +19,7 @@ export const getMyContracts = async (req: Request, res: Response): Promise<void>
   } else if (req.user.role === UserRole.Tenant) {
     contracts = await contractModel.getContractsByTenantId(req.user.id);
   } else {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   res.json({
@@ -37,7 +37,7 @@ export const getContractById = async (req: Request, res: Response): Promise<void
   const contract = await contractModel.getContractById(id);
 
   if (!contract) {
-    throw new ApiError(404, 'Contract not found');
+    throw new ApiError('Contract not found', 404);
   }
 
   res.json({
@@ -51,7 +51,7 @@ export const getContractById = async (req: Request, res: Response): Promise<void
  */
 export const createContract = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role !== UserRole.Owner) {
-    throw new ApiError(403, 'Only owners can create contracts');
+    throw new ApiError('Only owners can create contracts', 403);
   }
 
   const contract = await contractModel.createContract(req.body);
@@ -73,7 +73,7 @@ export const updateContract = async (req: Request, res: Response): Promise<void>
   const updatedContract = await contractModel.updateContract(id, req.body);
 
   if (!updatedContract) {
-    throw new ApiError(404, 'Contract not found');
+    throw new ApiError('Contract not found', 404);
   }
 
   logger.info('Contract updated:', { contractId: id });
@@ -93,7 +93,7 @@ export const terminateContract = async (req: Request, res: Response): Promise<vo
   const contract = await contractModel.terminateContract(id);
 
   if (!contract) {
-    throw new ApiError(404, 'Contract not found');
+    throw new ApiError('Contract not found', 404);
   }
 
   logger.info('Contract terminated:', { contractId: id });

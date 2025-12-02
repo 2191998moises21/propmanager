@@ -9,7 +9,7 @@ import { logger } from '../config/logger';
  */
 export const getMyProperties = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role !== UserRole.Owner) {
-    throw new ApiError(403, 'Only owners can access this endpoint');
+    throw new ApiError('Only owners can access this endpoint', 403);
   }
 
   const properties = await propertyModel.getPropertiesByOwnerId(req.user.id);
@@ -29,12 +29,12 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
   const property = await propertyModel.getPropertyById(id);
 
   if (!property) {
-    throw new ApiError(404, 'Property not found');
+    throw new ApiError('Property not found', 404);
   }
 
   // Check ownership (owners can only see their own properties, admins can see all)
   if (req.user?.role === UserRole.Owner && property.owner_id !== req.user.id) {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   res.json({
@@ -48,7 +48,7 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
  */
 export const createProperty = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role !== UserRole.Owner) {
-    throw new ApiError(403, 'Only owners can create properties');
+    throw new ApiError('Only owners can create properties', 403);
   }
 
   const property = await propertyModel.createProperty(req.user.id, req.body);
@@ -71,12 +71,12 @@ export const updateProperty = async (req: Request, res: Response): Promise<void>
   const existingProperty = await propertyModel.getPropertyById(id);
 
   if (!existingProperty) {
-    throw new ApiError(404, 'Property not found');
+    throw new ApiError('Property not found', 404);
   }
 
   // Check ownership
   if (req.user?.role === UserRole.Owner && existingProperty.owner_id !== req.user.id) {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   const updatedProperty = await propertyModel.updateProperty(id, req.body);
@@ -99,12 +99,12 @@ export const deleteProperty = async (req: Request, res: Response): Promise<void>
   const existingProperty = await propertyModel.getPropertyById(id);
 
   if (!existingProperty) {
-    throw new ApiError(404, 'Property not found');
+    throw new ApiError('Property not found', 404);
   }
 
   // Check ownership
   if (req.user?.role === UserRole.Owner && existingProperty.owner_id !== req.user.id) {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   await propertyModel.deleteProperty(id);
@@ -122,7 +122,7 @@ export const deleteProperty = async (req: Request, res: Response): Promise<void>
  */
 export const searchProperties = async (req: Request, res: Response): Promise<void> => {
   if (req.user?.role !== UserRole.SuperAdmin) {
-    throw new ApiError(403, 'Only super admins can search all properties');
+    throw new ApiError('Only super admins can search all properties', 403);
   }
 
   const { ciudad, estado_ocupacion, tipo_propiedad, page = '1', limit = '20' } = req.query;

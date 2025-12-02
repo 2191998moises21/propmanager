@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from './errorHandler';
+import { ApiError } from './errorHandler';
 
 interface FileValidationOptions {
   maxSizeBytes?: number; // Max file size for data URIs
@@ -119,20 +119,20 @@ export function validateFile(
  * Middleware factory for validating single file in request body
  */
 export function validateSingleFile(fieldName: string, options?: FileValidationOptions) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const file = req.body[fieldName];
 
     if (!file) {
-      return next(new AppError(`Field '${fieldName}' is required`, 400));
+      return next(new ApiError(`Field '${fieldName}' is required`, 400));
     }
 
     if (typeof file !== 'string') {
-      return next(new AppError(`Field '${fieldName}' must be a string (URL or data URI)`, 400));
+      return next(new ApiError(`Field '${fieldName}' must be a string (URL or data URI)`, 400));
     }
 
     const result = validateFile(file, options);
     if (!result.valid) {
-      return next(new AppError(result.error || 'File validation failed', 400));
+      return next(new ApiError(result.error || 'File validation failed', 400));
     }
 
     next();
@@ -146,7 +146,7 @@ export function validateMultipleFiles(
   fieldName: string,
   options?: FileValidationOptions & { maxFilesCount?: number }
 ) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const files = req.body[fieldName];
 
     if (!files) {
@@ -154,12 +154,12 @@ export function validateMultipleFiles(
     }
 
     if (!Array.isArray(files)) {
-      return next(new AppError(`Field '${fieldName}' must be an array`, 400));
+      return next(new ApiError(`Field '${fieldName}' must be an array`, 400));
     }
 
     const maxCount = options?.maxFilesCount || 10;
     if (files.length > maxCount) {
-      return next(new AppError(`Maximum ${maxCount} files allowed`, 400));
+      return next(new ApiError(`Maximum ${maxCount} files allowed`, 400));
     }
 
     for (let i = 0; i < files.length; i++) {
@@ -167,14 +167,14 @@ export function validateMultipleFiles(
 
       if (typeof file !== 'string') {
         return next(
-          new AppError(`File at index ${i} must be a string (URL or data URI)`, 400)
+          new ApiError(`File at index ${i} must be a string (URL or data URI)`, 400)
         );
       }
 
       const result = validateFile(file, options);
       if (!result.valid) {
         return next(
-          new AppError(`File at index ${i}: ${result.error || 'validation failed'}`, 400)
+          new ApiError(`File at index ${i}: ${result.error || 'validation failed'}`, 400)
         );
       }
     }

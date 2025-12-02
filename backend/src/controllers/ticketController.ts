@@ -9,7 +9,7 @@ import { logger } from '../config/logger';
  */
 export const getMyTickets = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError('Unauthorized', 401);
   }
 
   let tickets;
@@ -19,7 +19,7 @@ export const getMyTickets = async (req: Request, res: Response): Promise<void> =
   } else if (req.user.role === UserRole.Tenant) {
     tickets = await ticketModel.getTicketsByTenantId(req.user.id);
   } else {
-    throw new ApiError(403, 'Forbidden');
+    throw new ApiError('Forbidden', 403);
   }
 
   res.json({
@@ -51,7 +51,7 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
   const ticket = await ticketModel.getTicketById(id);
 
   if (!ticket) {
-    throw new ApiError(404, 'Ticket not found');
+    throw new ApiError('Ticket not found', 404);
   }
 
   res.json({
@@ -83,7 +83,7 @@ export const updateTicket = async (req: Request, res: Response): Promise<void> =
   const updatedTicket = await ticketModel.updateTicket(id, req.body);
 
   if (!updatedTicket) {
-    throw new ApiError(404, 'Ticket not found');
+    throw new ApiError('Ticket not found', 404);
   }
 
   logger.info('Ticket updated:', { ticketId: id });
@@ -103,7 +103,7 @@ export const deleteTicket = async (req: Request, res: Response): Promise<void> =
   const deleted = await ticketModel.deleteTicket(id);
 
   if (!deleted) {
-    throw new ApiError(404, 'Ticket not found');
+    throw new ApiError('Ticket not found', 404);
   }
 
   logger.info('Ticket deleted:', { ticketId: id });
