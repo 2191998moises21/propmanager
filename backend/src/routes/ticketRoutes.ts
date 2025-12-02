@@ -1,29 +1,61 @@
 import { Router } from 'express';
 import * as ticketController from '../controllers/ticketController';
-import { authenticate } from '../middleware/auth';
+import { authenticate, authorize } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validate } from '../middleware/validator';
+import { UserRole } from '../types';
+import {
+  createTicketSchema,
+  updateTicketSchema,
+} from '../validators/ticketValidators';
 
 const router = Router();
 
 // All routes require authentication
 router.use(authenticate);
 
-// Get my tickets
-router.get('/my', asyncHandler(ticketController.getMyTickets));
+// Get my tickets (Owner or Tenant can view their own)
+router.get(
+  '/my',
+  authorize(UserRole.Owner, UserRole.Tenant),
+  asyncHandler(ticketController.getMyTickets)
+);
 
-// Get tickets for a property
-router.get('/property/:propertyId', asyncHandler(ticketController.getTicketsByProperty));
+// Get tickets for a property (Owner or SuperAdmin - controller validates ownership)
+router.get(
+  '/property/:propertyId',
+  authorize(UserRole.Owner, UserRole.SuperAdmin),
+  asyncHandler(ticketController.getTicketsByProperty)
+);
 
-// Get ticket by ID
-router.get('/:id', asyncHandler(ticketController.getTicketById));
+// Get ticket by ID (Owner, Tenant or SuperAdmin - controller validates)
+router.get(
+  '/:id',
+  authorize(UserRole.Owner, UserRole.Tenant, UserRole.SuperAdmin),
+  asyncHandler(ticketController.getTicketById)
+);
 
-// Create ticket
-router.post('/', asyncHandler(ticketController.createTicket));
+// Create ticket (Tenant creates tickets, Owner can also - controller validates)
+router.post(
+  '/',
+  authorize(UserRole.Owner, UserRole.Tenant),
+  validate(createTicketSchema),
+  asyncHandler(ticketController.createTicket)
+);
 
-// Update ticket
-router.put('/:id', asyncHandler(ticketController.updateTicket));
+// Update ticket (Owner or Tenant - controller validates ownership)
+router.put(
+  '/:id',
+  authorize(UserRole.Owner, UserRole.Tenant),
+  validate(updateTicketSchema),
+  asyncHandler(ticketController.updateTicket)
+);
 
-// Delete ticket
-router.delete('/:id', asyncHandler(ticketController.deleteTicket));
+// Delete ticket (Owner or SuperAdmin - controller validates ownership)
+router.delete(
+  '/:id',
+  authorize(UserRole.Owner, UserRole.SuperAdmin),
+  asyncHandler(ticketController.deleteTicket)
+);
 
 export default router;

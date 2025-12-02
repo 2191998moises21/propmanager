@@ -67,7 +67,7 @@ images:
 # Substitutions (configure in Cloud Build trigger or pass as parameters)
 substitutions:
   # Backend API URL - Actualizado para apuntar al backend desplegado
-  _API_URL: 'https://propmanager-backend-aky777khiq-uc.a.run.app/api/v1'
+  _API_URL: 'https://propmanager-backend-340512713682.us-central1.run.app/api/v1'
   _COMMIT_SHA: 'latest'
 
 # Build timeout

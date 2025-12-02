@@ -65,16 +65,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const getPlaceholderText = () => {
-    if (role === 'owner') {
-      return 'Pruebe con: carlos.prop@email.com';
-    } else if (role === 'tenant') {
-      return 'Pruebe con: maria.r@email.com o carlos.silva@email.com.br';
-    } else {
-      return 'Pruebe con: admin@propmanager.com';
-    }
-  };
-
   const renderLoginForm = () => (
     <>
       <div className="p-2">
@@ -134,7 +124,6 @@ export const LoginPage: React.FC = () => {
                 disabled={isLoading}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
-              <p className="mt-2 text-xs text-gray-500">{getPlaceholderText()}</p>
             </div>
           </div>
 
