@@ -1,6 +1,46 @@
 import { z } from 'zod';
 import { PropertyType, OccupancyStatus, Currency } from '../types';
 
+// Helper to validate image URL or data URI
+const imageFileSchema = z
+  .string()
+  .refine(
+    (value) => {
+      // Allow URLs
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+      // Allow data URIs with image types
+      if (value.startsWith('data:image/')) {
+        const match = value.match(/^data:image\/(jpeg|jpg|png|webp|gif);base64,/);
+        return !!match;
+      }
+      return false;
+    },
+    { message: 'Image must be a valid URL or data URI (jpeg, png, webp, gif)' }
+  )
+  .refine(
+    (value) => {
+      // For data URIs, check size (max 5MB)
+      if (value.startsWith('data:')) {
+        const base64Data = value.split(',')[1];
+        if (base64Data) {
+          const padding = (base64Data.match(/=/g) || []).length;
+          const sizeBytes = (base64Data.length * 3) / 4 - padding;
+          const maxSize = 5 * 1024 * 1024; // 5MB
+          return sizeBytes <= maxSize;
+        }
+      }
+      return true;
+    },
+    { message: 'Image size must not exceed 5MB' }
+  );
+
 export const createPropertySchema = z.object({
   body: z.object({
     title: z.string().min(3).max(255),
@@ -19,7 +59,7 @@ export const createPropertySchema = z.object({
     fecha_disponible: z.string().optional(),
     deposito_requerido: z.number().positive().optional(),
     amenidades: z.string().optional(),
-    image_url: z.string().url().optional(),
+    image_url: imageFileSchema.optional(),
   }),
 });
 
@@ -40,6 +80,6 @@ export const updatePropertySchema = z.object({
     fecha_disponible: z.string().optional(),
     deposito_requerido: z.number().positive().optional(),
     amenidades: z.string().optional(),
-    image_url: z.string().url().optional(),
+    image_url: imageFileSchema.optional(),
   }),
 });
