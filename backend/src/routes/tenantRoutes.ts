@@ -4,12 +4,20 @@ import { authenticate, authorize } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import { validate } from '../middleware/validator';
 import { UserRole } from '../types';
-import { updateTenantSchema } from '../validators/tenantValidators';
+import { createTenantSchema, updateTenantSchema } from '../validators/tenantValidators';
 
 const router = Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+// Create new tenant (Owner/SuperAdmin only)
+router.post(
+  '/',
+  authorize(UserRole.Owner, UserRole.SuperAdmin),
+  validate(createTenantSchema),
+  asyncHandler(tenantController.createTenant)
+);
 
 // Get all tenants (Owner sees their tenants, SuperAdmin sees all - controller validates)
 router.get(

@@ -73,6 +73,24 @@ const documentFileSchema = z
     { message: 'Document size must not exceed 10MB' }
   );
 
+export const createTenantSchema = z.object({
+  body: z.object({
+    nombre_completo: z.string().min(3, 'Full name must be at least 3 characters').max(255),
+    documento_id: z.string().min(5, 'Document ID must be at least 5 characters').max(100),
+    email: z.string().email('Invalid email address').max(255),
+    telefono: z
+      .string()
+      .regex(/^\+?[\d\s-()]+$/, 'Invalid phone number format')
+      .min(7)
+      .max(50),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .max(100)
+      .optional(), // Optional - will be generated if not provided
+  }),
+});
+
 export const updateTenantSchema = z.object({
   body: z.object({
     nombre_completo: z.string().min(3, 'Full name must be at least 3 characters').max(255).optional(),
