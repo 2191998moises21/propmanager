@@ -10,11 +10,8 @@ yarn-error.log
 yarn.lock
 # NOTE: package-lock.json es necesario para npm ci en Cloud Build
 
-# TypeScript source (we only need compiled JS)
-*.ts
-!src/**/*.ts
-tsconfig.json
-tsconfig.*.json
+# TypeScript tests (excluir solo tests, mantener source files y config)
+# NOTE: tsconfig.json es necesario para compilar TypeScript en Cloud Build
 
 # Tests
 **/*.test.ts
