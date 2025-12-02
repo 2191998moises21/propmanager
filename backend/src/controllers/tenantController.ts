@@ -1,8 +1,66 @@
 import { Request, Response } from 'express';
 import * as tenantModel from '../models/tenantModel';
+import * as authModel from '../models/authModel';
 import { ApiError } from '../middleware/errorHandler';
 import { UserRole } from '../types';
 import { logger } from '../config/logger';
+import crypto from 'crypto';
+
+/**
+ * Generate a secure random password
+ */
+const generateTemporaryPassword = (): string => {
+  const length = 12;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  const randomBytes = crypto.randomBytes(length);
+
+  for (let i = 0; i < length; i++) {
+    password += charset[randomBytes[i] % charset.length];
+  }
+
+  return password;
+};
+
+/**
+ * Create new tenant (Owner/SuperAdmin only)
+ */
+export const createTenant = async (req: Request, res: Response): Promise<void> => {
+  if (!req.user || req.user.role === UserRole.Tenant) {
+    throw new ApiError(403, 'Only owners and admins can create tenants');
+  }
+
+  const { nombre_completo, documento_id, email, telefono, password } = req.body;
+
+  // Check if email already exists
+  const existingTenant = await authModel.findUserByEmailAndRole(email, UserRole.Tenant);
+  if (existingTenant) {
+    throw new ApiError(409, 'Email already in use');
+  }
+
+  // Generate temporary password if not provided
+  const temporaryPassword = password || generateTemporaryPassword();
+
+  // Create tenant
+  const tenant = await authModel.createTenant({
+    nombre_completo,
+    documento_id,
+    email,
+    telefono,
+    password: temporaryPassword,
+  });
+
+  logger.info('Tenant created:', { tenantId: tenant.id, createdBy: req.user.id });
+
+  res.status(201).json({
+    success: true,
+    data: {
+      tenant,
+      temporaryPassword, // Return password so owner can share it with tenant
+    },
+    message: 'Tenant created successfully. Please share the temporary password with the tenant.',
+  });
+};
 
 /**
  * Get all tenants (Owner can see their tenants, SuperAdmin can see all)

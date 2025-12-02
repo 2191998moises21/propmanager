@@ -6,7 +6,14 @@ import { Property } from '../types';
  */
 export const getPropertiesByOwnerId = async (ownerId: string): Promise<Property[]> => {
   const result = await pool.query(
-    `SELECT * FROM properties WHERE owner_id = $1 ORDER BY created_at DESC`,
+    `SELECT
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at
+    FROM properties WHERE owner_id = $1 ORDER BY created_at DESC`,
     [ownerId]
   );
 
@@ -17,7 +24,17 @@ export const getPropertiesByOwnerId = async (ownerId: string): Promise<Property[
  * Get property by ID
  */
 export const getPropertyById = async (propertyId: string): Promise<Property | null> => {
-  const result = await pool.query(`SELECT * FROM properties WHERE id = $1`, [propertyId]);
+  const result = await pool.query(
+    `SELECT
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at
+    FROM properties WHERE id = $1`,
+    [propertyId]
+  );
 
   return result.rows[0] || null;
 };
@@ -36,7 +53,13 @@ export const createProperty = async (
       precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
       deposito_requerido, amenidades, image_url
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-    RETURNING *`,
+    RETURNING
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at`,
     [
       ownerId,
       data.title,
@@ -89,7 +112,14 @@ export const updateProperty = async (
   values.push(propertyId);
 
   const result = await pool.query(
-    `UPDATE properties SET ${fields.join(', ')} WHERE id = $${paramCounter} RETURNING *`,
+    `UPDATE properties SET ${fields.join(', ')} WHERE id = $${paramCounter}
+    RETURNING
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at`,
     values
   );
 
@@ -154,7 +184,14 @@ export const searchProperties = async (filters: {
   values.push(limit, offset);
 
   const result = await pool.query(
-    `SELECT * FROM properties ${whereClause}
+    `SELECT
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at
+    FROM properties ${whereClause}
      ORDER BY created_at DESC
      LIMIT $${paramCounter} OFFSET $${paramCounter + 1}`,
     values
