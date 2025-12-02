@@ -53,11 +53,10 @@ desktop.ini
 .gitattributes
 .github/
 
-# Docker (not needed for Cloud Build)
-Dockerfile
-.dockerignore
+# Docker Compose files (not needed for Cloud Build)
 docker-compose.yml
 docker-compose.*.yml
+# NOTE: Dockerfile y .dockerignore SÍ son necesarios para Cloud Build
 
 # Documentation
 README.md
