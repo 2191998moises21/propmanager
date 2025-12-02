@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import {
   SuperAdmin,
   ActivityLog,
@@ -9,8 +9,9 @@ import {
   UserStatus,
   LogAction,
 } from '@/types';
-import { generateId } from '@/utils/id';
-import { mockSuperAdmin, mockActivityLogs, mockSystemConfig } from '@/data/mockSuperAdminData';
+import { activityLogsAPI } from '@/services/api';
+import { useAuth } from './AuthContext';
+import { mockSuperAdmin, mockSystemConfig } from '@/data/mockSuperAdminData';
 
 interface SuperAdminContextType {
   // State
@@ -43,8 +44,9 @@ interface SuperAdminProviderProps {
 }
 
 export const SuperAdminProvider: React.FC<SuperAdminProviderProps> = ({ children }) => {
+  const { currentUser, isAuthenticated } = useAuth();
   const [superAdmin] = useState<SuperAdmin>(mockSuperAdmin);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(mockActivityLogs);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [systemConfig, setSystemConfig] = useState<SystemConfig[]>(mockSystemConfig);
   const [platformStats, setPlatformStats] = useState<PlatformStats>({
     totalUsuarios: 0,
@@ -58,14 +60,67 @@ export const SuperAdminProvider: React.FC<SuperAdminProviderProps> = ({ children
     moneda: 'USD',
   });
 
-  // Log handlers
-  const addActivityLog = useCallback((log: Omit<ActivityLog, 'id' | 'fecha'>) => {
-    const newLog: ActivityLog = {
-      ...log,
-      id: generateId('log'),
-      fecha: new Date().toISOString(),
+  // Fetch activity logs when SuperAdmin logs in
+  useEffect(() => {
+    const fetchActivityLogs = async () => {
+      if (isAuthenticated && currentUser?.type === 'superadmin') {
+        try {
+          const result = await activityLogsAPI.getAll({ limit: 100 });
+          if (result.success && result.data) {
+            // Convert backend format (snake_case) to frontend format (camelCase)
+            const logs = (result.data as any[]).map((backendLog: any) => ({
+              id: backendLog.id,
+              userId: backendLog.user_id,
+              userType: backendLog.user_type,
+              userName: backendLog.user_name,
+              accion: backendLog.accion,
+              descripcion: backendLog.descripcion,
+              fecha: backendLog.fecha,
+              detalles: backendLog.detalles,
+            }));
+            setActivityLogs(logs);
+          }
+        } catch (error) {
+          console.error('Error fetching activity logs:', error);
+        }
+      } else {
+        setActivityLogs([]);
+      }
     };
-    setActivityLogs((prev) => [newLog, ...prev]);
+
+    fetchActivityLogs();
+  }, [isAuthenticated, currentUser]);
+
+  // Log handlers
+  const addActivityLog = useCallback(async (log: Omit<ActivityLog, 'id' | 'fecha'>) => {
+    try {
+      const result = await activityLogsAPI.create({
+        user_id: log.userId,
+        user_type: log.userType,
+        user_name: log.userName,
+        accion: log.accion as string,
+        descripcion: log.descripcion,
+        detalles: log.detalles,
+      });
+
+      if (result.success && result.data) {
+        // Convert backend format (snake_case) to frontend format (camelCase)
+        const backendLog: any = result.data;
+        const frontendLog: ActivityLog = {
+          id: backendLog.id,
+          userId: backendLog.user_id,
+          userType: backendLog.user_type,
+          userName: backendLog.user_name,
+          accion: backendLog.accion,
+          descripcion: backendLog.descripcion,
+          fecha: backendLog.fecha,
+          detalles: backendLog.detalles,
+        };
+        setActivityLogs((prev) => [frontendLog, ...prev]);
+      }
+    } catch (error) {
+      console.error('Error creating activity log:', error);
+    }
   }, []);
 
   const getLogsByUser = useCallback(

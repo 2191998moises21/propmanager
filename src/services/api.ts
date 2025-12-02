@@ -314,3 +314,79 @@ export const contractorsAPI = {
     });
   },
 };
+
+// Activity Logs API
+export const activityLogsAPI = {
+  getAll: async (params?: {
+    limit?: number;
+    offset?: number;
+    user_id?: string;
+    user_type?: string;
+    accion?: string;
+    fecha_desde?: string;
+    fecha_hasta?: string;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) queryParams.append(key, value.toString());
+      });
+    }
+    const queryString = queryParams.toString();
+    return fetchAPI(`/activity-logs${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getById: async (id: string) => {
+    return fetchAPI(`/activity-logs/${id}`);
+  },
+
+  getByUser: async (userId: string, limit?: number, offset?: number) => {
+    const queryParams = new URLSearchParams();
+    if (limit) queryParams.append('limit', limit.toString());
+    if (offset) queryParams.append('offset', offset.toString());
+    const queryString = queryParams.toString();
+    return fetchAPI(`/activity-logs/user/${userId}${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getByAction: async (accion: string, limit?: number, offset?: number) => {
+    const queryParams = new URLSearchParams();
+    if (limit) queryParams.append('limit', limit.toString());
+    if (offset) queryParams.append('offset', offset.toString());
+    const queryString = queryParams.toString();
+    return fetchAPI(`/activity-logs/action/${accion}${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getRecent: async (limit?: number) => {
+    const queryString = limit ? `?limit=${limit}` : '';
+    return fetchAPI(`/activity-logs/recent${queryString}`);
+  },
+
+  getStats: async (fecha_desde?: string, fecha_hasta?: string) => {
+    const queryParams = new URLSearchParams();
+    if (fecha_desde) queryParams.append('fecha_desde', fecha_desde);
+    if (fecha_hasta) queryParams.append('fecha_hasta', fecha_hasta);
+    const queryString = queryParams.toString();
+    return fetchAPI(`/activity-logs/stats${queryString ? `?${queryString}` : ''}`);
+  },
+
+  create: async (data: {
+    user_id: string;
+    user_type: string;
+    user_name: string;
+    accion: string;
+    descripcion: string;
+    detalles?: Record<string, unknown>;
+  }) => {
+    return fetchAPI('/activity-logs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  cleanup: async (daysToKeep?: number) => {
+    const queryString = daysToKeep ? `?daysToKeep=${daysToKeep}` : '';
+    return fetchAPI(`/activity-logs/cleanup${queryString}`, {
+      method: 'DELETE',
+    });
+  },
+};
