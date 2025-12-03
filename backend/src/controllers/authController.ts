@@ -206,3 +206,41 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     message: 'Password updated successfully',
   });
 };
+
+/**
+ * Update user profile
+ */
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    throw new ApiError('Unauthorized', 401);
+  }
+
+  const { nombre_completo, telefono, direccion, foto_url, documento_id_url } = req.body;
+
+  let updatedUser;
+
+  if (req.user.role === UserRole.Owner) {
+    updatedUser = await authModel.updateOwnerProfile(req.user.id, {
+      nombre_completo,
+      telefono,
+      direccion,
+      foto_url,
+    });
+  } else if (req.user.role === UserRole.Tenant) {
+    updatedUser = await authModel.updateTenantProfile(req.user.id, {
+      nombre_completo,
+      telefono,
+      foto_url,
+      documento_id_url,
+    });
+  } else {
+    throw new ApiError('Unsupported user role', 400);
+  }
+
+  logger.info('Profile updated:', { userId: req.user.id });
+
+  res.json({
+    success: true,
+    data: updatedUser,
+  });
+};
