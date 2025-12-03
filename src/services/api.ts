@@ -397,3 +397,33 @@ export const activityLogsAPI = {
     });
   },
 };
+
+// Notifications API
+export const notificationsAPI = {
+  getNotifications: async (limit?: number) => {
+    const queryString = limit ? `?limit=${limit}` : '';
+    return fetchAPI(`/notifications${queryString}`);
+  },
+
+  getUnreadCount: async () => {
+    return fetchAPI('/notifications/unread-count');
+  },
+
+  markAsRead: async (id: string) => {
+    return fetchAPI(`/notifications/${id}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  markAllAsRead: async () => {
+    return fetchAPI('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
+
+  deleteNotification: async (id: string) => {
+    return fetchAPI(`/notifications/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
