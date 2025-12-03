@@ -30,7 +30,7 @@ export const createTenant = async (req: Request, res: Response): Promise<void> =
     throw new ApiError('Only owners and admins can create tenants', 403);
   }
 
-  const { nombre_completo, documento_id, email, telefono, password } = req.body;
+  const { nombre_completo, documento_id, email, telefono, password, fotoUrl, documentoUrl } = req.body;
 
   // Check if email already exists
   const existingTenant = await authModel.findUserByEmailAndRole(email, UserRole.Tenant);
@@ -48,6 +48,8 @@ export const createTenant = async (req: Request, res: Response): Promise<void> =
     email,
     telefono,
     password: temporaryPassword,
+    fotoUrl,
+    documentoUrl,
   });
 
   logger.info('Tenant created:', { tenantId: tenant.id, createdBy: req.user.id });

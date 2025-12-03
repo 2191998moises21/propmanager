@@ -87,6 +87,8 @@ export const createTenantSchema = z.object({
       .min(6, 'Password must be at least 6 characters')
       .max(100)
       .optional(), // Optional - will be generated if not provided
+    fotoUrl: imageFileSchema.optional(), // Profile photo
+    documentoUrl: documentFileSchema.optional(), // ID document
   }),
 });
 

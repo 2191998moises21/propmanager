@@ -70,20 +70,26 @@ export const createTenant = async (data: {
   email: string;
   password: string;
   telefono: string;
+  fotoUrl?: string;
+  documentoUrl?: string;
 }): Promise<Tenant> => {
   const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
 
+  // Use provided photo URL or default avatar
+  const fotoUrl = data.fotoUrl || `https://i.pravatar.cc/150?u=${data.email}`;
+
   const result = await pool.query(
-    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url, created_at, updated_at`,
+    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url, documento_id_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_id_url as "documentoUrl", created_at, updated_at`,
     [
       data.nombre_completo,
       data.documento_id,
       data.email,
       passwordHash,
       data.telefono,
-      `https://i.pravatar.cc/150?u=${data.email}`,
+      fotoUrl,
+      data.documentoUrl || null,
     ]
   );
 
