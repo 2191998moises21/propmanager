@@ -55,13 +55,16 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({ owner }) => {
 
   const [view, setView] = useState<View>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
         setIsSidebarOpen(false);
       }
     };
@@ -252,10 +255,38 @@ export const LandlordPortal: React.FC<LandlordPortalProps> = ({ owner }) => {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar currentView={view} setView={setView} isOpen={isSidebarOpen} toggle={toggleSidebar} />
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={toggleSidebar}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar - Fixed on mobile, relative on desktop */}
+      <div
+        className={`fixed md:relative inset-y-0 left-0 z-30 md:z-0 transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <Sidebar
+          currentView={view}
+          setView={(newView) => {
+            setView(newView);
+            // Close sidebar on mobile when navigating
+            if (isMobile) {
+              setIsSidebarOpen(false);
+            }
+          }}
+          isOpen={isMobile ? true : isSidebarOpen}
+          toggle={toggleSidebar}
+        />
+      </div>
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={toggleSidebar} user={owner} onLogout={logout} setView={setView} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 sm:p-6">
           {content}
         </main>
       </div>

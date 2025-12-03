@@ -99,13 +99,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Quick Actions */}
       <Card>
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-gray-800">Acciones Rápidas</h2>
-          <div className="flex space-x-3">
-            <Button variant="primary" onClick={() => setView('properties')}>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Button variant="primary" onClick={() => setView('properties')} className="w-full sm:w-auto">
               + Agregar Propiedad
             </Button>
-            <Button variant="secondary" onClick={() => setView('tenants')}>
+            <Button variant="secondary" onClick={() => setView('tenants')} className="w-full sm:w-auto">
               + Agregar Inquilino
             </Button>
           </div>

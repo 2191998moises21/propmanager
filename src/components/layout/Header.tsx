@@ -42,12 +42,12 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout, s
         <div className="flex items-center">
           <button
             onClick={toggleSidebar}
-            className="p-2 -ml-2 mr-2 text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-700 hidden md:block"
+            className="p-2 -ml-2 mr-2 text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-700"
             aria-label="Toggle sidebar"
           >
             <Bars3Icon className="h-6 w-6" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-800">
+          <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
             Hola, {user.nombre_completo.split(' ')[0]}
           </h1>
         </div>
