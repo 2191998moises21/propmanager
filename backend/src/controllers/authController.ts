@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import * as authModel from '../models/authModel';
+import * as passwordResetModel from '../models/passwordResetModel';
 import { generateToken, generateRefreshToken } from '../middleware/auth';
 import { UserRole, LoginRequest, LoginResponse } from '../types';
 import { ApiError } from '../middleware/errorHandler';
 import { logger } from '../config/logger';
+import { sendPasswordResetEmail } from '../services/emailService';
 
 /**
  * Login user
@@ -242,5 +244,86 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
   res.json({
     success: true,
     data: updatedUser,
+  });
+};
+
+/**
+ * Forgot password - Send reset email
+ */
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email, role } = req.body;
+
+  // Find user
+  const user = await authModel.findUserByEmailAndRole(email, role);
+
+  // Always return success to prevent email enumeration
+  if (!user) {
+    logger.warn('Password reset requested for non-existent user:', { email, role });
+    res.json({
+      success: true,
+      message: 'Si el email existe, recibirás un enlace de recuperación',
+    });
+    return;
+  }
+
+  // Check if there's a recent token (rate limiting)
+  const recentToken = await passwordResetModel.findRecentTokenByEmail(email, 5);
+  if (recentToken) {
+    res.json({
+      success: true,
+      message: 'Si el email existe, recibirás un enlace de recuperación',
+    });
+    return;
+  }
+
+  // Create reset token
+  const resetToken = await passwordResetModel.createPasswordResetToken(user.id, role, email);
+
+  // Send email
+  const emailSent = await sendPasswordResetEmail(
+    email,
+    user.nombre_completo,
+    resetToken.token
+  );
+
+  if (!emailSent) {
+    logger.error('Failed to send password reset email:', { email });
+  }
+
+  logger.info('Password reset requested:', { userId: user.id, email });
+
+  res.json({
+    success: true,
+    message: 'Si el email existe, recibirás un enlace de recuperación',
+  });
+};
+
+/**
+ * Reset password with token
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, newPassword } = req.body;
+
+  // Find valid token
+  const resetToken = await passwordResetModel.findValidToken(token);
+
+  if (!resetToken) {
+    throw new ApiError('Token inválido o expirado', 400);
+  }
+
+  // Update password
+  await authModel.updatePassword(resetToken.user_id, newPassword, resetToken.user_role);
+
+  // Mark token as used
+  await passwordResetModel.markTokenAsUsed(resetToken.id);
+
+  // Optional: Delete all tokens for this user
+  await passwordResetModel.deleteUserTokens(resetToken.user_id);
+
+  logger.info('Password reset successful:', { userId: resetToken.user_id });
+
+  res.json({
+    success: true,
+    message: 'Contraseña actualizada exitosamente',
   });
 };

@@ -9,6 +9,8 @@ import {
   registerTenantSchema,
   changePasswordSchema,
   updateProfileSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validators/authValidators';
 
 const router = Router();
@@ -24,6 +26,16 @@ router.post(
   '/register/tenant',
   validate(registerTenantSchema),
   asyncHandler(authController.registerTenant)
+);
+router.post(
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  asyncHandler(authController.forgotPassword)
+);
+router.post(
+  '/reset-password',
+  validate(resetPasswordSchema),
+  asyncHandler(authController.resetPassword)
 );
 
 // Protected routes
