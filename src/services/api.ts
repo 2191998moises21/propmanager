@@ -266,6 +266,13 @@ export const tenantsAPI = {
     return fetchAPI(`/tenants/${id}`);
   },
 
+  createTenant: async (data: any) => {
+    return fetchAPI('/tenants', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   updateTenant: async (id: string, data: any) => {
     return fetchAPI(`/tenants/${id}`, {
       method: 'PUT',

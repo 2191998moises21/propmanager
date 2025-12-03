@@ -292,12 +292,32 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Tenant handlers
   const addTenant = useCallback(
     async (tenant: Omit<Tenant, 'id'>): Promise<Tenant | null> => {
-      // Note: There's no create tenant endpoint in the API
-      // Tenants are created via registration
-      showError('Los inquilinos deben registrarse mediante el formulario de registro');
-      return null;
+      try {
+        const result = await tenantsAPI.createTenant(tenant);
+
+        if (result.success && result.data) {
+          const newTenant = result.data.tenant;
+          const temporaryPassword = result.data.temporaryPassword;
+
+          setTenants((prev) => [...prev, newTenant]);
+
+          // Show success message with temporary password
+          success(
+            `Inquilino creado exitosamente.\n\nContraseña temporal: ${temporaryPassword}\n\nPor favor comparta esta contraseña con el inquilino.`
+          );
+
+          return newTenant;
+        } else {
+          showError(result.error || 'Error al crear inquilino');
+          return null;
+        }
+      } catch (error) {
+        console.error('Error creating tenant:', error);
+        showError('Error al crear inquilino');
+        return null;
+      }
     },
-    [showError]
+    [success, showError]
   );
 
   const updateTenant = useCallback(
