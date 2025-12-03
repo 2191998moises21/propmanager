@@ -6,7 +6,10 @@ import { Tenant } from '../types';
  */
 export const getAllTenants = async (): Promise<Tenant[]> => {
   const result = await pool.query(
-    `SELECT id, nombre_completo, documento_id, email, telefono, foto_url, documento_url, created_at, updated_at
+    `SELECT id, nombre_completo, documento_id, email, telefono,
+            foto_url as "fotoUrl",
+            documento_id_url as "documentoUrl",
+            created_at, updated_at
      FROM tenants
      ORDER BY created_at DESC`
   );
@@ -19,7 +22,10 @@ export const getAllTenants = async (): Promise<Tenant[]> => {
  */
 export const getTenantById = async (tenantId: string): Promise<Tenant | null> => {
   const result = await pool.query(
-    `SELECT id, nombre_completo, documento_id, email, telefono, foto_url, documento_url, created_at, updated_at
+    `SELECT id, nombre_completo, documento_id, email, telefono,
+            foto_url as "fotoUrl",
+            documento_id_url as "documentoUrl",
+            created_at, updated_at
      FROM tenants
      WHERE id = $1`,
     [tenantId]
@@ -61,7 +67,10 @@ export const updateTenant = async (
 
   const result = await pool.query(
     `UPDATE tenants SET ${fields.join(', ')} WHERE id = $${paramCounter}
-     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url, documento_url, created_at, updated_at`,
+     RETURNING id, nombre_completo, documento_id, email, telefono,
+               foto_url as "fotoUrl",
+               documento_id_url as "documentoUrl",
+               created_at, updated_at`,
     values
   );
 
@@ -82,7 +91,10 @@ export const deleteTenant = async (tenantId: string): Promise<boolean> => {
  */
 export const getTenantsByOwnerId = async (ownerId: string): Promise<Tenant[]> => {
   const result = await pool.query(
-    `SELECT DISTINCT t.id, t.nombre_completo, t.documento_id, t.email, t.telefono, t.foto_url, t.documento_url, t.created_at, t.updated_at
+    `SELECT DISTINCT t.id, t.nombre_completo, t.documento_id, t.email, t.telefono,
+            t.foto_url as "fotoUrl",
+            t.documento_id_url as "documentoUrl",
+            t.created_at, t.updated_at
      FROM tenants t
      JOIN contracts c ON t.id = c.tenant_id
      JOIN properties p ON c.property_id = p.id
