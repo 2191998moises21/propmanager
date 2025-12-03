@@ -211,3 +211,24 @@ export interface PlatformStats {
   ticketsCerrados: number;
   pagosEsperando: number;
 }
+
+export enum NotificationType {
+  Payment = 'payment',
+  Ticket = 'ticket',
+  Contract = 'contract',
+  System = 'system',
+  Maintenance = 'maintenance',
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  user_role: string;
+  tipo: NotificationType | string;
+  titulo: string;
+  mensaje: string;
+  leido: boolean;
+  url?: string;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+}

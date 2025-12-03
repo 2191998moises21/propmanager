@@ -195,6 +195,27 @@ export interface ActivityLog {
   created_at?: Date;
 }
 
+export enum NotificationType {
+  Payment = 'payment',
+  Ticket = 'ticket',
+  Contract = 'contract',
+  System = 'system',
+  Maintenance = 'maintenance',
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  user_role: UserRole;
+  tipo: NotificationType | string;
+  titulo: string;
+  mensaje: string;
+  leido: boolean;
+  url?: string;
+  metadata?: Record<string, unknown>;
+  created_at: Date;
+}
+
 // JWT Payload
 export interface JWTPayload {
   id: string;
