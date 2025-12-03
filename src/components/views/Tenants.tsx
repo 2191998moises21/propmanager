@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tenant } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/contexts/ToastContext';
 
 interface TenantsProps {
   tenants: Tenant[];
@@ -10,6 +11,7 @@ interface TenantsProps {
 }
 
 export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTenant }) => {
+  const { success, error: showError, warning } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -69,7 +71,7 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
       if (photoFile) {
         fotoUrl = await readFileAsDataURL(photoFile);
       } else if (!editingTenant && !photoPreview) {
-        alert('Por favor, suba una foto de perfil.');
+        warning('Por favor, suba una foto de perfil');
         return;
       }
 
@@ -99,7 +101,7 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
       }
     } catch (error) {
       console.error('Error processing files:', error);
-      alert('Hubo un error al procesar los archivos.');
+      showError('Hubo un error al procesar los archivos');
     }
   };
 
@@ -366,7 +368,7 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
                   variant="ghost"
                   onClick={() => {
                     navigator.clipboard.writeText(createdTenantData.temporaryPassword);
-                    alert('Contraseña copiada al portapapeles');
+                    success('Contraseña copiada al portapapeles');
                   }}
                 >
                   📋 Copiar Contraseña

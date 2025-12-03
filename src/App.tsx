@@ -3,59 +3,58 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AppProvider } from '@/contexts/AppContext';
 import { SuperAdminProvider } from '@/contexts/SuperAdminContext';
+import { ToastProvider } from '@/contexts/ToastContext';
+import { ToastContainer } from '@/components/ui/ToastContainer';
+import { useToast } from '@/contexts/ToastContext';
 import { LoginPage } from '@/pages/LoginPage';
 import { LandlordPortal } from '@/portals/LandlordPortal';
 import { TenantPortal } from '@/portals/TenantPortal';
 import { SuperAdminPortal } from '@/portals/SuperAdminPortal';
 
+const ToastManager: React.FC = () => {
+  const { toasts, removeToast } = useToast();
+  return <ToastContainer toasts={toasts} onRemove={removeToast} />;
+};
+
 const AppContent: React.FC = () => {
   const { currentUser, isOwner, isTenant, isSuperAdmin } = useAuth();
 
-  if (!currentUser) {
-    return (
-      <ErrorBoundary>
-        <LoginPage />
-      </ErrorBoundary>
-    );
-  }
-
-  if (isSuperAdmin && currentUser.type === 'superadmin') {
-    return (
-      <ErrorBoundary>
-        <SuperAdminPortal superAdmin={currentUser.data} />
-      </ErrorBoundary>
-    );
-  }
-
-  if (isOwner && currentUser.type === 'owner') {
-    return (
-      <ErrorBoundary>
-        <LandlordPortal owner={currentUser.data} />
-      </ErrorBoundary>
-    );
-  }
-
-  if (isTenant && currentUser.type === 'tenant') {
-    return (
-      <ErrorBoundary>
-        <TenantPortal tenant={currentUser.data} />
-      </ErrorBoundary>
-    );
-  }
-
-  return null;
+  return (
+    <>
+      <ToastManager />
+      {!currentUser ? (
+        <ErrorBoundary>
+          <LoginPage />
+        </ErrorBoundary>
+      ) : isSuperAdmin && currentUser.type === 'superadmin' ? (
+        <ErrorBoundary>
+          <SuperAdminPortal superAdmin={currentUser.data} />
+        </ErrorBoundary>
+      ) : isOwner && currentUser.type === 'owner' ? (
+        <ErrorBoundary>
+          <LandlordPortal owner={currentUser.data} />
+        </ErrorBoundary>
+      ) : isTenant && currentUser.type === 'tenant' ? (
+        <ErrorBoundary>
+          <TenantPortal tenant={currentUser.data} />
+        </ErrorBoundary>
+      ) : null}
+    </>
+  );
 };
 
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <SuperAdminProvider>
-          <AppProvider>
-            <AppContent />
-          </AppProvider>
-        </SuperAdminProvider>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <SuperAdminProvider>
+            <AppProvider>
+              <AppContent />
+            </AppProvider>
+          </SuperAdminProvider>
+        </AuthProvider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 };

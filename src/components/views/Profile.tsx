@@ -12,6 +12,7 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { authAPI } from '@/services/api';
+import { useToast } from '@/contexts/ToastContext';
 
 interface ProfileProps {
   owner: Owner | Tenant;
@@ -65,6 +66,7 @@ const isOwner = (user: Owner | Tenant): user is Owner => {
 };
 
 export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
+  const { success, error: showError } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(owner);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -136,13 +138,13 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
         setIsEditing(false);
         setPhotoFile(null);
         setPhotoPreview(null);
-        alert('Perfil actualizado con éxito.');
+        success('Perfil actualizado con éxito');
       } else {
-        alert(`Error al actualizar perfil: ${result.error}`);
+        showError(result.error || 'Error al actualizar perfil');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Hubo un error al actualizar el perfil.');
+      showError('Hubo un error al actualizar el perfil');
     } finally {
       setLoading(false);
     }
@@ -159,12 +161,12 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      showError('Las contraseñas no coinciden');
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      alert('La contraseña debe tener al menos 8 caracteres');
+      showError('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -176,7 +178,7 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
       );
 
       if (result.success) {
-        alert('Contraseña actualizada con éxito');
+        success('Contraseña actualizada con éxito');
         setPasswordData({
           currentPassword: '',
           newPassword: '',
@@ -184,11 +186,11 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
         });
         setShowPasswordForm(false);
       } else {
-        alert(`Error al cambiar contraseña: ${result.error}`);
+        showError(result.error || 'Error al cambiar contraseña');
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      alert('Hubo un error al cambiar la contraseña');
+      showError('Hubo un error al cambiar la contraseña');
     } finally {
       setPasswordLoading(false);
     }
