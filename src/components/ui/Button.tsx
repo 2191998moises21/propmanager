@@ -13,6 +13,7 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md',
   children,
   icon,
+  className,
   ...props
 }) => {
   const baseClasses =
@@ -31,7 +32,10 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <button className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]}`} {...props}>
+    <button
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className || ''}`}
+      {...props}
+    >
       {icon && <span className="mr-2 -ml-1 h-5 w-5">{icon}</span>}
       {children}
     </button>

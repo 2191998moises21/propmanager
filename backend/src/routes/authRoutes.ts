@@ -8,6 +8,7 @@ import {
   registerOwnerSchema,
   registerTenantSchema,
   changePasswordSchema,
+  updateProfileSchema,
 } from '../validators/authValidators';
 
 const router = Router();
@@ -27,6 +28,12 @@ router.post(
 
 // Protected routes
 router.get('/profile', authenticate, asyncHandler(authController.getProfile));
+router.put(
+  '/profile',
+  authenticate,
+  validate(updateProfileSchema),
+  asyncHandler(authController.updateProfile)
+);
 router.post(
   '/change-password',
   authenticate,

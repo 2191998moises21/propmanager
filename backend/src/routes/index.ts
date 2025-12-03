@@ -7,6 +7,7 @@ import ticketRoutes from './ticketRoutes';
 import tenantRoutes from './tenantRoutes';
 import contractorRoutes from './contractorRoutes';
 import activityLogRoutes from './activityLogRoutes';
+import notificationRoutes from './notificationRoutes';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get('/health', (_, res) => {
       tenants: '/api/v1/tenants',
       contractors: '/api/v1/contractors',
       activityLogs: '/api/v1/activity-logs',
+      notifications: '/api/v1/notifications',
     },
   });
 });
@@ -38,5 +40,6 @@ router.use('/tickets', ticketRoutes);
 router.use('/tenants', tenantRoutes);
 router.use('/contractors', contractorRoutes);
 router.use('/activity-logs', activityLogRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;

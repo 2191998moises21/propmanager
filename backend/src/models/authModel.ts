@@ -70,20 +70,26 @@ export const createTenant = async (data: {
   email: string;
   password: string;
   telefono: string;
+  fotoUrl?: string;
+  documentoUrl?: string;
 }): Promise<Tenant> => {
   const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
 
+  // Use provided photo URL or default avatar
+  const fotoUrl = data.fotoUrl || `https://i.pravatar.cc/150?u=${data.email}`;
+
   const result = await pool.query(
-    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url, created_at, updated_at`,
+    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url, documento_id_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_id_url as "documentoUrl", created_at, updated_at`,
     [
       data.nombre_completo,
       data.documento_id,
       data.email,
       passwordHash,
       data.telefono,
-      `https://i.pravatar.cc/150?u=${data.email}`,
+      fotoUrl,
+      data.documentoUrl || null,
     ]
   );
 
@@ -126,4 +132,116 @@ export const updatePassword = async (
   }
 
   await pool.query(`UPDATE ${table} SET password_hash = $1 WHERE id = $2`, [passwordHash, userId]);
+};
+
+/**
+ * Update owner profile
+ */
+export const updateOwnerProfile = async (
+  userId: string,
+  data: {
+    nombre_completo?: string;
+    telefono?: string;
+    direccion?: string;
+    foto_url?: string;
+  }
+): Promise<Owner> => {
+  const fields: string[] = [];
+  const values: any[] = [];
+  let paramCounter = 1;
+
+  if (data.nombre_completo !== undefined) {
+    fields.push(`nombre_completo = $${paramCounter++}`);
+    values.push(data.nombre_completo);
+  }
+  if (data.telefono !== undefined) {
+    fields.push(`telefono = $${paramCounter++}`);
+    values.push(data.telefono);
+  }
+  if (data.direccion !== undefined) {
+    fields.push(`direccion = $${paramCounter++}`);
+    values.push(data.direccion);
+  }
+  if (data.foto_url !== undefined) {
+    fields.push(`foto_url = $${paramCounter++}`);
+    values.push(data.foto_url);
+  }
+
+  if (fields.length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  fields.push(`updated_at = CURRENT_TIMESTAMP`);
+  values.push(userId);
+
+  const query = `
+    UPDATE owners
+    SET ${fields.join(', ')}
+    WHERE id = $${paramCounter}
+    RETURNING id, nombre_completo, email, telefono, direccion, foto_url as "fotoUrl", created_at, updated_at
+  `;
+
+  const result = await pool.query(query, values);
+
+  if (result.rows.length === 0) {
+    throw new Error('Owner not found');
+  }
+
+  return result.rows[0];
+};
+
+/**
+ * Update tenant profile
+ */
+export const updateTenantProfile = async (
+  userId: string,
+  data: {
+    nombre_completo?: string;
+    telefono?: string;
+    foto_url?: string;
+    documento_id_url?: string;
+  }
+): Promise<Tenant> => {
+  const fields: string[] = [];
+  const values: any[] = [];
+  let paramCounter = 1;
+
+  if (data.nombre_completo !== undefined) {
+    fields.push(`nombre_completo = $${paramCounter++}`);
+    values.push(data.nombre_completo);
+  }
+  if (data.telefono !== undefined) {
+    fields.push(`telefono = $${paramCounter++}`);
+    values.push(data.telefono);
+  }
+  if (data.foto_url !== undefined) {
+    fields.push(`foto_url = $${paramCounter++}`);
+    values.push(data.foto_url);
+  }
+  if (data.documento_id_url !== undefined) {
+    fields.push(`documento_id_url = $${paramCounter++}`);
+    values.push(data.documento_id_url);
+  }
+
+  if (fields.length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  fields.push(`updated_at = CURRENT_TIMESTAMP`);
+  values.push(userId);
+
+  const query = `
+    UPDATE tenants
+    SET ${fields.join(', ')}
+    WHERE id = $${paramCounter}
+    RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_id_url as "documentoUrl", created_at, updated_at
+  `;
+
+  const result = await pool.query(query, values);
+
+  if (result.rows.length === 0) {
+    throw new Error('Tenant not found');
+  }
+
+  return result.rows[0];
 };

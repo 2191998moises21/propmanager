@@ -106,6 +106,19 @@ export const authAPI = {
       body: JSON.stringify({ currentPassword, newPassword }),
     });
   },
+
+  updateProfile: async (data: {
+    nombre_completo?: string;
+    telefono?: string;
+    direccion?: string;
+    foto_url?: string;
+    documento_id_url?: string;
+  }) => {
+    return fetchAPI('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 // Properties API
@@ -393,6 +406,36 @@ export const activityLogsAPI = {
   cleanup: async (daysToKeep?: number) => {
     const queryString = daysToKeep ? `?daysToKeep=${daysToKeep}` : '';
     return fetchAPI(`/activity-logs/cleanup${queryString}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Notifications API
+export const notificationsAPI = {
+  getNotifications: async (limit?: number) => {
+    const queryString = limit ? `?limit=${limit}` : '';
+    return fetchAPI(`/notifications${queryString}`);
+  },
+
+  getUnreadCount: async () => {
+    return fetchAPI('/notifications/unread-count');
+  },
+
+  markAsRead: async (id: string) => {
+    return fetchAPI(`/notifications/${id}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  markAllAsRead: async () => {
+    return fetchAPI('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
+
+  deleteNotification: async (id: string) => {
+    return fetchAPI(`/notifications/${id}`, {
       method: 'DELETE',
     });
   },

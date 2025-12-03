@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 
 interface TenantsProps {
   tenants: Tenant[];
-  addTenant: (tenant: Omit<Tenant, 'id'>) => void;
+  addTenant: (tenant: Omit<Tenant, 'id'>) => Promise<{ tenant: Tenant; temporaryPassword: string } | null>;
   updateTenant: (tenant: Tenant) => void;
 }
 
@@ -15,6 +15,7 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [createdTenantData, setCreatedTenantData] = useState<{ tenant: Tenant; temporaryPassword: string } | null>(null);
 
   useEffect(() => {
     if (!showAddForm) {
@@ -88,11 +89,14 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
 
       if (editingTenant) {
         updateTenant({ ...editingTenant, ...tenantData });
+        setShowAddForm(false);
       } else {
-        addTenant(tenantData);
+        const result = await addTenant(tenantData);
+        if (result) {
+          setCreatedTenantData(result);
+          setShowAddForm(false);
+        }
       }
-
-      setShowAddForm(false);
     } catch (error) {
       console.error('Error processing files:', error);
       alert('Hubo un error al procesar los archivos.');
@@ -249,81 +253,244 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Inquilinos</h1>
-        <Button variant="primary" onClick={handleAddNewClick}>
-          + Agregar Inquilino
-        </Button>
-      </div>
-      <Card>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+    <>
+      {/* Modal for showing created tenant details */}
+      {createdTenantData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-2xl font-bold text-green-600">
+                  ✓ Inquilino Creado Exitosamente
+                </h2>
+                <button
+                  onClick={() => setCreatedTenantData(null)}
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  Nombre
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Documento
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Contacto
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Editar</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {tenants.map((tenant) => (
-                <tr key={tenant.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img
-                          className="h-10 w-10 rounded-full object-cover"
-                          src={tenant.fotoUrl}
-                          alt={tenant.nombre_completo}
-                        />
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Profile Card */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-6">
+                <div className="flex items-center space-x-6">
+                  <img
+                    src={createdTenantData.tenant.fotoUrl}
+                    alt={createdTenantData.tenant.nombre_completo}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-800">
+                      {createdTenantData.tenant.nombre_completo}
+                    </h3>
+                    <p className="text-gray-600">{createdTenantData.tenant.email}</p>
+                    <p className="text-gray-600">{createdTenantData.tenant.telefono}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Documento de Identidad</p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {createdTenantData.tenant.documento_id}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Fecha de Creación</p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {new Date(createdTenantData.tenant.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Temporary Password - Highlighted */}
+              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                <div className="flex items-start">
+                  <svg
+                    className="w-6 h-6 text-yellow-600 mt-0.5 mr-3 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-yellow-900 mb-2">
+                      Contraseña Temporal
+                    </h4>
+                    <div className="bg-white rounded p-3 mb-3 border border-yellow-200">
+                      <code className="text-2xl font-mono font-bold text-gray-800 select-all">
+                        {createdTenantData.temporaryPassword}
+                      </code>
+                    </div>
+                    <p className="text-sm text-yellow-800">
+                      ⚠️ <strong>Importante:</strong> Comparta esta contraseña con el inquilino.
+                      El inquilino podrá cambiarla después de iniciar sesión por primera vez.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Document Preview */}
+              {createdTenantData.tenant.documentoUrl && (
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">Documento de Identidad</h4>
+                  <div className="border rounded-lg overflow-hidden">
+                    {createdTenantData.tenant.documentoUrl.startsWith('data:image') ? (
+                      <img
+                        src={createdTenantData.tenant.documentoUrl}
+                        alt="Documento de Identidad"
+                        className="w-full h-auto"
+                      />
+                    ) : (
+                      <div className="p-4 bg-gray-50 text-center">
+                        <p className="text-gray-600">Documento PDF adjunto</p>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {tenant.nombre_completo}
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    navigator.clipboard.writeText(createdTenantData.temporaryPassword);
+                    alert('Contraseña copiada al portapapeles');
+                  }}
+                >
+                  📋 Copiar Contraseña
+                </Button>
+                <Button variant="primary" onClick={() => setCreatedTenantData(null)}>
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Inquilinos</h1>
+          <Button variant="primary" onClick={handleAddNewClick} className="w-full sm:w-auto">
+            + Agregar Inquilino
+          </Button>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="grid grid-cols-1 gap-4 sm:hidden">
+          {tenants.map((tenant) => (
+            <Card key={tenant.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center flex-1">
+                  <img
+                    className="h-14 w-14 rounded-full object-cover flex-shrink-0"
+                    src={tenant.fotoUrl}
+                    alt={tenant.nombre_completo}
+                  />
+                  <div className="ml-4 flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-gray-900 truncate">
+                      {tenant.nombre_completo}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Doc: {tenant.documento_id}
+                    </p>
+                    <p className="text-sm text-gray-600 truncate">{tenant.email}</p>
+                    <p className="text-sm text-gray-600">{tenant.telefono}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleEditClick(tenant)}
+                  className="text-primary hover:text-blue-700 font-medium text-sm ml-2 flex-shrink-0"
+                >
+                  Editar
+                </button>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <Card className="hidden sm:block">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Nombre
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Documento
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Contacto
+                  </th>
+                  <th scope="col" className="relative px-6 py-3">
+                    <span className="sr-only">Editar</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {tenants.map((tenant) => (
+                  <tr key={tenant.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img
+                            className="h-10 w-10 rounded-full object-cover"
+                            src={tenant.fotoUrl}
+                            alt={tenant.nombre_completo}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {tenant.nombre_completo}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {tenant.documento_id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{tenant.email}</div>
-                    <div className="text-sm text-gray-500">{tenant.telefono}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleEditClick(tenant)}
-                      className="text-primary hover:text-blue-700"
-                    >
-                      Editar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-    </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {tenant.documento_id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{tenant.email}</div>
+                      <div className="text-sm text-gray-500">{tenant.telefono}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEditClick(tenant)}
+                        className="text-primary hover:text-blue-700"
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    </>
   );
 };

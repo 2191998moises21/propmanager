@@ -273,7 +273,7 @@ export const Properties: React.FC<PropertiesProps> = ({
   return (
     <div className="space-y-6">
       <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div className="flex-1">
             <input
               type="text"
@@ -283,11 +283,11 @@ export const Properties: React.FC<PropertiesProps> = ({
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="border-gray-300 rounded-md"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todos los estados</option>
               {Object.values(OccupancyStatus).map((status) => (
@@ -299,7 +299,7 @@ export const Properties: React.FC<PropertiesProps> = ({
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="border-gray-300 rounded-md"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">Todos los tipos</option>
               {Object.values(PropertyType).map((type) => (
@@ -308,10 +308,10 @@ export const Properties: React.FC<PropertiesProps> = ({
                 </option>
               ))}
             </select>
+            <Button variant="primary" onClick={() => setShowAddForm(true)} className="w-full sm:w-auto">
+              + Agregar Propiedad
+            </Button>
           </div>
-          <Button variant="primary" onClick={() => setShowAddForm(true)}>
-            + Agregar Propiedad
-          </Button>
         </div>
       </div>
 

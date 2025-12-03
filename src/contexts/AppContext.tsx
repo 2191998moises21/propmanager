@@ -291,7 +291,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // Tenant handlers
   const addTenant = useCallback(
-    async (tenant: Omit<Tenant, 'id'>): Promise<Tenant | null> => {
+    async (tenant: Omit<Tenant, 'id'>): Promise<{ tenant: Tenant; temporaryPassword: string } | null> => {
       try {
         const result = await tenantsAPI.createTenant(tenant);
 
@@ -301,12 +301,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
           setTenants((prev) => [...prev, newTenant]);
 
-          // Show success message with temporary password
-          success(
-            `Inquilino creado exitosamente.\n\nContraseña temporal: ${temporaryPassword}\n\nPor favor comparta esta contraseña con el inquilino.`
-          );
-
-          return newTenant;
+          return { tenant: newTenant, temporaryPassword };
         } else {
           showError(result.error || 'Error al crear inquilino');
           return null;
@@ -317,7 +312,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         return null;
       }
     },
-    [success, showError]
+    [showError]
   );
 
   const updateTenant = useCallback(

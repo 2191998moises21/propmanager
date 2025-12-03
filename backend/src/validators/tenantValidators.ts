@@ -79,14 +79,19 @@ export const createTenantSchema = z.object({
     email: z.string().email('Invalid email address').max(255),
     telefono: z
       .string()
-      .regex(/^\+?[\d\s-()]+$/, 'Invalid phone number format')
-      .min(7)
-      .max(50),
+      .min(7, 'Phone number must be at least 7 characters')
+      .max(50, 'Phone number must not exceed 50 characters')
+      .refine(
+        (value) => /^[\d\s\-+()]+$/.test(value),
+        { message: 'Phone number can only contain digits, spaces, dashes, parentheses, and plus sign' }
+      ),
     password: z
       .string()
       .min(6, 'Password must be at least 6 characters')
       .max(100)
       .optional(), // Optional - will be generated if not provided
+    fotoUrl: imageFileSchema.optional(), // Profile photo
+    documentoUrl: documentFileSchema.optional(), // ID document
   }),
 });
 

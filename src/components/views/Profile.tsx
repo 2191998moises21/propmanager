@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Owner } from '@/types';
+import { Owner, Tenant } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PencilIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import {
+  PencilIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  MapPinIcon,
+  CameraIcon,
+  KeyIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
+import { authAPI } from '@/services/api';
 
 interface ProfileProps {
-  owner: Owner;
-  onUpdate: (owner: Owner) => void;
+  owner: Owner | Tenant;
+  onUpdate: (owner: Owner | Tenant) => void;
 }
 
 const InfoRow: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({
@@ -17,8 +26,8 @@ const InfoRow: React.FC<{ icon: React.ReactNode; label: string; value: string }>
   <div>
     <label className="text-xs text-gray-500">{label}</label>
     <div className="flex items-center mt-1">
-      <span className="w-5 h-5 text-gray-400 mr-3">{icon}</span>
-      <p className="text-sm text-gray-800">{value}</p>
+      <span className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0">{icon}</span>
+      <p className="text-sm text-gray-800 break-words">{value}</p>
     </div>
   </div>
 );
@@ -37,7 +46,7 @@ const InputRow: React.FC<{
     </label>
     <div className="mt-1 relative rounded-md shadow-sm">
       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <span className="text-gray-500 w-5 h-5">{icon}</span>
+        <span className="text-gray-500 w-5 h-5 flex-shrink-0">{icon}</span>
       </div>
       <input
         type={type}
@@ -51,12 +60,29 @@ const InputRow: React.FC<{
   </div>
 );
 
+const isOwner = (user: Owner | Tenant): user is Owner => {
+  return 'direccion' in user;
+};
+
 export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(owner);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Password change state
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     setFormData(owner);
+    setPhotoPreview(null);
   }, [owner]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,42 +90,160 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    onUpdate(formData);
-    setIsEditing(false);
-    alert('Perfil actualizado con éxito.');
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      let foto_url = formData.fotoUrl;
+      if (photoFile) {
+        foto_url = await readFileAsDataURL(photoFile);
+      }
+
+      const updateData: any = {
+        nombre_completo: formData.nombre_completo,
+        telefono: formData.telefono,
+        foto_url,
+      };
+
+      if (isOwner(formData)) {
+        updateData.direccion = formData.direccion;
+      }
+
+      const result = await authAPI.updateProfile(updateData);
+
+      if (result.success && result.data) {
+        onUpdate(result.data);
+        setIsEditing(false);
+        setPhotoFile(null);
+        setPhotoPreview(null);
+        alert('Perfil actualizado con éxito.');
+      } else {
+        alert(`Error al actualizar perfil: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Hubo un error al actualizar el perfil.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setFormData(owner);
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setIsEditing(false);
   };
 
-  const handlePasswordChange = (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert('Funcionalidad para cambiar contraseña no implementada en esta demo.');
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      alert('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const result = await authAPI.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
+
+      if (result.success) {
+        alert('Contraseña actualizada con éxito');
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        setShowPasswordForm(false);
+      } else {
+        alert(`Error al cambiar contraseña: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Hubo un error al cambiar la contraseña');
+    } finally {
+      setPasswordLoading(false);
+    }
   };
+
+  const displayPhoto = photoPreview || formData.fotoUrl;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900">Mi Perfil</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mi Perfil</h1>
 
+      {/* Profile Header Card */}
       <Card>
-        <div className="p-4">
-          <div className="flex items-center space-x-5">
-            <img
-              className="h-24 w-24 rounded-full object-cover ring-4 ring-gray-200"
-              src={owner.fotoUrl}
-              alt={owner.nombre_completo}
-            />
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{owner.nombre_completo}</h2>
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5">
+            <div className="relative">
+              <img
+                className="h-24 w-24 rounded-full object-cover ring-4 ring-gray-200"
+                src={displayPhoto}
+                alt={owner.nombre_completo}
+              />
+              {isEditing && (
+                <label
+                  htmlFor="photo-upload"
+                  className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 shadow-lg"
+                  title="Cambiar foto"
+                >
+                  <CameraIcon className="h-4 w-4" />
+                  <input
+                    id="photo-upload"
+                    name="photo-upload"
+                    type="file"
+                    className="sr-only"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                  />
+                </label>
+              )}
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {owner.nombre_completo}
+              </h2>
               <p className="text-md text-gray-500">{owner.email}</p>
+              {!isOwner(owner) && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Doc: {(owner as Tenant).documento_id}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </Card>
 
+      {/* Personal Information Card */}
       <Card>
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Información Personal</h3>
@@ -108,16 +252,17 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
               variant="ghost"
               icon={<PencilIcon className="w-4 h-4" />}
               onClick={() => setIsEditing(true)}
+              size="sm"
             >
-              Editar
+              <span className="hidden sm:inline">Editar</span>
             </Button>
           )}
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {isEditing ? (
             <div className="space-y-4">
               <InputRow
-                icon={<PencilIcon />}
+                icon={<UserCircleIcon />}
                 label="Nombre Completo"
                 name="nombre_completo"
                 value={formData.nombre_completo}
@@ -138,81 +283,142 @@ export const Profile: React.FC<ProfileProps> = ({ owner, onUpdate }) => {
                 value={formData.telefono}
                 onChange={handleChange}
               />
-              <InputRow
-                icon={<MapPinIcon />}
-                label="Dirección"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-              />
-              <div className="flex justify-end space-x-3 pt-4">
-                <Button variant="ghost" onClick={handleCancel}>
+              {isOwner(formData) && (
+                <InputRow
+                  icon={<MapPinIcon />}
+                  label="Dirección"
+                  name="direccion"
+                  value={formData.direccion}
+                  onChange={handleChange}
+                />
+              )}
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
+                <Button variant="ghost" onClick={handleCancel} disabled={loading} className="w-full sm:w-auto">
                   Cancelar
                 </Button>
-                <Button variant="primary" onClick={handleSave}>
-                  Guardar Cambios
+                <Button variant="primary" onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
+                  {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InfoRow
-                icon={<PencilIcon />}
+                icon={<UserCircleIcon />}
                 label="Nombre Completo"
                 value={owner.nombre_completo}
               />
               <InfoRow icon={<EnvelopeIcon />} label="Email" value={owner.email} />
               <InfoRow icon={<PhoneIcon />} label="Teléfono" value={owner.telefono} />
-              <InfoRow icon={<MapPinIcon />} label="Dirección" value={owner.direccion} />
+              {isOwner(owner) && (
+                <InfoRow icon={<MapPinIcon />} label="Dirección" value={owner.direccion} />
+              )}
             </div>
           )}
         </div>
       </Card>
 
+      {/* Security Card */}
       <Card>
-        <div className="p-4 border-b">
+        <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Seguridad</h3>
-        </div>
-        <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
-          <div>
-            <label htmlFor="current_password" className="block text-sm font-medium text-gray-700">
-              Contraseña Actual
-            </label>
-            <input
-              type="password"
-              name="current_password"
-              id="current_password"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
-              Nueva Contraseña
-            </label>
-            <input
-              type="password"
-              name="new_password"
-              id="new_password"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">
-              Confirmar Nueva Contraseña
-            </label>
-            <input
-              type="password"
-              name="confirm_password"
-              id="confirm_password"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-            />
-          </div>
-          <div className="flex justify-end pt-2">
-            <Button variant="primary" type="submit">
-              Cambiar Contraseña
+          {!showPasswordForm && (
+            <Button
+              variant="ghost"
+              icon={<KeyIcon className="w-4 h-4" />}
+              onClick={() => setShowPasswordForm(true)}
+              size="sm"
+            >
+              <span className="hidden sm:inline">Cambiar Contraseña</span>
             </Button>
+          )}
+        </div>
+        {showPasswordForm ? (
+          <form onSubmit={handlePasswordChange} className="p-4 sm:p-6 space-y-4">
+            <div>
+              <label
+                htmlFor="current_password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Contraseña Actual
+              </label>
+              <input
+                type="password"
+                name="current_password"
+                id="current_password"
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData((prev) => ({ ...prev, currentPassword: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
+                Nueva Contraseña (mínimo 8 caracteres)
+              </label>
+              <input
+                type="password"
+                name="new_password"
+                id="new_password"
+                required
+                minLength={8}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))
+                }
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="confirm_password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Confirmar Nueva Contraseña
+              </label>
+              <input
+                type="password"
+                name="confirm_password"
+                id="confirm_password"
+                required
+                minLength={8}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                }
+              />
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => {
+                  setShowPasswordForm(false);
+                  setPasswordData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: '',
+                  });
+                }}
+                disabled={passwordLoading}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button variant="primary" type="submit" disabled={passwordLoading} className="w-full sm:w-auto">
+                {passwordLoading ? 'Cambiando...' : 'Cambiar Contraseña'}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="p-4 sm:p-6 text-center text-gray-500">
+            <KeyIcon className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+            <p className="text-sm">Haz clic en "Cambiar Contraseña" para actualizar tu contraseña</p>
           </div>
-        </form>
+        )}
       </Card>
     </div>
   );

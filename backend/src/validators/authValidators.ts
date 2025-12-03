@@ -38,3 +38,13 @@ export const changePasswordSchema = z.object({
     newPassword: z.string().min(8).max(128),
   }),
 });
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    nombre_completo: z.string().min(3).max(255).optional(),
+    telefono: z.string().min(7).max(50).optional(),
+    direccion: z.string().min(5).max(255).optional(),
+    foto_url: z.string().url().optional().or(z.string().startsWith('data:image')).optional(),
+    documento_id_url: z.string().url().optional().or(z.string().startsWith('data:')).optional(),
+  }),
+});

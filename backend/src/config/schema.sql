@@ -180,6 +180,20 @@ CREATE TABLE activity_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    user_role user_role NOT NULL,
+    tipo VARCHAR(50) NOT NULL, -- 'payment', 'ticket', 'contract', 'system', 'maintenance'
+    titulo VARCHAR(255) NOT NULL,
+    mensaje TEXT NOT NULL,
+    leido BOOLEAN DEFAULT FALSE,
+    url TEXT, -- Optional link to related resource
+    metadata JSONB, -- Additional data (payment_id, ticket_id, etc.)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ========================================
 -- INDEXES
 -- ========================================
@@ -217,6 +231,12 @@ CREATE INDEX idx_tickets_urgencia ON tickets(urgencia);
 CREATE INDEX idx_activity_logs_user_id ON activity_logs(user_id);
 CREATE INDEX idx_activity_logs_user_type ON activity_logs(user_type);
 CREATE INDEX idx_activity_logs_fecha ON activity_logs(fecha);
+
+-- Notifications
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_user_role ON notifications(user_role);
+CREATE INDEX idx_notifications_leido ON notifications(leido);
+CREATE INDEX idx_notifications_created_at ON notifications(created_at);
 
 -- ========================================
 -- TRIGGERS
