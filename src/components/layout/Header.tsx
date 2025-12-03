@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  BellIcon,
   Bars3Icon,
   UserIcon as UserIconSolid,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import { Owner, Tenant } from '@/types';
+import { NotificationBell } from '@/components/shared/NotificationBell';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -15,34 +15,16 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout, setView }) => {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const notificationsRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
-
-  // Notifications can be dynamic based on user role in a real app
-  const notifications = [
-    { id: 1, text: 'Nuevo pago recibido de Maria Rodriguez.', time: 'hace 5 min' },
-    { id: 2, text: 'Ticket "Fuga de agua" ha sido cerrado.', time: 'hace 1 hora' },
-    { id: 3, text: 'Contrato para Av. Libertador vence en 30 días.', time: 'hace 1 día' },
-  ];
-
-  const toggleNotifications = () => {
-    setNotificationsOpen((prev) => !prev);
-    setAccountOpen(false);
-  };
 
   const toggleAccount = () => {
     setAccountOpen((prev) => !prev);
-    setNotificationsOpen(false);
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setNotificationsOpen(false);
-      }
       if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
         setAccountOpen(false);
       }
@@ -70,58 +52,8 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar, user, onLogout, s
           </h1>
         </div>
         <div className="flex items-center space-x-4">
-          {/* Notifications Button & Dropdown */}
-          <div ref={notificationsRef} className="relative">
-            <button
-              onClick={toggleNotifications}
-              className="relative p-2 text-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-            >
-              <BellIcon className="h-6 w-6" />
-              <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
-            </button>
-            {notificationsOpen && (
-              <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                <div
-                  className="py-1"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
-                >
-                  <div className="px-4 py-2 border-b">
-                    <h3 className="text-sm font-semibold text-gray-800">Notificaciones</h3>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    {notifications.map((notif) => (
-                      <a
-                        key={notif.id}
-                        href="#"
-                        className="flex items-start px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          alert('Navegando a la notificación...');
-                          setNotificationsOpen(false);
-                        }}
-                      >
-                        <BellIcon className="w-5 h-5 mr-3 mt-0.5 text-primary flex-shrink-0" />
-                        <div>
-                          <p>{notif.text}</p>
-                          <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                  <div className="px-4 py-2 border-t">
-                    <a
-                      href="#"
-                      className="block text-center text-sm font-medium text-primary hover:underline"
-                    >
-                      Ver todas las notificaciones
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Notifications Bell */}
+          <NotificationBell userId={user.id} />
           {/* Account Button & Dropdown */}
           <div ref={accountRef} className="relative">
             <button
