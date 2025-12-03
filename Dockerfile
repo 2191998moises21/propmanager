@@ -18,9 +18,6 @@ RUN npm ci && \
 # Copy source code
 COPY . .
 
-# Copy .env.production for build
-COPY .env.production .env.production
-
 # Build application
 # Vite will automatically use .env.production in production mode
 RUN npm run build
