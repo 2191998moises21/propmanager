@@ -18,16 +18,11 @@ RUN npm ci && \
 # Copy source code
 COPY . .
 
+# Copy .env.production for build
+COPY .env.production .env.production
+
 # Build application
-# Note: Build args can be passed during docker build
-ARG VITE_API_URL
-ARG VITE_GCP_PROJECT_ID=propmanager-production-478716
-ARG VITE_ENV=production
-
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_GCP_PROJECT_ID=$VITE_GCP_PROJECT_ID
-ENV VITE_ENV=$VITE_ENV
-
+# Vite will automatically use .env.production in production mode
 RUN npm run build
 
 # Stage 2: Production with Nginx
