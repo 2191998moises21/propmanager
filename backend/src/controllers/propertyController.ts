@@ -51,7 +51,14 @@ export const createProperty = async (req: Request, res: Response): Promise<void>
     throw new ApiError('Only owners can create properties', 403);
   }
 
-  const property = await propertyModel.createProperty(req.user.id, req.body);
+  // Map imageUrl (camelCase from frontend) to image_url (snake_case for DB)
+  const propertyData = { ...req.body };
+  if (propertyData.imageUrl !== undefined) {
+    propertyData.image_url = propertyData.imageUrl;
+    delete propertyData.imageUrl;
+  }
+
+  const property = await propertyModel.createProperty(req.user.id, propertyData);
 
   logger.info('Property created:', { propertyId: property.id, ownerId: req.user.id });
 
@@ -79,7 +86,14 @@ export const updateProperty = async (req: Request, res: Response): Promise<void>
     throw new ApiError('Forbidden', 403);
   }
 
-  const updatedProperty = await propertyModel.updateProperty(id, req.body);
+  // Map imageUrl (camelCase from frontend) to image_url (snake_case for DB)
+  const updateData = { ...req.body };
+  if (updateData.imageUrl !== undefined) {
+    updateData.image_url = updateData.imageUrl;
+    delete updateData.imageUrl;
+  }
+
+  const updatedProperty = await propertyModel.updateProperty(id, updateData);
 
   logger.info('Property updated:', { propertyId: id });
 
