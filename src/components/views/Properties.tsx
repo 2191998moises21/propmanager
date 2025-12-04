@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Property, PropertyType, OccupancyStatus, Currency } from '@/types';
 import { PropertyCard } from '@/components/shared/PropertyCard';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/contexts/ToastContext';
 
 interface PropertiesProps {
   properties: Property[];
@@ -14,6 +15,7 @@ export const Properties: React.FC<PropertiesProps> = ({
   addProperty,
   onSelectProperty,
 }) => {
+  const { warning } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -47,7 +49,7 @@ export const Properties: React.FC<PropertiesProps> = ({
   const handleAddProperty = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!imagePreview) {
-      alert('Por favor, suba una imagen para la propiedad.');
+      warning('Por favor, suba una imagen para la propiedad');
       return;
     }
     const formData = new FormData(e.currentTarget);
