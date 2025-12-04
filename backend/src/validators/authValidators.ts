@@ -65,3 +65,15 @@ export const resetPasswordSchema = z.object({
       .max(128, 'Password is too long'),
   }),
 });
+
+export const refreshTokenSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().min(1, 'Refresh token is required'),
+  }),
+});
+
+export const logoutSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().optional(),
+  }),
+});
