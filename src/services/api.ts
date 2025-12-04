@@ -119,6 +119,20 @@ export const authAPI = {
       body: JSON.stringify(data),
     });
   },
+
+  forgotPassword: async (email: string, role: string) => {
+    return fetchAPI('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    return fetchAPI('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
 };
 
 // Properties API
