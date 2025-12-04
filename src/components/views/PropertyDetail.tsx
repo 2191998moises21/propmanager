@@ -3,6 +3,7 @@ import { Property, Contract, Tenant, OccupancyStatus, PropertyType, Currency } f
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { useToast } from '@/contexts/ToastContext';
 import {
   ArrowLeftIcon,
   MapPinIcon,
@@ -81,6 +82,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   updateProperty,
   deleteProperty,
 }) => {
+  const { error: showError } = useToast();
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Property>(property);
@@ -102,7 +104,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
 
   const handleDelete = () => {
     if (property.estado_ocupacion === OccupancyStatus.Ocupada) {
-      alert('No puede eliminar una propiedad que está actualmente ocupada.');
+      showError('No puede eliminar una propiedad que está actualmente ocupada');
       return;
     }
     if (

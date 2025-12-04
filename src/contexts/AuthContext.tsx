@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Owner, Tenant, SuperAdmin } from '@/types';
 import { STORAGE_KEYS } from '@/utils/constants';
+import { authAPI, clearAuthTokens, getRefreshToken } from '@/services/api';
 
 export type User =
   | { type: 'owner'; data: Owner }
@@ -43,10 +44,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const refreshToken = getRefreshToken();
+
+    // Call backend to revoke refresh token
+    if (refreshToken) {
+      try {
+        await authAPI.logout(refreshToken);
+      } catch (error) {
+        console.error('Error during logout:', error);
+        // Continue with logout even if backend call fails
+      }
+    }
+
+    // Clear local state and tokens
     setCurrentUser(null);
     localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    clearAuthTokens();
   }, []);
 
   const updateUser = useCallback((userData: Owner | Tenant | SuperAdmin) => {

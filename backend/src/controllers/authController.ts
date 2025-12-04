@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import * as authModel from '../models/authModel';
-import { generateToken, generateRefreshToken } from '../middleware/auth';
+import * as passwordResetModel from '../models/passwordResetModel';
+import * as refreshTokenModel from '../models/refreshTokenModel';
+import { generateToken, generateRefreshToken, verifyToken } from '../middleware/auth';
 import { UserRole, LoginRequest, LoginResponse } from '../types';
 import { ApiError } from '../middleware/errorHandler';
 import { logger } from '../config/logger';
+import { sendPasswordResetEmail } from '../services/emailService';
 
 /**
  * Login user
@@ -28,24 +31,21 @@ export const login = async (
     throw new ApiError('Invalid credentials', 401);
   }
 
-  // Generate tokens
+  // Generate access token (expires in 15 minutes)
   const token = generateToken({
     id: user.id,
     email: user.email,
     role,
   });
 
-  const refreshToken = generateRefreshToken({
-    id: user.id,
-    email: user.email,
-    role,
-  });
+  // Create and store refresh token (expires in 7 days)
+  const refreshTokenDoc = await refreshTokenModel.createRefreshToken(user.id, role);
 
   logger.info('User logged in:', { userId: user.id, role });
 
   const response: LoginResponse = {
     token,
-    refreshToken,
+    refreshToken: refreshTokenDoc.token,
     user: {
       id: user.id,
       email: user.email,
@@ -199,11 +199,14 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
   // Update password
   await authModel.updatePassword(req.user.id, newPassword, req.user.role);
 
-  logger.info('Password changed:', { userId: req.user.id });
+  // Revoke all refresh tokens for security (force re-login on all devices)
+  await refreshTokenModel.revokeAllUserTokens(req.user.id);
+
+  logger.info('Password changed and all tokens revoked:', { userId: req.user.id });
 
   res.json({
     success: true,
-    message: 'Password updated successfully',
+    message: 'Password updated successfully. Please log in again.',
   });
 };
 
@@ -242,5 +245,184 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
   res.json({
     success: true,
     data: updatedUser,
+  });
+};
+
+/**
+ * Forgot password - Send reset email
+ */
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email, role } = req.body;
+
+  // Find user
+  const user = await authModel.findUserByEmailAndRole(email, role);
+
+  // Always return success to prevent email enumeration
+  if (!user) {
+    logger.warn('Password reset requested for non-existent user:', { email, role });
+    res.json({
+      success: true,
+      message: 'Si el email existe, recibirás un enlace de recuperación',
+    });
+    return;
+  }
+
+  // Check if there's a recent token (rate limiting)
+  const recentToken = await passwordResetModel.findRecentTokenByEmail(email, 5);
+  if (recentToken) {
+    res.json({
+      success: true,
+      message: 'Si el email existe, recibirás un enlace de recuperación',
+    });
+    return;
+  }
+
+  // Create reset token
+  const resetToken = await passwordResetModel.createPasswordResetToken(user.id, role, email);
+
+  // Send email
+  const emailSent = await sendPasswordResetEmail(
+    email,
+    user.nombre_completo,
+    resetToken.token
+  );
+
+  if (!emailSent) {
+    logger.error('Failed to send password reset email:', { email });
+  }
+
+  logger.info('Password reset requested:', { userId: user.id, email });
+
+  res.json({
+    success: true,
+    message: 'Si el email existe, recibirás un enlace de recuperación',
+  });
+};
+
+/**
+ * Reset password with token
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, newPassword } = req.body;
+
+  // Find valid token
+  const resetToken = await passwordResetModel.findValidToken(token);
+
+  if (!resetToken) {
+    throw new ApiError('Token inválido o expirado', 400);
+  }
+
+  // Update password
+  await authModel.updatePassword(resetToken.user_id, newPassword, resetToken.user_role);
+
+  // Mark token as used
+  await passwordResetModel.markTokenAsUsed(resetToken.id);
+
+  // Delete all password reset tokens for this user
+  await passwordResetModel.deleteUserTokens(resetToken.user_id);
+
+  // Revoke all refresh tokens for security (force re-login on all devices)
+  await refreshTokenModel.revokeAllUserTokens(resetToken.user_id);
+
+  logger.info('Password reset successful and all tokens revoked:', { userId: resetToken.user_id });
+
+  res.json({
+    success: true,
+    message: 'Contraseña actualizada exitosamente. Por favor inicie sesión nuevamente.',
+  });
+};
+
+/**
+ * Refresh access token using refresh token
+ * Implements token rotation for security
+ */
+export const refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    throw new ApiError('Refresh token is required', 400);
+  }
+
+  // Find and validate refresh token
+  const tokenDoc = await refreshTokenModel.findValidRefreshToken(refreshToken);
+
+  if (!tokenDoc) {
+    throw new ApiError('Invalid or expired refresh token', 401);
+  }
+
+  // Get user to ensure they still exist
+  const user = await authModel.findUserByEmailAndRole(
+    tokenDoc.user_id,
+    tokenDoc.user_role
+  );
+
+  if (!user) {
+    // Revoke token if user doesn't exist
+    await refreshTokenModel.revokeRefreshToken(tokenDoc.id);
+    throw new ApiError('User not found', 404);
+  }
+
+  // Token Rotation: Revoke the old refresh token
+  await refreshTokenModel.revokeRefreshToken(tokenDoc.id);
+
+  // Generate new access token
+  const newAccessToken = generateToken({
+    id: user.id,
+    email: user.email,
+    role: tokenDoc.user_role,
+  });
+
+  // Generate new refresh token
+  const newRefreshTokenDoc = await refreshTokenModel.createRefreshToken(
+    user.id,
+    tokenDoc.user_role
+  );
+
+  logger.info('Tokens refreshed:', { userId: user.id, role: tokenDoc.user_role });
+
+  res.json({
+    success: true,
+    data: {
+      token: newAccessToken,
+      refreshToken: newRefreshTokenDoc.token,
+    },
+  });
+};
+
+/**
+ * Logout - Revoke refresh token
+ */
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  const { refreshToken } = req.body;
+
+  if (refreshToken) {
+    const tokenDoc = await refreshTokenModel.findValidRefreshToken(refreshToken);
+    if (tokenDoc) {
+      await refreshTokenModel.revokeRefreshToken(tokenDoc.id);
+      logger.info('User logged out:', { userId: tokenDoc.user_id });
+    }
+  }
+
+  res.json({
+    success: true,
+    message: 'Logged out successfully',
+  });
+};
+
+/**
+ * Logout from all devices - Revoke all refresh tokens for user
+ */
+export const logoutAll = async (req: Request, res: Response): Promise<void> => {
+  if (!req.user) {
+    throw new ApiError('Unauthorized', 401);
+  }
+
+  await refreshTokenModel.revokeAllUserTokens(req.user.id);
+
+  logger.info('User logged out from all devices:', { userId: req.user.id });
+
+  res.json({
+    success: true,
+    message: 'Logged out from all devices successfully',
   });
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BuildingOffice2Icon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -150,16 +151,12 @@ export const LoginPage: React.FC = () => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert('Funcionalidad de recuperación de contraseña próximamente');
-                }}
+              <Link
+                to="/forgot-password"
                 className="font-medium text-primary hover:text-blue-700"
               >
                 ¿Olvidó su contraseña?
-              </button>
+              </Link>
             </div>
           </div>
 

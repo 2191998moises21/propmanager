@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { authAPI } from '@/services/api';
 import { useApp } from '@/contexts/AppContext';
+import { useToast } from '@/contexts/ToastContext';
 
 interface TenantProfileViewProps {
   tenant: Tenant;
@@ -71,6 +72,7 @@ const InputRow: React.FC<{
 
 export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) => {
   const { updateTenant } = useApp();
+  const { success, error: showError } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(tenant);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -139,13 +141,13 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
         setIsEditing(false);
         setPhotoFile(null);
         setPhotoPreview(null);
-        alert('Perfil actualizado con éxito.');
+        success('Perfil actualizado con éxito');
       } else {
-        alert(`Error al actualizar perfil: ${result.error}`);
+        showError(result.error || 'Error al actualizar perfil');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Hubo un error al actualizar el perfil.');
+      showError('Hubo un error al actualizar el perfil');
     } finally {
       setLoading(false);
     }
@@ -162,12 +164,12 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      showError('Las contraseñas no coinciden');
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      alert('La contraseña debe tener al menos 8 caracteres');
+      showError('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -179,7 +181,7 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
       );
 
       if (result.success) {
-        alert('Contraseña actualizada con éxito');
+        success('Contraseña actualizada con éxito');
         setPasswordData({
           currentPassword: '',
           newPassword: '',
@@ -187,11 +189,11 @@ export const TenantProfileView: React.FC<TenantProfileViewProps> = ({ tenant }) 
         });
         setShowPasswordForm(false);
       } else {
-        alert(`Error al cambiar contraseña: ${result.error}`);
+        showError(result.error || 'Error al cambiar contraseña');
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      alert('Hubo un error al cambiar la contraseña');
+      showError('Hubo un error al cambiar la contraseña');
     } finally {
       setPasswordLoading(false);
     }

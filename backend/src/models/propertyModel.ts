@@ -2,7 +2,7 @@ import { pool } from '../config/database';
 import { Property } from '../types';
 
 /**
- * Get all properties for an owner
+ * Get all properties for an owner (without pagination - kept for backward compatibility)
  */
 export const getPropertiesByOwnerId = async (ownerId: string): Promise<Property[]> => {
   const result = await pool.query(
@@ -18,6 +18,42 @@ export const getPropertiesByOwnerId = async (ownerId: string): Promise<Property[
   );
 
   return result.rows;
+};
+
+/**
+ * Get properties for an owner with pagination
+ */
+export const getPropertiesByOwnerIdPaginated = async (
+  ownerId: string,
+  limit: number,
+  offset: number
+): Promise<{ properties: Property[]; total: number }> => {
+  // Get paginated properties
+  const propertiesResult = await pool.query(
+    `SELECT
+      id, owner_id, title, direccion, ciudad, estado, codigo_postal,
+      tipo_propiedad, area_m2, habitaciones, banos, estacionamientos,
+      precio_alquiler, moneda, estado_ocupacion, fecha_disponible,
+      deposito_requerido, amenidades,
+      image_url as "imageUrl",
+      created_at, updated_at
+    FROM properties
+    WHERE owner_id = $1
+    ORDER BY created_at DESC
+    LIMIT $2 OFFSET $3`,
+    [ownerId, limit, offset]
+  );
+
+  // Get total count
+  const countResult = await pool.query(
+    `SELECT COUNT(*) as count FROM properties WHERE owner_id = $1`,
+    [ownerId]
+  );
+
+  return {
+    properties: propertiesResult.rows,
+    total: parseInt(countResult.rows[0].count),
+  };
 };
 
 /**

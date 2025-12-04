@@ -2,6 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { Property, PropertyType, OccupancyStatus, Currency } from '@/types';
 import { PropertyCard } from '@/components/shared/PropertyCard';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
+import { useToast } from '@/contexts/ToastContext';
+import { usePagination } from '@/hooks/usePagination';
 
 interface PropertiesProps {
   properties: Property[];
@@ -14,6 +17,7 @@ export const Properties: React.FC<PropertiesProps> = ({
   addProperty,
   onSelectProperty,
 }) => {
+  const { warning } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -32,6 +36,18 @@ export const Properties: React.FC<PropertiesProps> = ({
     });
   }, [properties, searchTerm, statusFilter, typeFilter]);
 
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedProperties,
+    goToPage,
+    total,
+  } = usePagination({
+    items: filteredProperties,
+    itemsPerPage: 9, // 3x3 grid
+  });
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -47,7 +63,7 @@ export const Properties: React.FC<PropertiesProps> = ({
   const handleAddProperty = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!imagePreview) {
-      alert('Por favor, suba una imagen para la propiedad.');
+      warning('Por favor, suba una imagen para la propiedad');
       return;
     }
     const formData = new FormData(e.currentTarget);
@@ -316,15 +332,26 @@ export const Properties: React.FC<PropertiesProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProperties.map((property) => (
+        {paginatedProperties.map((property) => (
           <PropertyCard key={property.id} property={property} onSelect={onSelectProperty} />
         ))}
       </div>
+
       {filteredProperties.length === 0 && (
         <div className="text-center py-10">
           <h3 className="text-xl font-medium text-gray-800">No se encontraron propiedades</h3>
           <p className="text-gray-500 mt-2">Intenta ajustar tus filtros de búsqueda.</p>
         </div>
+      )}
+
+      {filteredProperties.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={goToPage}
+          total={total}
+          limit={9}
+        />
       )}
     </div>
   );

@@ -6,18 +6,46 @@ import { logger } from '../config/logger';
 
 /**
  * Get all properties for authenticated owner
+ * Supports optional pagination via query params: ?page=1&limit=10
  */
 export const getMyProperties = async (req: Request, res: Response): Promise<void> => {
   if (!req.user || req.user.role !== UserRole.Owner) {
     throw new ApiError('Only owners can access this endpoint', 403);
   }
 
-  const properties = await propertyModel.getPropertiesByOwnerId(req.user.id);
+  const { page, limit } = req.query;
 
-  res.json({
-    success: true,
-    data: properties,
-  });
+  // If pagination params provided, use paginated query
+  if (page || limit) {
+    const pageNum = parseInt((page as string) || '1');
+    const limitNum = parseInt((limit as string) || '20');
+    const offset = (pageNum - 1) * limitNum;
+
+    const { properties, total } = await propertyModel.getPropertiesByOwnerIdPaginated(
+      req.user.id,
+      limitNum,
+      offset
+    );
+
+    res.json({
+      success: true,
+      data: properties,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    });
+  } else {
+    // Backward compatibility: return all properties if no pagination params
+    const properties = await propertyModel.getPropertiesByOwnerId(req.user.id);
+
+    res.json({
+      success: true,
+      data: properties,
+    });
+  }
 };
 
 /**
