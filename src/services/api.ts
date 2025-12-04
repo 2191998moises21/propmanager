@@ -178,8 +178,12 @@ export const authAPI = {
 
 // Properties API
 export const propertiesAPI = {
-  getMyProperties: async () => {
-    return fetchAPI('/properties/my');
+  getMyProperties: async (page?: number, limit?: number) => {
+    const params = new URLSearchParams();
+    if (page) params.append('page', page.toString());
+    if (limit) params.append('limit', limit.toString());
+    const queryString = params.toString();
+    return fetchAPI(`/properties/my${queryString ? `?${queryString}` : ''}`);
   },
 
   getPropertyById: async (id: string) => {
