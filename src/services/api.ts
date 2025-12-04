@@ -5,19 +5,40 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
-// Get token from localStorage
+// Get access token from localStorage
 const getAuthToken = (): string | null => {
   return localStorage.getItem('authToken');
 };
 
-// Set token in localStorage
+// Set access token in localStorage
 export const setAuthToken = (token: string): void => {
   localStorage.setItem('authToken', token);
 };
 
-// Remove token from localStorage
+// Remove access token from localStorage
 export const removeAuthToken = (): void => {
   localStorage.removeItem('authToken');
+};
+
+// Get refresh token from localStorage
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem('refreshToken');
+};
+
+// Set refresh token in localStorage
+export const setRefreshToken = (token: string): void => {
+  localStorage.setItem('refreshToken', token);
+};
+
+// Remove refresh token from localStorage
+export const removeRefreshToken = (): void => {
+  localStorage.removeItem('refreshToken');
+};
+
+// Clear all auth tokens
+export const clearAuthTokens = (): void => {
+  removeAuthToken();
+  removeRefreshToken();
 };
 
 // Generic fetch wrapper with auth
@@ -131,6 +152,26 @@ export const authAPI = {
     return fetchAPI('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
+  refreshToken: async (refreshToken: string) => {
+    return fetchAPI('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+
+  logout: async (refreshToken: string) => {
+    return fetchAPI('/auth/logout', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+
+  logoutAll: async () => {
+    return fetchAPI('/auth/logout-all', {
+      method: 'POST',
     });
   },
 };

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth, User } from '@/contexts/AuthContext';
 import { Owner, Tenant } from '@/types';
-import { authAPI, setAuthToken } from '@/services/api';
+import { authAPI, setAuthToken, setRefreshToken } from '@/services/api';
 import { ERROR_MESSAGES } from '@/utils/constants';
 
 interface UseLoginReturn {
@@ -38,8 +38,11 @@ export const useLogin = (): UseLoginReturn => {
         const response = await authAPI.login(email, password, role);
 
         if (response.success && response.data) {
-          // Store JWT token
+          // Store access token and refresh token
           setAuthToken(response.data.token);
+          if (response.data.refreshToken) {
+            setRefreshToken(response.data.refreshToken);
+          }
 
           // Create user object
           const user: User = {
@@ -76,8 +79,11 @@ export const useLogin = (): UseLoginReturn => {
         });
 
         if (response.success && response.data) {
-          // Store JWT token
+          // Store access token and refresh token
           setAuthToken(response.data.token);
+          if (response.data.refreshToken) {
+            setRefreshToken(response.data.refreshToken);
+          }
 
           // Create user object
           const user: User = {
