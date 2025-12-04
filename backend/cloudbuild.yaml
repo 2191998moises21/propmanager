@@ -5,17 +5,17 @@
 
 steps:
   # Step 1: Build Docker image
-  # Contexto: backend/ (especificado en gcloud builds submit)
+  # Contexto: raíz del repositorio cuando se ejecuta desde GitHub
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-f'
-      - 'Dockerfile'
+      - 'backend/Dockerfile'
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:${_COMMIT_SHA}'
       - '-t'
       - 'gcr.io/$PROJECT_ID/propmanager-backend:latest'
-      - '.'
+      - 'backend/'
 
   # Step 2: Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
