@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as authModel from '../models/authModel';
 import * as passwordResetModel from '../models/passwordResetModel';
 import * as refreshTokenModel from '../models/refreshTokenModel';
-import { generateToken, generateRefreshToken, verifyToken } from '../middleware/auth';
+import { generateToken } from '../middleware/auth';
 import { UserRole, LoginRequest, LoginResponse } from '../types';
 import { ApiError } from '../middleware/errorHandler';
 import { logger } from '../config/logger';

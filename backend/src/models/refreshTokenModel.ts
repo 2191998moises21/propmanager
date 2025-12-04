@@ -1,4 +1,4 @@
-import pool from '../config/database';
+import { pool } from '../config/database';
 import crypto from 'crypto';
 import { UserRole } from '../types';
 
