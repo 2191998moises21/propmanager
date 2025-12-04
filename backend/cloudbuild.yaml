@@ -58,6 +58,8 @@ steps:
       - 'DB_PASSWORD=propmanager-db-password:latest'
       - '--update-secrets'
       - 'JWT_SECRET=jwt-secret:latest'
+      - '--update-secrets'
+      - 'JWT_REFRESH_SECRET=jwt-refresh-secret:latest'
 
 # Store images in Container Registry
 images:
