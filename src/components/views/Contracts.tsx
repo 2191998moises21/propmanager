@@ -60,8 +60,8 @@ export const Contracts: React.FC<ContractsProps> = ({
 
     const newContract = {
       title: `Contrato ${selectedProperty.title}`,
-      propertyId: propertyId,
-      tenantId: formData.get('tenantId') as string,
+      property_id: propertyId,
+      tenant_id: formData.get('tenantId') as string,
       fecha_inicio: formData.get('fecha_inicio') as string,
       fecha_fin: formData.get('fecha_fin') as string,
       monto_mensual: Number(formData.get('monto_mensual')),
