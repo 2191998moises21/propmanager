@@ -45,7 +45,7 @@ export const updateProfileSchema = z.object({
     telefono: z.string().min(7).max(50).optional(),
     direccion: z.string().min(5).max(255).optional(),
     foto_url: z.string().url().optional().or(z.string().startsWith('data:image')).optional(),
-    documento_id_url: z.string().url().optional().or(z.string().startsWith('data:')).optional(),
+    documento_url: z.string().url().optional().or(z.string().startsWith('data:')).optional(),
   }),
 });
 
