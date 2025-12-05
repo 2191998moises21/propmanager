@@ -9,7 +9,7 @@ echo "Checking Backend Logs (last 50 entries)"
 echo "========================================="
 echo ""
 
-gcloud run logs read propmanager-backend \
+gcloud run services logs read propmanager-backend \
     --project=propmanager-production-478716 \
     --region=us-central1 \
     --limit=50 \
@@ -21,7 +21,7 @@ echo "Filtering for ERROR entries only"
 echo "========================================="
 echo ""
 
-gcloud run logs read propmanager-backend \
+gcloud run services logs read propmanager-backend \
     --project=propmanager-production-478716 \
     --region=us-central1 \
     --limit=100 \
