@@ -79,9 +79,9 @@ export const createTenant = async (data: {
   const fotoUrl = data.fotoUrl || `https://i.pravatar.cc/150?u=${data.email}`;
 
   const result = await pool.query(
-    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url, documento_id_url)
+    `INSERT INTO tenants (nombre_completo, documento_id, email, password_hash, telefono, foto_url, documento_url)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
-     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_id_url as "documentoUrl", created_at, updated_at`,
+     RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_url as "documentoUrl", created_at, updated_at`,
     [
       data.nombre_completo,
       data.documento_id,
@@ -199,7 +199,7 @@ export const updateTenantProfile = async (
     nombre_completo?: string;
     telefono?: string;
     foto_url?: string;
-    documento_id_url?: string;
+    documento_url?: string;
   }
 ): Promise<Tenant> => {
   const fields: string[] = [];
@@ -218,9 +218,9 @@ export const updateTenantProfile = async (
     fields.push(`foto_url = $${paramCounter++}`);
     values.push(data.foto_url);
   }
-  if (data.documento_id_url !== undefined) {
-    fields.push(`documento_id_url = $${paramCounter++}`);
-    values.push(data.documento_id_url);
+  if (data.documento_url !== undefined) {
+    fields.push(`documento_url = $${paramCounter++}`);
+    values.push(data.documento_url);
   }
 
   if (fields.length === 0) {
@@ -234,7 +234,7 @@ export const updateTenantProfile = async (
     UPDATE tenants
     SET ${fields.join(', ')}
     WHERE id = $${paramCounter}
-    RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_id_url as "documentoUrl", created_at, updated_at
+    RETURNING id, nombre_completo, documento_id, email, telefono, foto_url as "fotoUrl", documento_url as "documentoUrl", created_at, updated_at
   `;
 
   const result = await pool.query(query, values);

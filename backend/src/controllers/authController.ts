@@ -218,7 +218,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     throw new ApiError('Unauthorized', 401);
   }
 
-  const { nombre_completo, telefono, direccion, foto_url, documento_id_url } = req.body;
+  const { nombre_completo, telefono, direccion, foto_url, documento_url } = req.body;
 
   let updatedUser;
 
@@ -234,7 +234,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       nombre_completo,
       telefono,
       foto_url,
-      documento_id_url,
+      documento_url,
     });
   } else {
     throw new ApiError('Unsupported user role', 400);

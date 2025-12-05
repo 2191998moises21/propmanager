@@ -104,7 +104,7 @@ export const updateTenantSchema = z.object({
       .optional(),
     direccion: z.string().min(5).max(500).optional(),
     foto_url: imageFileSchema.optional(),
-    documento_id_url: documentFileSchema.optional(),
+    documento_url: documentFileSchema.optional(),
     referencias_url: documentFileSchema.optional(),
     comprobante_ingresos_url: documentFileSchema.optional(),
   }),

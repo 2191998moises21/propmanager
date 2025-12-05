@@ -8,7 +8,7 @@ export const getAllTenants = async (): Promise<Tenant[]> => {
   const result = await pool.query(
     `SELECT id, nombre_completo, documento_id, email, telefono,
             foto_url as "fotoUrl",
-            documento_id_url as "documentoUrl",
+            documento_url as "documentoUrl",
             created_at, updated_at
      FROM tenants
      ORDER BY created_at DESC`
@@ -24,7 +24,7 @@ export const getTenantById = async (tenantId: string): Promise<Tenant | null> =>
   const result = await pool.query(
     `SELECT id, nombre_completo, documento_id, email, telefono,
             foto_url as "fotoUrl",
-            documento_id_url as "documentoUrl",
+            documento_url as "documentoUrl",
             created_at, updated_at
      FROM tenants
      WHERE id = $1`,
@@ -69,7 +69,7 @@ export const updateTenant = async (
     `UPDATE tenants SET ${fields.join(', ')} WHERE id = $${paramCounter}
      RETURNING id, nombre_completo, documento_id, email, telefono,
                foto_url as "fotoUrl",
-               documento_id_url as "documentoUrl",
+               documento_url as "documentoUrl",
                created_at, updated_at`,
     values
   );
