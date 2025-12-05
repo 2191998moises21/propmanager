@@ -91,12 +91,13 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
 
       if (editingTenant) {
         updateTenant({ ...editingTenant, ...tenantData });
+        success('Inquilino actualizado exitosamente');
         setShowAddForm(false);
       } else {
         const result = await addTenant(tenantData);
         if (result) {
           setCreatedTenantData(result);
-          setShowAddForm(false);
+          // NO cerrar el formulario aquí - se cierra cuando el usuario cierre el modal
         }
       }
     } catch (error) {
@@ -266,7 +267,10 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
                   ✓ Inquilino Creado Exitosamente
                 </h2>
                 <button
-                  onClick={() => setCreatedTenantData(null)}
+                  onClick={() => {
+                    setCreatedTenantData(null);
+                    setShowAddForm(false);
+                  }}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,7 +377,10 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
                 >
                   📋 Copiar Contraseña
                 </Button>
-                <Button variant="primary" onClick={() => setCreatedTenantData(null)}>
+                <Button variant="primary" onClick={() => {
+                  setCreatedTenantData(null);
+                  setShowAddForm(false);
+                }}>
                   Cerrar
                 </Button>
               </div>
