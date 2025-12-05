@@ -93,7 +93,7 @@ export const getTenantsByOwnerId = async (ownerId: string): Promise<Tenant[]> =>
   const result = await pool.query(
     `SELECT DISTINCT t.id, t.nombre_completo, t.documento_id, t.email, t.telefono,
             t.foto_url as "fotoUrl",
-            t.documento_id_url as "documentoUrl",
+            t.documento_url as "documentoUrl",
             t.created_at, t.updated_at
      FROM tenants t
      JOIN contracts c ON t.id = c.tenant_id
