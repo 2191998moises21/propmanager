@@ -18,14 +18,14 @@ echo ""
 echo "📋 Configuration:"
 echo "   Project: $PROJECT_ID"
 echo "   Region: $REGION"
-echo "   Build Config: backend/cloudbuild-manual.yaml"
+echo "   Build Config: backend/cloudbuild.yaml"
 echo ""
 
 # Confirm current directory
-if [ ! -f "backend/cloudbuild-manual.yaml" ]; then
+if [ ! -f "backend/cloudbuild.yaml" ]; then
     echo "❌ Error: Must run this script from the repository root"
     echo "   Current directory: $(pwd)"
-    echo "   Expected file: backend/cloudbuild-manual.yaml"
+    echo "   Expected file: backend/cloudbuild.yaml"
     exit 1
 fi
 
@@ -48,14 +48,12 @@ fi
 echo ""
 echo "🔄 Submitting build to Cloud Build..."
 echo ""
-echo "ℹ️  Note: Submitting from backend/ directory to avoid .gcloudignore conflicts"
+echo "ℹ️  Note: .gcloudignore has been fixed to NOT exclude backend/"
 echo ""
 
-# Change to backend directory and submit build
-# This avoids the root .gcloudignore which excludes backend/
-cd backend
+# Submit build from repository root using backend/cloudbuild.yaml
 gcloud builds submit \
-    --config=cloudbuild-manual.yaml \
+    --config=backend/cloudbuild.yaml \
     --project=$PROJECT_ID \
     --substitutions=_COMMIT_SHA="$COMMIT_SHA" \
     .
