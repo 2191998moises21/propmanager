@@ -29,5 +29,8 @@ coverage/
 **/*.test.tsx
 **/*.spec.tsx
 
-# Backend directory (no necesario para frontend)
-backend/
+# NOTA: NO excluir backend/ aquí porque:
+# - Este .gcloudignore se usa cuando haces submit desde la raíz
+# - Si excluyes backend/, los builds del backend fallan
+# - Cada componente (frontend/backend) tiene su propio .gcloudignore
+# backend/

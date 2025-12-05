@@ -48,12 +48,15 @@ fi
 echo ""
 echo "🔄 Submitting build to Cloud Build..."
 echo ""
+echo "ℹ️  Note: .gcloudignore has been fixed to NOT exclude backend/"
+echo ""
 
-# Submit build from repository root with backend cloudbuild.yaml
+# Submit build from repository root using backend/cloudbuild.yaml
 gcloud builds submit \
     --config=backend/cloudbuild.yaml \
     --project=$PROJECT_ID \
-    --substitutions=_COMMIT_SHA="$COMMIT_SHA"
+    --substitutions=_COMMIT_SHA="$COMMIT_SHA" \
+    .
 
 if [ $? -eq 0 ]; then
     echo ""
