@@ -90,7 +90,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, updateUser } = useAuth();
   const { success, error: showError } = useToast();
 
   // State
@@ -322,6 +322,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         if (result.success) {
           setTenants((prev) => prev.map((t) => (t.id === updatedTenant.id ? updatedTenant : t)));
+
+          // Update the current user in AuthContext if this is the logged-in tenant
+          if (currentUser?.type === 'tenant' && currentUser.data.id === updatedTenant.id) {
+            updateUser(updatedTenant);
+          }
+
           success('Inquilino actualizado exitosamente');
         } else {
           showError(result.error || 'Error al actualizar inquilino');
@@ -331,7 +337,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         showError(errorMsg);
       }
     },
-    [success, showError]
+    [success, showError, currentUser, updateUser]
   );
 
   // Contract handlers
@@ -676,9 +682,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // Note: There's no update owner endpoint in the API
       // This would typically be done via profile update
       setOwners((prev) => prev.map((o) => (o.id === updatedOwner.id ? updatedOwner : o)));
+
+      // Update the current user in AuthContext if this is the logged-in owner
+      if (currentUser?.type === 'owner' && currentUser.data.id === updatedOwner.id) {
+        updateUser(updatedOwner);
+      }
+
       success('Propietario actualizado exitosamente');
     },
-    [success]
+    [success, currentUser, updateUser]
   );
 
   const value: AppContextType = {

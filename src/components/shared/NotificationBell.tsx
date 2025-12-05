@@ -129,15 +129,18 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ userId, clas
 
   // Polling for new notifications
   useEffect(() => {
+    // Only fetch if userId exists
+    if (!userId) return;
+
     fetchUnreadCount();
 
-    // Poll every 30 seconds
+    // Poll every 60 seconds (increased from 30 to reduce load)
     const interval = setInterval(() => {
       fetchUnreadCount();
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(interval);
-  }, [userId]);
+  }, []); // Empty dependencies - only run once on mount
 
   // Format time ago
   const formatTimeAgo = (dateString: string): string => {
