@@ -502,6 +502,5 @@ export const Tenants: React.FC<TenantsProps> = ({ tenants, addTenant, updateTena
           </div>
         </Card>
       </div>
-    </>
   );
 };
